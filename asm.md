@@ -80,14 +80,14 @@ Low-endian architecture, 16-bit address space
 | **5x** | AWR W0 | | AWR W2 | | AWR W4 | | AWR W6 | | SWR W0 | | SWR W2 | | SWR W4 | | SWR W6 | |
 | **6x** | BAWR W0 | | BAWR W2 | | BAWR W4 | | BAWR W6 | | BOWR W0 | | BOWR W2 | | BOWR W4 | | BOWR W6 |
 | **7x** | BXWR W0 | | BXWR W2 | | BXWR W4 | | BXWR W6 | | XWR W0 | | XWR W2 | | XWR W4 | | XWR W6 |
-| **8x** | ?LBR B0 | LBR B1 | LBR B2 | LBR B3 | LBR B4 | LBR B5 | LBR B6 | LBR B7 | ?STBR B0 | STBR B1 | STBR B2 | STBR B3 | STBR B4 | STBR B5 | STBR B6 | STBR B7 |
+| **8x** | LBI | LBV Byte | ABC | SBC | RBL | RBR | CPLB | TESTB | STBI | NOP | IFC 0 | IFC 1 | IFZ 0 | IFZ 1 | IFS 0 | IFS 1 |
 | **9x** | RABR B0 | RABR B1 | RABR B2 | RABR B3 | RABR B4 | RABR B5 | RABR B6 | RABR B7 | RSBR B0 | RSBR B1 | RSBR B2 | RSBR B3 | RSBR B4 | RSBR B5 | RSBR B6 | RSBR B7 |
 | **Ax** | RBABR B0 | RBABR B1 | RBABR B2 | RBABR B3 | RBABR B4 | RBABR B5 | RBABR B6 | RBABR B7 | RBOBR B0 | RBOBR B1 | RBOBR B2 | RBOBR B3 | RBOBR B4 | RBOBR B5 | RBOBR B6 | RBOBR B7 |
-| **Bx** | RBXBR B0 | RBXBR B1 | RBXBR B2 | RBXBR B3 | RBXBR B4 | RBXBR B5 | RBXBR B6 | RBXBR B7 | ?XBR B0 | XBR B1 | XBR B2 | XBR B3 | XBR B4 | XBR B5 | XBR B6 | XBR B7 |
-| **Cx** | ?LWR W0 | | LWR W2 | | LWR W4 | | LWR W6 | | ARWR W0 | | ARWR W2 | | ARWR W4 | | ARWR W6 | |
+| **Bx** | RBXBR B0 | RBXBR B1 | RBXBR B2 | RBXBR B3 | RBXBR B4 | RBXBR B5 | RBXBR B6 | RBXBR B7 | ARA | ARV Word | LPS | STPS | | | IN | OUT |
+| **Cx** | LWI | LWV Word | AWC | SWC | RWL | RWR | CPLW | TESTW | STWI | JMP | LSP | STSP | PUSH | POP | CALL | RET |
 | **Dx** | RAWR W0 | | RAWR W2 | | RAWR W4 | | RAWR W6 | | RSWR W0 | | RSWR W2 | | RSWR W4 | | RSWR W6 | |
 | **Ex** | RBAWR W0 | | RBAWR W2 | | RBAWR W4 | | RBAWR W6 | | RBOWR W0 | | RBOWR W2 | | RBOWR W4 | | RBOWR W6 |
-| **Fx** | RBXWR W0 | | RBXWR W2 | | RBXWR W4 | | RBXWR W6 | | ?XWR W0 | | XWR W2 | | XWR W4 | | XWR W6 |
+| **Fx** | RBXWR W0 | | RBXWR W2 | | RBXWR W4 | | RBXWR W6 |  | ARWR W0 | | ARWR W2 | | ARWR W4 | | ARWR W6 | |
 
 
 
