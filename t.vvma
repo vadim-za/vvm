@@ -1,0 +1,66 @@
+; shift left A
+    zxwx
+    rol
+
+; shift right A
+    zxwx
+    ror
+
+; shift right LSB(A)
+    zxbw
+    rol
+
+; arithmetic shift right A
+    sxwx
+    ror
+
+; arithmetic shift right LSB(A)
+    sxbw
+    sxwx
+    ror
+
+; rotate right A
+    cxwx
+    ror
+
+; rotate left A
+    cxwx
+    rol
+
+; rotate right LSB(A)
+    cxbw
+    ror
+
+; rotate left LSB(A)
+    cxbw
+    rol
+
+; -----------------------------
+
+    ; w0 = call address for OS
+    lwr w0
+    arv Exit+1
+    stwi
+
+    lwv Hello
+    stwr w2 ; w2 = ptr
+Loop:
+    arwr w2
+    lbi
+    arv Exit
+    ifzb
+        jmp
+    arv 0 ; conout
+    out
+    lwv 1
+    lwr w2
+    add ; w2 = w2+1
+    stwr w2
+    arv Loop
+    jmp
+Exit:
+    arv 0
+    lwv 0
+    jmp
+
+Hello:  db 'Hello world!',0
