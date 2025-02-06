@@ -75,8 +75,8 @@ Low-endian architecture, 16-bit address space
 | **0x** | LBR B0 | LBR B1 | LBR B2 | LBR B3 | LBR B4 | LBR B5 | LBR B6 | LBR B7 | LWR W0 | LWR W1 | LWR W2 | LWR W3
 | **1x** | STBR B0 | STBR B1 | STBR B2 | STBR B3 | STBR B4 | STBR B5 | STBR B6 | STBR B7 | STWR W0 | STWR W1 | STWR W2 | STWR W3 
 | **2x** | XBR B0 | XBR B1 | XBR B2 | XBR B3 | XBR B4 | XBR B5 | XBR B6 | XBR B7 | XWR W0 | XWR W1 | XWR W2 | XWR W3 
-| **3x** | IF7 0 | IF7 1 | IF8 0 | IF8 1 | IFZB | IFNZB | SXBW | ZXBW | IF15 0 | IF15 1 | IF16 0 | IF16 1 | IFZW | IFNZW | SXWX | ZXWX |
+| **3x** | JIF7 0 | JIF7 1 | JIF8 0 | JIF8 1 | JIFZB | JIFNZB | | | JIF15 0 | JIF15 1 | JIF16 0 | JIF16 1 | JIFZW | JIFNZW |
 | **4x** | ADD | SUB |  AND | OR | XOR | JMP | CALL | RET | ARWR W0 | ARWR W1 | ARWR W2 | ARWR W3
-| **5x** | ADDC | SUBC | ZERO | ALL | CPL | XHL | CXBW | AXBW | ROL | ROR | | | | XA | CXWX | AXWX
+| **5x** | ADDC8 | SUBC8 | ZERO | ALL | CPL | XHL | | | ADDC16 | SUBC16 | ROL | ROR | NOP | XA |
 | **6x** | LBI | LBV Byte | IN | | | | | | LWI | LWV Word | LSP | POP
-| **7x** | STBI | ARA | OUT | | | | | | STWI | ARV Word | STSP | PUSH
+| **7x** | STBI | ARA | OUT | | SXBW | CXBW | ZXBW | AXBW | STWI | ARV Word | STSP | PUSH | SXWX | CXWX | ZXWX | AXWX

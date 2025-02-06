@@ -35,6 +35,17 @@
     cxbw
     rol
 
+; shift right two connected bytes b1:b0
+    lbr b1
+    zxbw
+    ror ; bit31 = carry
+    stbr b1
+    rol ; bit0 = carry
+    cxbw ; bit8 = carry
+    lbr b0
+    ror ; shift in carry
+    stbr b0
+
 ; -----------------------------
 
     ; w0 = call address for OS
@@ -48,11 +59,11 @@ Loop:
     arwr w2
     lbi
     arv Exit
-    ifzb
-        jmp
+    jifzb
     arv 0 ; conout
     out
     lwv 1
+    xa
     lwr w2
     add ; w2 = w2+1
     stwr w2
