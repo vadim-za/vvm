@@ -13,29 +13,29 @@ Low-endian architecture, 16-bit address space
 | 00001nnn | STBR Bn | STore to Byte Register | Bn:=LSB(A) |
 | 00010nnn | ABR Bn | Add Byte Register | LSB(A):=LSB(A)+Bn, update ZF,SF,CF |
 | 00011nnn | SBR Bn | Subtract Byte Register | LSB(A):=LSB(A)-Bn, update ZF,SF,CF |
-| 00100nnn | BABR Bn | Bitwise-And Byte Register | LSB(A):=LSB(A)&Bn, update ZF,SF,CF |
-| 00101nnn | BOBR Bn | Bitwise-Or Byte Register | LSB(A):=LSB(A)\|Bn, update ZF,SF,CF |
-| 00110nnn | BXBR Bn | Bitwise-Xor Byte Register | LSB(A):=LSB(A)^Bn, update ZF,SF,CF |
+| 00100nnn | BABR Bn | Bitwise-And Byte Register | LSB(A):=LSB(A)&Bn, CF:=0, update ZF,SF |
+| 00101nnn | BOBR Bn | Bitwise-Or Byte Register | LSB(A):=LSB(A)\|Bn, CF:=0, update ZF,SF |
+| 00110nnn | BXBR Bn | Bitwise-Xor Byte Register | LSB(A):=LSB(A)^Bn, CF:=0, update ZF,SF |
 | 00111nnn | XBR Bn | eXchange Byte Register | LSB(A)<->Bn |
-| 01000nn0 | LWR Wn | | |
-| 010001nn | STWR Wn | | |
-| 010010nn | AWR Wn | | |
-| 010011nn | SWR Wn | | |
-| 010100nn | BAWR Wn | | |
-| 010101nn | BOWR Wn | | |
-| 010110nn | BXWR Wn | | |
-| 010111nn | XWR Wn | | |
-| ... | ... | | |
-| ... | LBI | Load Byte Indirect | LSB(A):=[ADDR] |
+| 010000nn | LWR Wn | Load from Word Register | A:=Wn, update ZF,SF,CF |
+| 010010nn | STWR Wn | STore to Word Register | Wn:=A, update ZF,SF,CF |
+| 010100nn | AWR Wn | Add Word Register | A:=A+Wn, update ZF,SF,CF |
+| 010110nn | SWR Wn | Subtract Word Register | A:=A-Wn, update ZF,SF,CF |
+| 011000nn | BAWR Wn | Bitwise-And Word Register | A:=A&Wn, CF:=0, update ZF,SF |
+| 011010nn | BOWR Wn | Bitwise-Or Word Register | A:=A\|Wn, CF:=0, update ZF,SF |
+| 011100nn | BXWR Wn | Bitwise-Xor Word Register | A:=A^Wn, CF:=0, update ZF,SF |
+| 011110nn | XWR Wn | eXchange Word Register | A<->Wn |
+| 10000000 | LBI | Load Byte Indirect | LSB(A):=[ADDR] |
+| 10000001 | LBV ByteValue | Load Byte Value | LSB(A):=ByteValue |
+| 10000010 | ABC | Add Byte Carry | LSB(A):=LSB(A)+CF, update ZF,SF,CF |
+| 10000011 | SBC | Subtract Byte Carry | LSB(A):=LSB(A)-CF, update ZF,SF,CF |
+| 10000100 | RBL | Rotate Byte Left | (CF:LSB(A)):=RotL(CF:LSB(A)), update SF,ZF |
+| 10000101 | RBR | Rotate Byte Right | (CF:LSB(A)):=RotR(CF:LSB(A)), update SF,ZF |
+| 10000110 | CPLB | Complement Byte | LSB(A):=~LSB(A), CF:=0, update ZF,SF |
 | ... | STBI | STore Byte Indirect | [ADDR]:=LSB(A) |
-| ... | TESTB | set flags according to accumulator Byte | update ZF,SF |
+| ... | TESTB | set flags according to accumulator Byte | update ZF,SF,CF |
 | ... | ZB | Zero accumulator Byte | LSB(A):=0 |
-| ... | ABC | Add Byte Carry | LSB(A):=LSB(A)+CF, update PSB |
-| ... | SBC | Subtract Byte Carry | LSB(A):=LSB(A)-CF, update PSB |
-| ... | RBL | Rotate Byte Left | (CF:LSB(A)):=RotL(CF:LSB(A)), update SF,ZF |
-| ... | RBR | Rotate Byte Right | (CF:LSB(A)):=RotR(CF:LSB(A)), update SF,ZF |
 | ... | SXBC | Sign eXtend Byte to Carry | CF:=Bit7(A) |
-| ... | LBV ByteValue | Load Byte Value | LSB(A):=ByteValue |
 | ... | ... | | |
 | ... | LWI | Load Word Indirect | A:=[ADDR] |
 | ... | STWI | STore Word Indirect | [ADDR]:=A |
