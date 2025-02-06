@@ -3,21 +3,21 @@ Low-endian architecture, 16-bit address space
 | Entity kind | Instances |
 | ----------- | --------- |
 | Byte registers | B0, B1, B2, B3, B4, B5, B6, B7 |
-| Word (2-byte) registers | W0, W2, W4, W6 (where W0=B1:B0, W2=B3:B2, W4=B5:B4, W6=B7:B6) |
+| Word (2-byte) registers | W0, W1, W2, W3 (where W0=B1:B0, W1=B3:B2, W2=B5:B4, W3=B7:B6) |
 | Additional byte registers | PSB (processor status byte) |
-| Additional word registers | SP, PC, A (accumulator), ADDR (address register) |
+| Additional word registers | PS, PC, A (accumulator), ADDR (address register) |
 
 | Code | Command | Deciphering | Description |
 | ---- | ------- | ----------- | ----------- |
 | 00000nnn | LBR Bn | Load from Byte Register | LSB(A):=Bn |
 | 00001nnn | STBR Bn | STore to Byte Register | Bn:=LSB(A) |
-| 00010nnn | ABR Bn | Add Byte Register | LSB(A):=LSB(A)+Bn, update PSB |
-| 00011nnn | SBR Bn | Subtract Byte Register | LSB(A):=LSB(A)-Bn, update PSB |
-| 00100nnn | BABR Bn | Bitwise-And Byte Register | LSB(A):=LSB(A)&Bn, update ZF,SF |
-| 00101nnn | BOBR Bn | Bitwise-Or Byte Register | LSB(A):=LSB(A)\|Bn, update ZF,SF |
-| 00110nnn | BXBR Bn | Bitwise-Xor Byte Register | LSB(A):=LSB(A)^Bn, update ZF,SF |
+| 00010nnn | ABR Bn | Add Byte Register | LSB(A):=LSB(A)+Bn, update ZF,SF,CF |
+| 00011nnn | SBR Bn | Subtract Byte Register | LSB(A):=LSB(A)-Bn, update ZF,SF,CF |
+| 00100nnn | BABR Bn | Bitwise-And Byte Register | LSB(A):=LSB(A)&Bn, update ZF,SF,CF |
+| 00101nnn | BOBR Bn | Bitwise-Or Byte Register | LSB(A):=LSB(A)\|Bn, update ZF,SF,CF |
+| 00110nnn | BXBR Bn | Bitwise-Xor Byte Register | LSB(A):=LSB(A)^Bn, update ZF,SF,CF |
 | 00111nnn | XBR Bn | eXchange Byte Register | LSB(A)<->Bn |
-| 010000nn | LWR Wn | | |
+| 01000nn0 | LWR Wn | | |
 | 010001nn | STWR Wn | | |
 | 010010nn | AWR Wn | | |
 | 010011nn | SWR Wn | | |
@@ -76,28 +76,15 @@ Low-endian architecture, 16-bit address space
 | **1x** | ABR B0 | ABR B1 | ABR B2 | ABR B3 | ABR B4 | ABR B5 | ABR B6 | ABR B7 | SBR B0 | SBR B1 | SBR B2 | SBR B3 | SBR B4 | SBR B5 | SBR B6 | SBR B7 |
 | **2x** | BABR B0 | BABR B1 | BABR B2 | BABR B3 | BABR B4 | BABR B5 | BABR B6 | BABR B7 | BOBR B0 | BOBR B1 | BOBR B2 | BOBR B3 | BOBR B4 | BOBR B5 | BOBR B6 | BOBR B7 |
 | **3x** | BXBR B0 | BXBR B1 | BXBR B2 | BXBR B3 | BXBR B4 | BXBR B5 | BXBR B6 | BXBR B7 | XBR B0 | XBR B1 | XBR B2 | XBR B3 | XBR B4 | XBR B5 | XBR B6 | XBR B7 |
-| **4x** | LWR W0 | | LWR W2 | | LWR W4 | | LWR W6 | | STWR W0 | | STWR W2 | | STWR W4 | | STWR W6 | |
-| **5x** | AWR W0 | | AWR W2 | | AWR W4 | | AWR W6 | | SWR W0 | | SWR W2 | | SWR W4 | | SWR W6 | |
-| **6x** | BAWR W0 | | BAWR W2 | | BAWR W4 | | BAWR W6 | | BOWR W0 | | BOWR W2 | | BOWR W4 | | BOWR W6 |
-| **7x** | BXWR W0 | | BXWR W2 | | BXWR W4 | | BXWR W6 | | XWR W0 | | XWR W2 | | XWR W4 | | XWR W6 |
+| **4x** | LWR W0 | LWR W1 | LWR W2 | LWR W3 | | | | | STWR W0 | STWR W1 | STWR W2 | STWR W3 |
+| **5x** | AWR W0 | AWR W1 | AWR W2 | AWR W3 | | | | | SWR W0 | SWR W1 | SWR W2 | SWR W3 |
+| **6x** | BAWR W0 | BAWR W1 | BAWR W2 | BAWR W3 | | | | | BOWR W0 | BOWR W1 | BOWR W2 | BOWR W3 |
+| **7x** | BXWR W0 | BXWR W1 | BXWR W2 | BXWR W3 | | | | | XWR W0 | XWR W1 | XWR W2 | XWR W3 |
 | **8x** | LBI | LBV Byte | ABC | SBC | RBL | RBR | CPLB | TESTB | STBI | NOP | IFC 0 | IFC 1 | IFZ 0 | IFZ 1 | IFS 0 | IFS 1 |
 | **9x** | RABR B0 | RABR B1 | RABR B2 | RABR B3 | RABR B4 | RABR B5 | RABR B6 | RABR B7 | RSBR B0 | RSBR B1 | RSBR B2 | RSBR B3 | RSBR B4 | RSBR B5 | RSBR B6 | RSBR B7 |
 | **Ax** | RBABR B0 | RBABR B1 | RBABR B2 | RBABR B3 | RBABR B4 | RBABR B5 | RBABR B6 | RBABR B7 | RBOBR B0 | RBOBR B1 | RBOBR B2 | RBOBR B3 | RBOBR B4 | RBOBR B5 | RBOBR B6 | RBOBR B7 |
 | **Bx** | RBXBR B0 | RBXBR B1 | RBXBR B2 | RBXBR B3 | RBXBR B4 | RBXBR B5 | RBXBR B6 | RBXBR B7 | ARA | ARV Word | LPS | STPS | | | IN | OUT |
 | **Cx** | LWI | LWV Word | AWC | SWC | RWL | RWR | CPLW | TESTW | STWI | JMP | LSP | STSP | PUSH | POP | CALL | RET |
-| **Dx** | RAWR W0 | | RAWR W2 | | RAWR W4 | | RAWR W6 | | RSWR W0 | | RSWR W2 | | RSWR W4 | | RSWR W6 | |
-| **Ex** | RBAWR W0 | | RBAWR W2 | | RBAWR W4 | | RBAWR W6 | | RBOWR W0 | | RBOWR W2 | | RBOWR W4 | | RBOWR W6 |
-| **Fx** | RBXWR W0 | | RBXWR W2 | | RBXWR W4 | | RBXWR W6 |  | ARWR W0 | | ARWR W2 | | ARWR W4 | | ARWR W6 | |
-
-
-
-|   | x0 | x1 | x2 | x3 | x4 | x5 | x6 | x7 | x8 | x9 | xA | xB | xC | xD | xE | xF |
-| - | -- | -- | -- | -- | -- | -- | -- | -- | -- | -- | -- | -- | -- | -- | -- | -- |
-| **4x** | LBI | LBV Byte | | | | | | IN | STBI | SCL | SCV 0 | SCV 1 | | | | OUT |
-| **5x** | ABC | RBL | SXBC | | | | | | SBC | RBR | | | | | | |
-| **6x** | TESTB | | | | | | | | | | | | | | | |
-| **7x** | ZB | CPLB | CPLC | | | | | | XBI | XB | IFC 0 | IFC 1 | IFZ 0 | IFZ 1 | IFS 0 | IFS 1 |
-| **Cx** | LWI | LWV Word | LSP | POP | | | | | STWI | ARV Word | STSP | PUSH | | | ARA | ARSP |
-| **Dx** | AWC | RWL | SXWC | RET | | | | | SWC | RWR | JMP | CALL | | | | |
-| **Ex** | TESTW | | | | | | | | ARWR W0 | | ARWR W2 | | ARWR W4 | | ARWR W6 | |
-| **Fx** | ZW | CPLW | | | | | | | XWI | NOP
+| **Dx** | RAWR W0 | RAWR W1 | RAWR W2 | RAWR W3 | | | | | RSWR W0 | RSWR W1 | RSWR W2 | RSWR W3 |
+| **Ex** | RBAWR W0 | RBAWR W1 | RBAWR W2 | RBAWR W3 | | | | | RBOWR W0 | RBOWR W1 | RBOWR W2 | RBOWR W3 |
+| **Fx** | RBXWR W0 | RBXWR W1 | RBXWR W2 | RBXWR W3 | | | | | ARWR W0 | ARWR W1 | ARWR W2 | ARWR W3 |
