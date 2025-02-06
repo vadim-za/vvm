@@ -46,6 +46,50 @@
     ror ; shift in carry
     stbr b0
 
+; add two 32-bit numbers w1:w0 and w3:w2 storing in w1:w0
+    lwr w0
+    xa
+    lwr w2
+    add ; (x:a) = w0+w2
+    stwr w0 ; w0 = w0+w2, x = carry  (carry = 1 or 0)
+    lwr w1
+    add ; (x:a) = carry + w1
+    xa
+    lwr w3
+    add ; (x:a) = carry + w1 + w3
+    stwr w1
+
+; subtract two 32-bit numbers (w1:w0)-(w3:w2) storing in w1:w0
+    lwr w0
+    xa
+    lwr w2
+    sub ; (x:a) = w0-w2
+    stwr w0 ; w0 = w0-w2, x = carry  (carry = -1 or 0)
+    lwr w1
+    sub ; (x:a) = carry + w1
+    xa
+    lwr w3
+    sub ; (x:a) = carry + w1 - w3
+    stwr w1
+
+; add two 16-bit numbers b1:b0 and b3:b2 storing in b1:b0
+    lbr b0
+    zxbw
+    xa
+    lbr b2
+    zxbw
+    add ; (x:a) = b0+b2
+    stbr b0
+    xhl ; LSB(A) = carry
+    zxbw ; A = carry
+    xa ; X = carry
+    lbr b1
+    add ; (x:a) = carry + b1
+    xa
+    lbr b3
+    add ; (x:a) = carry + b1 + b3
+    stwr b1
+
 ; -----------------------------
 
     ; w0 = call address for OS
