@@ -1,8 +1,13 @@
 const std = @import("std");
 const Vvm = @import("../Vvm.zig");
-const Handler = @import("../commands.zig").Handler;
+const commands = @import("../commands.zig");
 
-pub fn handler(comptime command_code: u8) Handler {
+pub const descriptor = commands.Descriptor.initRange(
+    0x00,
+    8,
+);
+
+pub fn handler(comptime command_code: u8) commands.Handler {
     return struct {
         fn actualHandler(vvm: *Vvm) void {
             const index: u4 = command_code & 7;
@@ -14,8 +19,8 @@ pub fn handler(comptime command_code: u8) Handler {
 test "Test" {
     var vvm: Vvm = undefined;
 
-    for (0..7) |index| {
-        vvm.memory[0] = @intCast(0x00 + index); // lbr b0
+    for (0..descriptor.count) |index| {
+        vvm.memory[0] = @intCast(descriptor.base + index); // lbr b0
         vvm.registers.gp.b[index] = 0x10;
         vvm.registers.a.w = 0;
         vvm.registers.pc = 0;
