@@ -104,4 +104,7 @@ const commands = struct {
     pub const xa = @import("commands/xa.zig");
     // pub const lbi = @import("commands/lbi.zig");
     pub const lbv = @import("commands/lbv.zig");
+    // pub const in = @import("commands/in.zig");
+    // pub const lwi = @import("commands/lwi.zig");
+    pub const lwv = @import("commands/lwv.zig");
 };
