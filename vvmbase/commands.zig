@@ -86,6 +86,7 @@ const commands = struct {
     pub const xwr = @import("commands/xwr.zig");
     // const jif = @import("commands/jif.zig");
     pub const add = @import("commands/add.zig");
+    pub const sub = @import("commands/sub.zig");
     // const arwr = @import("commands/arwr.zig");
     pub const nop = @import("commands/nop.zig");
 };
