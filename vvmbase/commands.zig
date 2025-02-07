@@ -50,7 +50,7 @@ fn fillEntry(tbl: []Handler, entry_index: usize, handler: Handler) void {
         handler != default_handler;
     if (comptime duplicate_fill)
         @compileError("Duplicate entry fill at index " ++
-            std.fmt.comptimePrint("{}", .{entry_index}));
+            std.fmt.comptimePrint("0x{X}", .{entry_index}));
 
     tbl[entry_index] = handler;
 }
