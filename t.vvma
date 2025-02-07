@@ -70,15 +70,43 @@ True:
 Skip:
 
 ; ------------- unsigned byte comparisons
-; unsigned if(b0 >= b1)
-    lbr b1
-    zxbw
-    xa
+; unsigned if(b0 >= b1)         8080: unsigned if(B >= C)
+    lbr b1                          MOV A,B
+    zxbw                            CMP C
+    xa                              JC SKIP
     lbr b0
     zxbw
     sub
     jifhnz Skip ; if(b0 < b1)
-    ???
+True:
+    ; We get here if(b0 >= b1)
+    ...
+Skip:
+
+; ------------- signed byte comparisons
+; signed if(b0 >= b1)               8080: signed if(B >= C)
+    lbr b1                              MOV A,B
+    xa                                  XRA C
+    lbr b0                              JP SameSign
+    xor                                 MOV A,B
+    sxbw ; HSB(A)=xor of signs          ORA A
+    jifhz SameSign                      JP True ; B >= 0, C < 0
+    lbr b0                              JMP Skip
+    sxbw                            SameSign:
+    jifhz True ; b0 >= 0, b1 < 0        MOV A,B
+    jmp Skip                            SUB C
+SameSign:                               JM Skip
+    lbr b1
+    sxbw
+    xa
+    lbr b0
+    sxbw
+    sub
+    jifhnz Skip ; if(b0 < b1)
+True:
+    ; We get here if(b0 >= b1)
+    ...
+Skip:
 
 ; ------------- shifts and rotations
 ; shift left A

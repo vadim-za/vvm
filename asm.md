@@ -6,72 +6,61 @@ Low-endian architecture, 16-bit address space
 | Word (2-byte) registers | W0, W1, W2, W3 (where W0=B1:B0, W1=B3:B2, W2=B5:B4, W3=B7:B6) |
 | Additional word registers | PC (program counter), A (accumulator), X (accumulator eXtension), ADDR (address register) |
 
-| Code | Command | Deciphering | Description |
-| ---- | ------- | ----------- | ----------- |
-| 00000nnn | LBR Bn | Load from Byte Register | LSB(A):=Bn |
-| 000010nn | LWR Wn | Load from Word Register | A:=Wn |
-| ... |
-| 00010nnn | STBR Bn | STore to Byte Register | Bn:=LSB(A) |
-| 000110nn | STWR Wn | STore to Word Register | Wn:=A |
-| ... |
-| 00100nnn | XBR Bn | eXchange Byte Register | LSB(A)<->Bn |
-| 001010nn | XWR Wn | eXchange Word Register | A<->Wn |
-| ... |
-| 00110000 | JIFLZ | Jump IF Low byte is Zero | if(LSB(A)==0) PC:=ADDR |
-| 00110001 | JIFLNZ | Jump IF Low byte is Not Zero | if(LSB(A)!=0) PC:=ADDR |
-| 00110010 | JIFHZ | Jump IF High byte is Zero | if(HSB(A)==0) PC:=ADDR |
-| 00110011 | JIFHNZ | Jump IF High byte is Not Zero | if(HSB(A)!=0) PC:=ADDR |
-| 00110100 | JIFZ | Jump IF accumulator is Zero | if(A==0) PC:=ADDR |
-| 00110101 | JIFNZ | Jump IF accumulator is Not Zero | if(A!=0) PC:=ADDR |
-| 00110100 | JIFXZ | Jump IF accumulator eXtension is Zero | if(X==0) PC:=ADDR |
-| 00110101 | JIFXNZ | Jump IF accumulator eXtension is Not Zero | if(X!=0) PC:=ADDR |
-| ... |
-| 01000000 | ADD | unsigned Add, 32-bit result in (X:A)  | (X:A):=A+X |
-| 01000001 | SUB | unsigned Subtract, 32-bit result in (X:A) | (X:A):=A-X |
-| 01000010 | AND | Bitwise And | A:=A&X |
-| 01000011 | OR | Bitwise Or | A:=A\|X |
-| 01000100 | XOR | Bitwise Xor | A:=A^X |
-| 01000101 | JMP | Jump (unconditionally) | PC:=ADDR |
-| 01000110 | CALL | Call | SP:=SP-2, [SP]:=PC, PC:=ADDR |
-| 01000111 | RET | Return | PC:=[SP], SP:=SP+2 |
-| 010010nn | ARWR Wn | Address Register from Word Register | ADDR:=Wn |
-| ... |
-| 01010000 | ZERO | Zero the accumulator | A:=0 |
-| 01010001 | ALL | Set all accumulator bits | A:=0xFFFF |
-| 01010010 | CPL | Complement all accumulator bits | A:=~A |
-| 01010011 | XHL | eXchange accumulator's HSB and LSB | HSB(A)<->LSB(A) |
-| ... |
-| 01011000 | ROL | ROtate extended accumulator Left | (X:A):=ROL(X:A) |
-| 01011001 | ROR | ROtate extended accumulator Right | (X:A):=ROR(X:A) |
-| 01011010 | NOP | No-operation | Do nothing |
-| 01011011 | XA | eXchange the accumulators | X<->A |
-| ... |
-| 01100000 | LBI | Load Byte Indirect | LSB(A):=[ADDR] |
-| 01100001 Byte | LBV Byte | Load Byte Value | LSB(A):=Byte |
-| 01100010 | IN | Input: read from port | LSB(A):=Port[LSB(ADDR)] |
-| ... |
-| 01101000 | LWI | Load Word Indirect | A:=[ADDR] |
-| 01101001 LSB HSB | LWV Word | Load Word Value | A:=Word |
-| 01101010 | LSP | Load Stack Pointer | A:=SP |
-| 01101011 | POP | Pop from stack | A:=[SP], SP:=SP+2 |
-| ... |
-| 01110000 | STBI | STore Byte Indirect | [ADDR]:=LSB(A) |
-| 01110001 | ARA | Address Register from Accumulator | ADDR:=A |
-| 01110010 | OUT | Output: write into port | Port[LSB(ADDR)]:=LSB(A) |
-| ... |
-| 01110100 | SXBW | Sign eXtend Byte to Word | A:=SignExtend(LSB(A)) |
-| 01110101 | CXBW | Copy-eXtend Byte to Word | HSB(A):=LSB(A) |
-| 01110110 | ZXBW | Zero-eXtend Byte to Word | HSB(A):=0 |
-| 01110111 | AXBW | All-eXtend Byte to Word | HSB(A):=0xFF |
-| 01111000 | STWI | STore Word Indirect | [ADDR]:=A |
-| 01111001 LSB HSB | ARV Word | Address Register from Value | ADDR:=Word |
-| 01111010 | STSP | STore into Stack Pointer | SP:=A |
-| 01111011 | PUSH | Push to stack | SP:=SP-2, [SP]:=A |
-| 01111100 | SXWX | Sign eXtend Word to eXtended | (X:A):=SignExtend(LSB(A)) |
-| 01111101 | CXWX | Copy-eXtend Word to eXtended | X:=A |
-| 01111110 | ZXWX | Zero-eXtend Word to eXtended | X:=0 |
-| 01111111 | AXWX | All-eXtend Word to eXtended | X:=0xFFFF |
-
+| Command | Deciphering | Description |
+| ------- | ----------- | ----------- |
+| LBR Bn | Load from Byte Register | LSB(A):=Bn |
+| LWR Wn | Load from Word Register | A:=Wn |
+| STBR Bn | STore to Byte Register | Bn:=LSB(A) |
+| STWR Wn | STore to Word Register | Wn:=A |
+| XBR Bn | eXchange Byte Register | LSB(A)<->Bn |
+| XWR Wn | eXchange Word Register | A<->Wn |
+| JIFLZ | Jump IF Low byte is Zero | if(LSB(A)==0) PC:=ADDR |
+| JIFLNZ | Jump IF Low byte is Not Zero | if(LSB(A)!=0) PC:=ADDR |
+| JIFHZ | Jump IF High byte is Zero | if(HSB(A)==0) PC:=ADDR |
+| JIFHNZ | Jump IF High byte is Not Zero | if(HSB(A)!=0) PC:=ADDR |
+| JIFZ | Jump IF accumulator is Zero | if(A==0) PC:=ADDR |
+| JIFNZ | Jump IF accumulator is Not Zero | if(A!=0) PC:=ADDR |
+| JIFXZ | Jump IF accumulator eXtension is Zero | if(X==0) PC:=ADDR |
+| JIFXNZ | Jump IF accumulator eXtension is Not Zero | if(X!=0) PC:=ADDR |
+| ADD | unsigned Add, 32-bit result in (X:A)  | (X:A):=A+X |
+| SUB | unsigned Subtract, 32-bit result in (X:A) | (X:A):=A-X |
+| AND | Bitwise And | A:=A&X |
+| OR | Bitwise Or | A:=A\|X |
+| XOR | Bitwise Xor | A:=A^X |
+| JMP | Jump (unconditionally) | PC:=ADDR |
+| CALL | Call | SP:=SP-2, [SP]:=PC, PC:=ADDR |
+| RET | Return | PC:=[SP], SP:=SP+2 |
+| ARWR Wn | Address Register from Word Register | ADDR:=Wn |
+| ZERO | Zero the accumulator | A:=0 |
+| ALL | Set all accumulator bits | A:=0xFFFF |
+| CPL | Complement all accumulator bits | A:=~A |
+| XHL | eXchange accumulator's HSB and LSB | HSB(A)<->LSB(A) |
+| ROL | ROtate extended accumulator Left | (X:A):=ROL(X:A) |
+| ROR | ROtate extended accumulator Right | (X:A):=ROR(X:A) |
+| NOP | No-operation | Do nothing |
+| XA | eXchange the accumulators | X<->A |
+| LBI | Load Byte Indirect | LSB(A):=[ADDR] |
+| LBV Byte | Load Byte Value | LSB(A):=Byte |
+| IN | Input: read from port | LSB(A):=Port[LSB(ADDR)] |
+| LWI | Load Word Indirect | A:=[ADDR] |
+| LWV Word | Load Word Value | A:=Word |
+| LSP | Load Stack Pointer | A:=SP |
+| POP | Pop from stack | A:=[SP], SP:=SP+2 |
+| STBI | STore Byte Indirect | [ADDR]:=LSB(A) |
+| ARA | Address Register from Accumulator | ADDR:=A |
+| OUT | Output: write into port | Port[LSB(ADDR)]:=LSB(A) |
+| SXBW | Sign eXtend Byte to Word | A:=SignExtend(LSB(A)) |
+| CXBW | Copy-eXtend Byte to Word | HSB(A):=LSB(A) |
+| ZXBW | Zero-eXtend Byte to Word | HSB(A):=0 |
+| AXBW | All-eXtend Byte to Word | HSB(A):=0xFF |
+| STWI | STore Word Indirect | [ADDR]:=A |
+| ARV Word | Address Register from Value | ADDR:=Word |
+| STSP | STore into Stack Pointer | SP:=A |
+| PUSH | Push to stack | SP:=SP-2, [SP]:=A |
+| SXWX | Sign eXtend Word to eXtended | (X:A):=SignExtend(LSB(A)) |
+| CXWX | Copy-eXtend Word to eXtended | X:=A |
+| ZXWX | Zero-eXtend Word to eXtended | X:=0 |
+| AXWX | All-eXtend Word to eXtended | X:=0xFFFF |
 
 
 |   | x0 | x1 | x2 | x3 | x4 | x5 | x6 | x7 | x8 | x9 | xA | xB | xC | xD | xE | xF |
