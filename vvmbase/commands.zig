@@ -1,29 +1,39 @@
+const std = @import("std");
 const Vvm = @import("Vvm.zig");
 
 pub const table = prepareTable();
 
-pub const Handler = fn (vvm: *Vvm) void;
+pub const Handler = *const fn (vvm: *Vvm) void;
 const HandlerTable = [256]Handler;
 
+// Prepare a table containing command handlers in positions corresponding to command codes
 fn prepareTable() HandlerTable {
     var tbl: HandlerTable = [1]Handler{commands.nop.handler} ** 256;
 
-    for (0..8) |i| {
-        tbl[0x00 + i] = commands.lbr.handler(i);
-        // tbl[0x10 + i] = stbr(i);
-        // tbl[0x20 + i] = xbr(i);
-        // tbl[0x30 + i] = jif(i);
-    }
-    for (0..4) |i| {
-        tbl[0x08 + i] = commands.lwr.handler(i);
-        // tbl[0x18 + i] = stwr(i);
-        // tbl[0x28 + i] = xwr(i);
-        // tbl[0x48 + i] = arwr(i);
+    // Go over all public decls in 'commands' and prepare the respective table entries
+    const command_decls = @typeInfo(commands).@"struct".decls;
+    for (command_decls) |decl| {
+        const command = @field(commands, decl.name);
+        prepareCommandEntries(&tbl, command);
     }
 
     return tbl;
 }
 
+// Fill table entries corresponding to the specified command
+fn prepareCommandEntries(tbl: []Handler, command: type) void {
+    if (comptime command.descriptor.count == 1) {
+        tbl[command.descriptor.base] = command.handler;
+    } else {
+        for (
+            0..command.descriptor.count,
+            command.descriptor.base..,
+        ) |index, code|
+            tbl[code] = command.handler(@intCast(index));
+    }
+}
+
+// Specifies the code range (from 'base' to 'base+count-1') for a command
 pub const Descriptor = struct {
     base: u8, // base command code
     count: u8, // variant count
