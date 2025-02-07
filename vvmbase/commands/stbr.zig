@@ -10,7 +10,7 @@ pub const descriptor = commands.Descriptor.initRange(
 pub fn handler(comptime command_code: u8) commands.Handler {
     return struct {
         fn actualHandler(vvm: *Vvm) void {
-            const index: u4 = command_code & 7;
+            const index: u3 = command_code & 7;
             vvm.registers.gp.b[index] = vvm.registers.a.b[0];
         }
     }.actualHandler;
