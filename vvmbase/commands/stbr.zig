@@ -19,13 +19,16 @@ pub fn handler(comptime command_code: u8) commands.Handler {
 test "Test" {
     var vvm: Vvm = undefined;
 
-    for (0..descriptor.count) |index| {
-        vvm.memory[0] = @intCast(descriptor.base + index); // stbr b0
-        vvm.registers.gp.b[index] = 0;
-        vvm.registers.a.w = 0x1110;
+    for (0..descriptor.count) |n| {
+        const value16: u16 = 0x9110 + @as(u16, @intCast(n));
+
+        vvm.memory[0] = @intCast(descriptor.base + n); // STBR Bn
+        vvm.registers.gp.b[n] = 0;
+        vvm.registers.a.w = value16;
         vvm.registers.pc = 0;
         vvm.step();
 
-        try std.testing.expectEqual(0x10, vvm.registers.gp.b[0]);
+        const value8: u8 = @truncate(value16);
+        try std.testing.expectEqual(value8, vvm.registers.gp.b[n]);
     }
 }

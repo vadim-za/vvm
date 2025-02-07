@@ -10,7 +10,7 @@ pub const descriptor = commands.Descriptor.initRange(
 pub fn handler(comptime command_code: u8) commands.Handler {
     return struct {
         fn actualHandler(vvm: *Vvm) void {
-            const index: u4 = command_code & 3;
+            const index: u2 = command_code & 3;
             vvm.registers.a.w = vvm.registers.gp.w[index];
         }
     }.actualHandler;
@@ -19,13 +19,15 @@ pub fn handler(comptime command_code: u8) commands.Handler {
 test "Test" {
     var vvm: Vvm = undefined;
 
-    for (0..descriptor.count) |index| {
-        vvm.memory[0] = @intCast(descriptor.base + index); // lwr w0
-        vvm.registers.gp.w[index] = 0x1110;
+    for (0..descriptor.count) |n| {
+        const value: u16 = 0x9110 + @as(u16, @intCast(n));
+
+        vvm.memory[0] = @intCast(descriptor.base + n); // LWR Wn
+        vvm.registers.gp.w[n] = value;
         vvm.registers.a.w = 0;
         vvm.registers.pc = 0;
         vvm.step();
 
-        try std.testing.expectEqual(0x1110, vvm.registers.a.w);
+        try std.testing.expectEqual(value, vvm.registers.a.w);
     }
 }
