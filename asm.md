@@ -26,8 +26,8 @@ Low-endian architecture, 16-bit address space
 | 00110100 | JIFXZ | Jump IF accumulator eXtension is Zero | if(X==0) PC:=ADDR |
 | 00110101 | JIFXNZ | Jump IF accumulator eXtension is Not Zero | if(X!=0) PC:=ADDR |
 | ... |
-| 01000000 | ADD | Add, producing 32-bit result in (X:A)  | (X:A):=A+X |
-| 01000001 | SUB | Subtract, producing 32-bit result in (X:A) | (X:A):=A-X |
+| 01000000 | ADD | unsigned Add, 32-bit result in (X:A)  | (X:A):=A+X |
+| 01000001 | SUB | unsigned Subtract, 32-bit result in (X:A) | (X:A):=A-X |
 | 01000010 | AND | Bitwise And | A:=A&X |
 | 01000011 | OR | Bitwise Or | A:=A\|X |
 | 01000100 | XOR | Bitwise Xor | A:=A^X |
