@@ -89,7 +89,7 @@ const commands = struct {
     pub const sub = @import("commands/sub.zig");
     pub const and_ = @import("commands/and.zig");
     pub const or_ = @import("commands/or.zig");
-    // pub const xor = @import("commands/xor.zig");
+    pub const xor_ = @import("commands/xor.zig");
     // const arwr = @import("commands/arwr.zig");
     pub const nop = @import("commands/nop.zig");
 };
