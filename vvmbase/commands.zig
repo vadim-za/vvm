@@ -102,4 +102,6 @@ const commands = struct {
     pub const ror = @import("commands/ror.zig");
     pub const nop = @import("commands/nop.zig");
     pub const xa = @import("commands/xa.zig");
+    // pub const lbi = @import("commands/lbi.zig");
+    pub const lbv = @import("commands/lbv.zig");
 };
