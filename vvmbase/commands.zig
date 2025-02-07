@@ -90,6 +90,9 @@ const commands = struct {
     pub const and_ = @import("commands/and.zig");
     pub const or_ = @import("commands/or.zig");
     pub const xor_ = @import("commands/xor.zig");
-    // const arwr = @import("commands/arwr.zig");
+    // pub const jmp = @import("commands/jmp.zig");
+    // pub const call = @import("commands/call.zig");
+    // pub const ret = @import("commands/ret.zig");
+    pub const arwr = @import("commands/arwr.zig");
     pub const nop = @import("commands/nop.zig");
 };
