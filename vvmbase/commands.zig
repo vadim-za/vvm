@@ -101,4 +101,5 @@ const commands = struct {
     pub const rol = @import("commands/rol.zig");
     pub const ror = @import("commands/ror.zig");
     pub const nop = @import("commands/nop.zig");
+    pub const xa = @import("commands/xa.zig");
 };

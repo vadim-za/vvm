@@ -2,7 +2,7 @@ const std = @import("std");
 const Vvm = @import("../Vvm.zig");
 const commands = @import("../commands.zig");
 
-pub const descriptor = commands.Descriptor.init(0x81);
+pub const descriptor = commands.Descriptor.init(0x59);
 
 pub fn handler(vvm: *Vvm) void {
     const xa: u32 = (@as(u32, vvm.registers.x) << 16) + vvm.registers.a.w;
