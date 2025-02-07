@@ -56,7 +56,6 @@ pub const Descriptor = struct {
 };
 
 const commands = struct {
-    pub const nop = @import("commands/nop.zig");
     pub const lbr = @import("commands/lbr.zig");
     pub const lwr = @import("commands/lwr.zig");
     pub const stbr = @import("commands/stbr.zig");
@@ -64,5 +63,7 @@ const commands = struct {
     // const xbr = @import("commands/xbr.zig");
     // const xwr = @import("commands/xwr.zig");
     // const jif = @import("commands/jif.zig");
+    pub const add = @import("commands/add.zig");
     // const arwr = @import("commands/arwr.zig");
+    pub const nop = @import("commands/nop.zig");
 };
