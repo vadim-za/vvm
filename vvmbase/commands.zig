@@ -1,27 +1,28 @@
 const std = @import("std");
 const Vvm = @import("Vvm.zig");
 
-pub const table = prepareTable();
+// This is the main table used to perform commands given their codes
+pub const table: HandlerTable = makeTable();
 
 pub const Handler = *const fn (vvm: *Vvm) void;
 const HandlerTable = [256]Handler;
 
 // Prepare a table containing command handlers in positions corresponding to command codes
-fn prepareTable() HandlerTable {
+fn makeTable() HandlerTable {
     var tbl: HandlerTable = [1]Handler{commands.nop.handler} ** 256;
 
     // Go over all public decls in 'commands' and prepare the respective table entries
     const command_decls = @typeInfo(commands).@"struct".decls;
     for (command_decls) |decl| {
         const command = @field(commands, decl.name);
-        prepareCommandEntries(&tbl, command);
+        fillEntries(&tbl, command);
     }
 
     return tbl;
 }
 
 // Fill table entries corresponding to the specified command
-fn prepareCommandEntries(tbl: []Handler, command: type) void {
+fn fillEntries(tbl: []Handler, command: type) void {
     if (comptime command.descriptor.count == 1) {
         tbl[command.descriptor.base] = command.handler;
     } else {
@@ -47,7 +48,7 @@ pub const Descriptor = struct {
 
     pub fn initRange(base: u8, comptime count: u8) @This() {
         if (comptime count < 2)
-            @compileError("Command range must contain at leats 2 variants");
+            @compileError("Command range must contain at least 2 variants");
         return .{
             .base = base,
             .count = count,
