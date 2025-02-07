@@ -6,10 +6,11 @@ pub const table: HandlerTable = makeTable();
 
 pub const Handler = *const fn (vvm: *Vvm) void;
 const HandlerTable = [256]Handler;
+const default_handler = commands.nop.handler;
 
 // Prepare a table containing command handlers in positions corresponding to command codes
 fn makeTable() HandlerTable {
-    var tbl: HandlerTable = [1]Handler{commands.nop.handler} ** 256;
+    var tbl: HandlerTable = [1]Handler{default_handler} ** 256;
 
     // Go over all public decls in 'commands' and prepare the respective table entries
     const command_decls = @typeInfo(commands).@"struct".decls;
@@ -24,14 +25,34 @@ fn makeTable() HandlerTable {
 // Fill table entries corresponding to the specified command
 fn fillEntries(tbl: []Handler, command: type) void {
     if (comptime command.descriptor.count == 1) {
-        tbl[command.descriptor.base] = command.handler;
+        fillEntry(
+            tbl,
+            command.descriptor.base,
+            command.handler,
+        );
     } else {
         for (
             0..command.descriptor.count,
             command.descriptor.base..,
         ) |index, code|
-            tbl[code] = command.handler(@intCast(index));
+            fillEntry(
+                tbl,
+                code,
+                command.handler(@intCast(index)),
+            );
     }
+}
+
+// Fill a single table entry
+// Generates a compile-time error for duplicate fill attempts
+fn fillEntry(tbl: []Handler, entry_index: usize, handler: Handler) void {
+    const duplicate_fill = tbl[entry_index] != default_handler and
+        handler != default_handler;
+    if (comptime duplicate_fill)
+        @compileError("Duplicate entry fill at index " ++
+            std.fmt.comptimePrint("{}", .{entry_index}));
+
+    tbl[entry_index] = handler;
 }
 
 // Specifies the code range (from 'base' to 'base+count-1') for a command
