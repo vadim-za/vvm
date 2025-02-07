@@ -17,15 +17,14 @@ Low-endian architecture, 16-bit address space
 | 00100nnn | XBR Bn | eXchange Byte Register | LSB(A)<->Bn |
 | 001010nn | XWR Wn | eXchange Word Register | A<->Wn |
 | ... |
-| 0011000v | JIF7 v | Jump IF bit 7 equals v | if(A[7]==v) PC:=ADDR |
-| 0011001v | JIF8 v | Jump IF bit 8 equals v | if(A[8]==v) PC:=ADDR |
-| 00110100 | JIFZB | Jump IF Zero Byte | if(LSB(A)==0) PC:=ADDR |
-| 00110101 | JIFNZB | Jump IF Non-Zero Byte | if(LSB(A)!=0) PC:=ADDR |
-| ... |
-| 0011100v | JIF15 v | Jump IF bit 15 equals v | if(A[15]==v) PC:=ADDR |
-| 0011101v | JIF16 v | Jump IF bit 16 equals v | if(X[0]==v) PC:=ADDR |
-| 00111100 | JIFZW | Jump IF Zero Word | if(A==0) PC:=ADDR |
-| 00111101 | JIFNZW | Jump IF Non-Zero Word | if(A!=0) PC:=ADDR |
+| 00110000 | JIFLZ | Jump IF Low byte is Zero | if(LSB(A)==0) PC:=ADDR |
+| 00110001 | JIFLNZ | Jump IF Low byte is Not Zero | if(LSB(A)!=0) PC:=ADDR |
+| 00110010 | JIFHZ | Jump IF High byte is Zero | if(HSB(A)==0) PC:=ADDR |
+| 00110011 | JIFHNZ | Jump IF High byte is Not Zero | if(HSB(A)!=0) PC:=ADDR |
+| 00110100 | JIFZ | Jump IF accumulator is Zero | if(A==0) PC:=ADDR |
+| 00110101 | JIFNZ | Jump IF accumulator is Not Zero | if(A!=0) PC:=ADDR |
+| 00110100 | JIFXZ | Jump IF accumulator eXtension is Zero | if(X==0) PC:=ADDR |
+| 00110101 | JIFXNZ | Jump IF accumulator eXtension is Not Zero | if(X!=0) PC:=ADDR |
 | ... |
 | 01000000 | ADD | Add, producing 32-bit result in (X:A)  | (X:A):=A+X |
 | 01000001 | SUB | Subtract, producing 32-bit result in (X:A) | (X:A):=A-X |
@@ -80,7 +79,7 @@ Low-endian architecture, 16-bit address space
 | **0x** | LBR B0 | LBR B1 | LBR B2 | LBR B3 | LBR B4 | LBR B5 | LBR B6 | LBR B7 | LWR W0 | LWR W1 | LWR W2 | LWR W3
 | **1x** | STBR B0 | STBR B1 | STBR B2 | STBR B3 | STBR B4 | STBR B5 | STBR B6 | STBR B7 | STWR W0 | STWR W1 | STWR W2 | STWR W3 
 | **2x** | XBR B0 | XBR B1 | XBR B2 | XBR B3 | XBR B4 | XBR B5 | XBR B6 | XBR B7 | XWR W0 | XWR W1 | XWR W2 | XWR W3 
-| **3x** | JIF7 0 | JIF7 1 | JIF8 0 | JIF8 1 | JIFZB | JIFNZB | | | JIF15 0 | JIF15 1 | JIF16 0 | JIF16 1 | JIFZW | JIFNZW |
+| **3x** | JIFLZ | JIFLNZ | JIFHZ | JIFHNZ | JIFZ | JIFNZ | JIFXZ | JIFXNZ
 | **4x** | ADD | SUB |  AND | OR | XOR | JMP | CALL | RET | ARWR W0 | ARWR W1 | ARWR W2 | ARWR W3
 | **5x** | ZERO | ALL | CPL | XHL | | | | | ROL | ROR | NOP | XA |
 | **6x** | LBI | LBV Byte | IN | | | | | | LWI | LWV Word | LSP | POP

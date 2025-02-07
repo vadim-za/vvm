@@ -1,3 +1,86 @@
+; ------------- unsigned word comparisons
+; unsigned if(w0 >= w1)
+    lwr w1
+    xa
+    lwr w0
+    sub ; (X:A)=W0-W1
+    jifxnz Skip ; if(w0 < w1)
+    ; We get here if(w0 >= w1)
+    ...
+Skip:
+
+; unsigned if(w0 < w1)
+    lwr w1
+    xa
+    lwr w0
+    sub ; (X:A)=W0-W1
+    jifxz Skip ; if(w0 >= w1)
+    ; We get here if(w0 < w1)
+    ...
+Skip:
+
+; unsigned if(w0 > w1)
+; it is more efficient to check if(w1 < w0)
+; but we do it for the sake of exercise anyway
+    lwr w1
+    xa
+    lwr w0
+    sub ; (X:A)=W0-W1
+    jifxnz Skip ; if(w0 < w1)
+    jifz Skip ; if(w0 == w1)
+    ; We get here if(w0 > w1)
+    ...
+Skip:
+
+; unsigned if(w0 <= w1)
+; it is more efficient to check if(w1 >= w0)
+; but we do it for the sake of exercise anyway
+    lwr w1
+    xa
+    lwr w0
+    sub ; (X:A)=W0-W1
+    jifxnz True ; if(w0 < w1)
+    jifnz Skip ; if(w0 != w1)
+True:
+    ; We get here if(w0 <= w1)
+    ...
+Skip:
+
+; ------------- signed word comparisons
+; signed if(w0 >= w1)
+    lwr w1
+    xa
+    lwr w0
+    xor
+    sxwx
+    jifxz SameSign
+    lwr w0
+    sxwx
+    jifxz True ; w0 >= 0, w1 < 0
+    jmp Skip
+SameSign:
+    lwr w1
+    xa
+    lwr w0
+    sub ; (X:A)=W0-W1
+    jifxnz Skip ; if(w0 < w1)
+True:
+    ; We get here if(w0 >= w1)
+    ...
+Skip:
+
+; ------------- unsigned byte comparisons
+; unsigned if(b0 >= b1)
+    lbr b1
+    zxbw
+    xa
+    lbr b0
+    zxbw
+    sub
+    jifhnz Skip ; if(b0 < b1)
+    ???
+
+; ------------- shifts and rotations
 ; shift left A
     zxwx
     rol
@@ -46,6 +129,7 @@
     ror ; shift in carry
     stbr b0
 
+; ------------- carry arithmetic
 ; add two 32-bit numbers w1:w0 and w3:w2 storing in w1:w0
     lwr w0
     xa
@@ -66,7 +150,7 @@
     sub ; (x:a) = w0-w2
     stwr w0 ; w0 = w0-w2, x = carry  (carry = -1 or 0)
     lwr w1
-    sub ; (x:a) = carry + w1
+    add ; (x:a) = carry + w1
     xa
     lwr w3
     sub ; (x:a) = carry + w1 - w3
@@ -103,7 +187,7 @@ Loop:
     arwr w2
     lbi
     arv Exit
-    jifzb
+    jiflz
     arv 0 ; conout
     out
     lwv 1
