@@ -59,10 +59,10 @@ const commands = struct {
     pub const nop = @import("commands/nop.zig");
     pub const lbr = @import("commands/lbr.zig");
     pub const lwr = @import("commands/lwr.zig");
-    // const stbr = @import("commands/stbr.zig").handler;
-    // const stwr = @import("commands/stwr.zig").handler;
-    // const xbr = @import("commands/xbr.zig").handler;
-    // const xwr = @import("commands/xwr.zig").handler;
-    // const jif = @import("commands/jif.zig").handler;
-    // const arwr = @import("commands/arwr.zig").handler;
+    pub const stbr = @import("commands/stbr.zig");
+    // const stwr = @import("commands/stwr.zig");
+    // const xbr = @import("commands/xbr.zig");
+    // const xwr = @import("commands/xwr.zig");
+    // const jif = @import("commands/jif.zig");
+    // const arwr = @import("commands/arwr.zig");
 };
