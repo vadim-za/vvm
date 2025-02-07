@@ -5,8 +5,8 @@ const Handler = @import("../commands.zig").Handler;
 pub fn handler(comptime command_code: u8) Handler {
     return struct {
         fn actualHandler(vvm: *Vvm) void {
-            const index: u4 = command_code & 7;
-            vvm.registers.a.b[0] = vvm.registers.gp.b[index];
+            const index: u4 = command_code & 3;
+            vvm.registers.a.w = vvm.registers.gp.w[index];
         }
     }.actualHandler;
 }
@@ -14,11 +14,11 @@ pub fn handler(comptime command_code: u8) Handler {
 test "Test" {
     var vvm: Vvm = undefined;
 
-    vvm.memory[0] = 0; // lbr b0
-    vvm.registers.gp.b[0] = 0x10;
+    vvm.memory[0] = 8; // lwr w0
+    vvm.registers.gp.w[0] = 0x1110;
     vvm.registers.a.w = 0;
     vvm.registers.pc = 0;
     vvm.step();
 
-    try std.testing.expectEqual(0x10, vvm.registers.a.b[0]);
+    try std.testing.expectEqual(0x1110, vvm.registers.a.w);
 }

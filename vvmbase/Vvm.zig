@@ -50,17 +50,6 @@ fn dispatch(self: *@This(), command_code: u8) void {
 
 const commands = @import("commands.zig").table;
 
-// ----------------------------------------------------------------------------------------
-
 test "Test" {
-    const Vvm = @This();
-    var vvm: Vvm = undefined;
-
-    vvm.memory[0] = 0; // lbr b0
-    vvm.registers.gp.b[0] = 0x10;
-    vvm.registers.a.w = 0;
-    vvm.registers.pc = 0;
-    vvm.step();
-
-    try std.testing.expectEqual(0x10, vvm.registers.a.b[0]);
+    std.testing.refAllDecls(@This());
 }

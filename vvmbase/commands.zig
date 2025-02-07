@@ -15,8 +15,7 @@ fn prepareTable() HandlerTable {
         // tbl[0x30 + i] = jif(i);
     }
     for (0..3) |i| {
-        _ = i;
-        // tbl[0x08 + i] = lwr(i);
+        tbl[0x08 + i] = lwr(i);
         // tbl[0x18 + i] = stwr(i);
         // tbl[0x28 + i] = xwr(i);
         // tbl[0x48 + i] = arwr(i);
@@ -27,7 +26,7 @@ fn prepareTable() HandlerTable {
 
 const nop = @import("commands/nop.zig").handler;
 const lbr = @import("commands/lbr.zig").handler;
-// const lwr = @import("commands/lwr.zig").handler;
+const lwr = @import("commands/lwr.zig").handler;
 // const stbr = @import("commands/stbr.zig").handler;
 // const stwr = @import("commands/stwr.zig").handler;
 // const xbr = @import("commands/xbr.zig").handler;
