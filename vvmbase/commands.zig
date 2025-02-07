@@ -94,5 +94,6 @@ const commands = struct {
     // pub const call = @import("commands/call.zig");
     // pub const ret = @import("commands/ret.zig");
     pub const arwr = @import("commands/arwr.zig");
+    pub const zero = @import("commands/zero.zig");
     pub const nop = @import("commands/nop.zig");
 };
