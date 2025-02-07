@@ -13,7 +13,7 @@ pub fn handler(vvm: *Vvm) void {
 test "Test" {
     var vvm: Vvm = undefined;
 
-    vvm.memory[0] = @intCast(descriptor.base); // add
+    vvm.memory[0] = @intCast(descriptor.base); // ADD
     vvm.registers.a.w = 0x9110;
     vvm.registers.x = 0x8000;
     vvm.registers.pc = 0;
