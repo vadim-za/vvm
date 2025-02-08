@@ -2,10 +2,10 @@ const std = @import("std");
 const Vvm = @import("../Vvm.zig");
 const Command = @import("../Command.zig");
 
-pub fn handler(comptime command_code: u8) Command.Handler {
+pub fn handler(comptime command_opcode: u8) Command.Handler {
     return struct {
         fn actualHandler(vvm: *Vvm) void {
-            const index: u3 = command_code & 7;
+            const index: u3 = command_opcode & 7;
             if (condition(vvm, index))
                 vvm.registers.pc = vvm.registers.addr;
         }

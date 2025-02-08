@@ -29,8 +29,8 @@ pub const Registers = struct {
 };
 
 pub fn step(self: *@This()) void {
-    const command_code = self.fetchCommandByte();
-    self.dispatch(command_code);
+    const command_opcode = self.fetchCommandByte();
+    self.dispatch(command_opcode);
 }
 
 // Fetch exactly one byte at PC and post-increment the PC
@@ -76,14 +76,14 @@ pub fn popWord(self: *@This()) u16 {
     return result;
 }
 
-// Given the just fetched command code, complete fetching the command and execute it.
-fn dispatch(self: *@This(), command_code: u8) void {
-    switch (command_code) {
+// Given the just fetched command opcode, complete fetching the command and execute it.
+fn dispatch(self: *@This(), command_opcode: u8) void {
+    switch (command_opcode) {
         // We want the compiler to generate a dispatched jump instruction,
         // so use 'inline else'. Try achieving the same in C++ in a similarly
         // nice way, hehe (maybe some good optimizer can unwrap a function
         // pointer table to the same kind of code?)
-        inline else => |code| (comptime commands[code])(self),
+        inline else => |opcode| (comptime commands[opcode])(self),
     }
 }
 

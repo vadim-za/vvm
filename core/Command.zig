@@ -11,7 +11,7 @@ variant_count: u8,
 
 // the 'impl' type should publish the 'handler' function:
 //      fn handler(vvm: *Vvm) void - for count == 1
-//      fn handler(comptime command_code: u8) fn (*Vvm) void - for count > 1
+//      fn handler(comptime command_opcode: u8) fn (*Vvm) void - for count > 1
 impl: type,
 
 // A struct containing all commands as its fields (of Command type each).
@@ -19,7 +19,7 @@ impl: type,
 // on command_collection. However it allows convenient usage by simply
 // referring to it as 'Commmand.collection'. We can also utilize some
 // of its commands it to reduce the amount of code in unit tests for the
-// 'Command.code...()' functions. So we allow it as an exception.)
+// 'Command.opcode...()' functions. So we allow it as an exception.)
 pub const collection = command_collection.collectAll();
 const command_collection = @import("command_collection.zig");
 
@@ -53,7 +53,7 @@ pub fn handler(self: @This(), variant_index: u8) *const Handler {
 }
 
 // -----------------------------------------------------------------------------
-// The 'code...()'' functions can be called at runtime! (not purely comptime)
+// The 'opcode...()'' functions can be called at runtime! (not purely comptime)
 
 pub fn opcodeVariant(comptime self: @This(), variant_index: usize) u8 {
     std.debug.assert(variant_index < self.variant_count);

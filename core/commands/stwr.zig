@@ -2,10 +2,10 @@ const std = @import("std");
 const Vvm = @import("../Vvm.zig");
 const Command = @import("../Command.zig");
 
-pub fn handler(comptime command_code: u8) Command.Handler {
+pub fn handler(comptime command_opcode: u8) Command.Handler {
     return struct {
         fn actualHandler(vvm: *Vvm) void {
-            const index: u2 = command_code & 3;
+            const index: u2 = command_opcode & 3;
             vvm.registers.gp.w[index] = vvm.registers.a.w[0];
         }
     }.actualHandler;

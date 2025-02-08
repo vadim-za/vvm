@@ -22,10 +22,10 @@ fn makeTable() HandlerTable {
         for (
             0..command.variant_count,
             command.base_opcode..,
-        ) |index, code|
+        ) |index, opcode|
             fillEntry(
                 &tbl,
-                code,
+                opcode,
                 command.handler(@intCast(index)),
                 field.name,
             );
