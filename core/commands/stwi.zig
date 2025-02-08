@@ -25,13 +25,13 @@ test "Test" {
     try std.testing.expectEqual(0x12, vvm.memory[0x1003]); // written
 
     // Try to write into the rom
+    vvm.memory[0xEFFE] = 0;
     vvm.memory[0xF000] = 0;
-    vvm.memory[0xF001] = 0;
-    vvm.registers.a.w[0] = 0x10;
-    vvm.registers.addr = 0xF000;
+    vvm.registers.a.w[0] = 0x1234;
+    vvm.registers.addr = 0xEFFE;
     vvm.registers.pc = 0;
     vvm.step();
 
+    try std.testing.expectEqual(0x34, vvm.memory[0xEFFE]); // written
     try std.testing.expectEqual(0, vvm.memory[0xF000]); // not written
-    try std.testing.expectEqual(0, vvm.memory[0xF001]); // not written
 }
