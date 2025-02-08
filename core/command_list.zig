@@ -39,6 +39,7 @@ pub const   stbi = .{ 0x70, 1, @import("commands/stbi.zig") };
 pub const   stbid= .{ 0x71, 1, @import("commands/stbid.zig") };
 pub const   nop  = .{ 0x72, 1, @import("commands/nop.zig") };
 pub const   sxbw = .{ 0x74, 1, @import("commands/sxbw.zig") };
+pub const   cxbw = .{ 0x75, 1, @import("commands/cxbw.zig") };
 //
 pub const   stwi = .{ 0x78, 1, @import("commands/stwi.zig") };
 pub const   stwid= .{ 0x79, 1, @import("commands/stwid.zig") };
