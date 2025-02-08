@@ -20,7 +20,7 @@ test "Test" {
     for (0..lwr.variant_count) |n| {
         const value: u16 = 0x9110 + @as(u16, @intCast(n));
 
-        vvm.memory[0] = lwr.codeVariant(n); // LWR Wn
+        vvm.memory[0] = lwr.opcodeVariant(n); // LWR Wn
         vvm.registers.gp.w[n] = value;
         vvm.registers.a.dw = 0;
         vvm.registers.pc = 0;

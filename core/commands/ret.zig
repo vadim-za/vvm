@@ -12,7 +12,7 @@ test "Test" {
     var vvm: Vvm = undefined;
     vvm.init();
 
-    vvm.memory[0x5678] = ret.code(); // RET
+    vvm.memory[0x5678] = ret.opcode(); // RET
     vvm.memory[0xEFFE] = 0x34;
     vvm.memory[0xEFFF] = 0x12;
     vvm.registers.addr = 0xFFFF;

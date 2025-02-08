@@ -20,7 +20,7 @@ test "Test" {
     inline for (0..lbr.variant_count) |n| {
         const value: u8 = 0x10 + @as(u8, @intCast(n));
 
-        vvm.memory[0] = lbr.codeVariant(n); // LBR Bn
+        vvm.memory[0] = lbr.opcodeVariant(n); // LBR Bn
         vvm.registers.gp.b[n] = value;
         vvm.registers.a.dw = 0;
         vvm.registers.pc = 0;

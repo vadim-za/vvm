@@ -12,7 +12,7 @@ test "Test" {
     var vvm: Vvm = undefined;
     vvm.init();
 
-    vvm.memory[0] = lsp.code(); // LSP
+    vvm.memory[0] = lsp.opcode(); // LSP
     vvm.registers.a.dw = 0;
     vvm.registers.sp = 0x1231;
     vvm.registers.pc = 0;

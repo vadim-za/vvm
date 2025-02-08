@@ -12,7 +12,7 @@ test "Test" {
     var vvm: Vvm = undefined;
     vvm.init();
 
-    vvm.memory[0] = jmp.code(); // JMP
+    vvm.memory[0] = jmp.opcode(); // JMP
     vvm.registers.addr = 0x1002;
     vvm.registers.pc = 0;
     vvm.step();

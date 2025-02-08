@@ -12,7 +12,7 @@ test "Test" {
     var vvm: Vvm = undefined;
     vvm.init();
 
-    vvm.memory[0] = ara.code(); // ARA
+    vvm.memory[0] = ara.opcode(); // ARA
     vvm.registers.a.w[0] = 0x9110;
     vvm.registers.addr = 0;
     vvm.registers.pc = 0;

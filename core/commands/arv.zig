@@ -15,7 +15,7 @@ test "Test" {
     var vvm: Vvm = undefined;
     vvm.init();
 
-    @memcpy(vvm.memory[0..3], &arv.codeWithLiteral16(0x1234)); // ARV 0x1234
+    @memcpy(vvm.memory[0..3], &arv.opcodeWithLiteral16(0x1234)); // ARV 0x1234
     vvm.registers.addr = 0;
     vvm.registers.pc = 0;
     vvm.step();

@@ -33,7 +33,7 @@ test "Test" {
     vvm.init();
     vvm.env = .init(Env, &env);
 
-    vvm.memory[0] = out.code(); // OUT
+    vvm.memory[0] = out.opcode(); // OUT
     vvm.registers.a.b[0] = 0x10;
     vvm.registers.addr = 0x1234;
     vvm.registers.pc = 0;

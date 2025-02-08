@@ -12,7 +12,7 @@ test "Test" {
     var vvm: Vvm = undefined;
     vvm.init();
 
-    vvm.memory[0] = xhl.code(); // XHL
+    vvm.memory[0] = xhl.opcode(); // XHL
     vvm.registers.a.w[0] = 0x9110;
     vvm.registers.pc = 0;
     vvm.step();

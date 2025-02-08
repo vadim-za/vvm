@@ -20,7 +20,7 @@ test "Test" {
     for (0..arwr.variant_count) |n| {
         const value: u16 = 0x9110 + @as(u16, @intCast(n));
 
-        vvm.memory[0] = arwr.codeVariant(n); // ARWR Wn
+        vvm.memory[0] = arwr.opcodeVariant(n); // ARWR Wn
         vvm.registers.gp.w[n] = value;
         vvm.registers.addr = 0;
         vvm.registers.pc = 0;

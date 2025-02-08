@@ -14,7 +14,7 @@ test "Test" {
     vvm.init();
     vvm.rom_addr = 0xF000;
 
-    @memcpy(vvm.memory[0..3], &stbid.codeWithLiteral16(0xCFFB)); // STBID disp
+    @memcpy(vvm.memory[0..3], &stbid.opcodeWithLiteral16(0xCFFB)); // STBID disp
     vvm.memory[0xEFFF] = 0;
     vvm.registers.a.b[0] = 0x10;
     vvm.registers.addr = 0x2004;
@@ -25,7 +25,7 @@ test "Test" {
     try std.testing.expectEqual(0x3, vvm.registers.pc);
 
     // Try to write into the ROM
-    @memcpy(vvm.memory[0..3], &stbid.codeWithLiteral16(0xCFFC)); // STBID disp
+    @memcpy(vvm.memory[0..3], &stbid.opcodeWithLiteral16(0xCFFC)); // STBID disp
     vvm.memory[0xF000] = 0;
     vvm.registers.a.b[0] = 0x10;
     vvm.registers.addr = 0x2004;

@@ -12,7 +12,7 @@ test "Test" {
     var vvm: Vvm = undefined;
     vvm.init();
 
-    vvm.memory[0] = zxbw.code(); // ZXBW
+    vvm.memory[0] = zxbw.opcode(); // ZXBW
     vvm.registers.a.b[0] = 0x8F;
     vvm.registers.a.b[1] = 0xFF;
     vvm.registers.pc = 0;

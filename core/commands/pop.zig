@@ -12,7 +12,7 @@ test "Test" {
     var vvm: Vvm = undefined;
     vvm.init();
 
-    vvm.memory[0] = pop.code(); // POP
+    vvm.memory[0] = pop.opcode(); // POP
     vvm.registers.a.dw = 0;
     vvm.memory[0x1000] = 0x01;
     vvm.memory[0x1001] = 0x91;

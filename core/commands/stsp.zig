@@ -12,7 +12,7 @@ test "Test" {
     var vvm: Vvm = undefined;
     vvm.init();
 
-    vvm.memory[0] = stsp.code(); // STSP
+    vvm.memory[0] = stsp.opcode(); // STSP
     vvm.registers.a.w[0] = 0x1231;
     vvm.registers.sp = 0;
     vvm.registers.pc = 0;

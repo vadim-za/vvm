@@ -13,7 +13,7 @@ test "Test" {
     var vvm: Vvm = undefined;
     vvm.init();
 
-    @memcpy(vvm.memory[0..3], &lwid.codeWithLiteral16(0xEFFE)); // LWID disp
+    @memcpy(vvm.memory[0..3], &lwid.opcodeWithLiteral16(0xEFFE)); // LWID disp
     vvm.memory[0x1002] = 0x34;
     vvm.memory[0x1003] = 0x12;
     vvm.registers.a.dw = 0;

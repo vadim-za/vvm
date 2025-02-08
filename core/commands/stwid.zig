@@ -17,7 +17,7 @@ test "Test" {
     vvm.init();
     vvm.rom_addr = 0xF000;
 
-    @memcpy(vvm.memory[0..3], &stwid.codeWithLiteral16(0xCFFA)); // STWID disp
+    @memcpy(vvm.memory[0..3], &stwid.opcodeWithLiteral16(0xCFFA)); // STWID disp
     vvm.memory[0xEFFE] = 0;
     vvm.memory[0xEFFF] = 0;
     vvm.registers.a.w[0] = 0x1234;
@@ -30,7 +30,7 @@ test "Test" {
     try std.testing.expectEqual(0x3, vvm.registers.pc);
 
     // Try to write across the ROM boundary
-    @memcpy(vvm.memory[0..3], &stwid.codeWithLiteral16(0xCFFB)); // STBID disp
+    @memcpy(vvm.memory[0..3], &stwid.opcodeWithLiteral16(0xCFFB)); // STBID disp
     vvm.memory[0xEFFF] = 0;
     vvm.memory[0xF000] = 0;
     vvm.registers.a.w[0] = 0x1234;

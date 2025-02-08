@@ -15,7 +15,7 @@ test "Test" {
     vvm.init();
 
     // Positive values, no sign to extend
-    vvm.memory[0] = sxwx.code(); // SXWX
+    vvm.memory[0] = sxwx.opcode(); // SXWX
     vvm.registers.a.w[0] = 0x7F12;
     vvm.registers.a.w[1] = 0xFFFF;
     vvm.registers.pc = 0;
@@ -24,7 +24,7 @@ test "Test" {
     try std.testing.expectEqual(0x7F12, vvm.registers.a.dw);
 
     // Negative values, sign need to be extended
-    vvm.memory[0] = sxwx.code(); // SXWX
+    vvm.memory[0] = sxwx.opcode(); // SXWX
     vvm.registers.a.w[0] = 0x8012;
     vvm.registers.a.w[1] = 0;
     vvm.registers.pc = 0;

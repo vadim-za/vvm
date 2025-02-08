@@ -12,7 +12,7 @@ test "Test" {
     var vvm: Vvm = undefined;
     vvm.init();
 
-    vvm.memory[0] = xa.code(); // XA
+    vvm.memory[0] = xa.opcode(); // XA
     vvm.registers.a.w[0] = 0xFED9;
     vvm.registers.a.w[1] = 0xBA98;
     vvm.registers.pc = 0;

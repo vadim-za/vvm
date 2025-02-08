@@ -12,7 +12,7 @@ test "Test" {
     var vvm: Vvm = undefined;
     vvm.init();
 
-    vvm.memory[0] = lwi.code(); // LBI
+    vvm.memory[0] = lwi.opcode(); // LBI
     vvm.memory[0x1002] = 0x34;
     vvm.memory[0x1003] = 0x12;
     vvm.registers.a.dw = 0;

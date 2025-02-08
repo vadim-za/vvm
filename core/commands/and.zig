@@ -12,7 +12,7 @@ test "Test" {
     var vvm: Vvm = undefined;
     vvm.init();
 
-    vvm.memory[0] = @"and".code(); // AND
+    vvm.memory[0] = @"and".opcode(); // AND
     vvm.registers.a.w[0] = 0x9112;
     vvm.registers.a.w[1] = 0x800E;
     vvm.registers.pc = 0;

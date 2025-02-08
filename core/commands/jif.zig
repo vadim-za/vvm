@@ -34,7 +34,7 @@ test "Test" {
     var vvm: Vvm = undefined;
     vvm.init();
 
-    vvm.memory[0] = jif.codeVariant(0); // JIFLZ
+    vvm.memory[0] = jif.opcodeVariant(0); // JIFLZ
     vvm.registers.addr = 0x1002;
 
     vvm.registers.a.dw = 0xFFFF_FF00;
@@ -47,7 +47,7 @@ test "Test" {
     vvm.step();
     try std.testing.expectEqual(1, vvm.registers.pc); // not taken
 
-    vvm.memory[0] = jif.codeVariant(1); // JIFLNZ
+    vvm.memory[0] = jif.opcodeVariant(1); // JIFLNZ
     vvm.registers.addr = 0x1002;
 
     vvm.registers.a.dw = 0xFF;
@@ -60,7 +60,7 @@ test "Test" {
     vvm.step();
     try std.testing.expectEqual(1, vvm.registers.pc); // not taken
 
-    vvm.memory[0] = jif.codeVariant(2); // JIFHZ
+    vvm.memory[0] = jif.opcodeVariant(2); // JIFHZ
     vvm.registers.addr = 0x1002;
 
     vvm.registers.a.dw = 0xFFFF_00FF;
@@ -73,7 +73,7 @@ test "Test" {
     vvm.step();
     try std.testing.expectEqual(1, vvm.registers.pc); // not taken
 
-    vvm.memory[0] = jif.codeVariant(3); // JIFHNZ
+    vvm.memory[0] = jif.opcodeVariant(3); // JIFHNZ
     vvm.registers.addr = 0x1002;
 
     vvm.registers.a.dw = 0xFF00;
@@ -86,7 +86,7 @@ test "Test" {
     vvm.step();
     try std.testing.expectEqual(1, vvm.registers.pc); // not taken
 
-    vvm.memory[0] = jif.codeVariant(4); // JIFZ
+    vvm.memory[0] = jif.opcodeVariant(4); // JIFZ
     vvm.registers.addr = 0x1002;
 
     vvm.registers.a.dw = 0xFFFF_0000;
@@ -99,7 +99,7 @@ test "Test" {
     vvm.step();
     try std.testing.expectEqual(1, vvm.registers.pc); // not taken
 
-    vvm.memory[0] = jif.codeVariant(5); // JIFNZ
+    vvm.memory[0] = jif.opcodeVariant(5); // JIFNZ
     vvm.registers.addr = 0x1002;
 
     vvm.registers.a.dw = 0xFFFF;
@@ -112,7 +112,7 @@ test "Test" {
     vvm.step();
     try std.testing.expectEqual(1, vvm.registers.pc); // not taken
 
-    vvm.memory[0] = jif.codeVariant(6); // JIFXZ
+    vvm.memory[0] = jif.opcodeVariant(6); // JIFXZ
     vvm.registers.addr = 0x1002;
 
     vvm.registers.a.dw = 0xFFFF;
@@ -125,7 +125,7 @@ test "Test" {
     vvm.step();
     try std.testing.expectEqual(1, vvm.registers.pc); // not taken
 
-    vvm.memory[0] = jif.codeVariant(7); // JIFXNZ
+    vvm.memory[0] = jif.opcodeVariant(7); // JIFXNZ
     vvm.registers.addr = 0x1002;
 
     vvm.registers.a.dw = 0xFFFF_0000;

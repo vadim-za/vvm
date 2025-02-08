@@ -14,7 +14,7 @@ test "Test" {
     vvm.init();
     vvm.rom_addr = 0xF000;
 
-    vvm.memory[0x1234] = call.code(); // CALL
+    vvm.memory[0x1234] = call.opcode(); // CALL
     vvm.memory[0xEFFE] = 0;
     vvm.memory[0xEFFF] = 0;
     vvm.registers.addr = 0x5678;
@@ -28,7 +28,7 @@ test "Test" {
     try std.testing.expectEqual(0x12, vvm.memory[0xEFFF]);
 
     // CALL pushing address across the ROM boundary
-    vvm.memory[0x1234] = call.code(); // CALL
+    vvm.memory[0x1234] = call.opcode(); // CALL
     vvm.memory[0xEFFF] = 0;
     vvm.memory[0xF000] = 0;
     vvm.registers.addr = 0x5678;

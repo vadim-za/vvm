@@ -12,7 +12,7 @@ test "Test" {
     var vvm: Vvm = undefined;
     vvm.init();
 
-    vvm.memory[0] = axbw.code(); // AXBW
+    vvm.memory[0] = axbw.opcode(); // AXBW
     vvm.registers.a.b[0] = 0x8F;
     vvm.registers.a.b[1] = 0;
     vvm.registers.pc = 0;

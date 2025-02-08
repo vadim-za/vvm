@@ -12,7 +12,7 @@ test "Test" {
     var vvm: Vvm = undefined;
     vvm.init();
 
-    vvm.memory[0] = zxwx.code(); // ZXWC
+    vvm.memory[0] = zxwx.opcode(); // ZXWC
     vvm.registers.a.w[0] = 0x8F12;
     vvm.registers.a.w[1] = 0xFFFF;
     vvm.registers.pc = 0;

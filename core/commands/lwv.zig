@@ -15,7 +15,7 @@ test "Test" {
     var vvm: Vvm = undefined;
     vvm.init();
 
-    @memcpy(vvm.memory[0..3], &lwv.codeWithLiteral16(0x1234)); // LWV 0x1234
+    @memcpy(vvm.memory[0..3], &lwv.opcodeWithLiteral16(0x1234)); // LWV 0x1234
     vvm.registers.a.w[0] = 0;
     vvm.registers.pc = 0;
     vvm.step();

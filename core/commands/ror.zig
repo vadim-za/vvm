@@ -13,7 +13,7 @@ test "Test" {
     var vvm: Vvm = undefined;
     vvm.init();
 
-    vvm.memory[0] = ror.code(); // ROR
+    vvm.memory[0] = ror.opcode(); // ROR
     vvm.registers.a.w[0] = 0xFED9;
     vvm.registers.a.w[1] = 0xBA98;
     vvm.registers.pc = 0;

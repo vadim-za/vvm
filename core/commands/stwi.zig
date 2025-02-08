@@ -13,7 +13,7 @@ test "Test" {
     vvm.init();
     vvm.rom_addr = 0xF000;
 
-    vvm.memory[0] = stwi.code(); // STWI
+    vvm.memory[0] = stwi.opcode(); // STWI
     vvm.memory[0x1002] = 0;
     vvm.memory[0x1003] = 0;
     vvm.registers.a.w[0] = 0x1234;

@@ -13,7 +13,7 @@ test "Test" {
     vvm.init();
     vvm.rom_addr = 0xF000;
 
-    vvm.memory[0] = push.code(); // PUSH
+    vvm.memory[0] = push.opcode(); // PUSH
     vvm.registers.a.w[0] = 0x1234;
     vvm.memory[0x1000] = 0;
     vvm.memory[0x1001] = 0;
