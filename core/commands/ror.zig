@@ -11,7 +11,7 @@ test "Test" {
     const ror = Command.collection.ror;
     var vvm: Vvm = undefined;
 
-    vvm.memory[0] = ror.code(0); // ROR
+    vvm.memory[0] = ror.code(); // ROR
     vvm.registers.a.w[0] = 0xFED9;
     vvm.registers.a.w[1] = 0xBA98;
     vvm.registers.pc = 0;

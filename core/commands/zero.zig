@@ -10,7 +10,7 @@ test "Test" {
     const zero = Command.collection.zero;
     var vvm: Vvm = undefined;
 
-    vvm.memory[0] = zero.code(0); // ZERO
+    vvm.memory[0] = zero.code(); // ZERO
     vvm.registers.a.w[0] = 0x9110;
     vvm.registers.pc = 0;
     vvm.step();

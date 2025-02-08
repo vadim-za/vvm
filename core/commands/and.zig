@@ -10,7 +10,7 @@ test "Test" {
     const @"and" = Command.collection.@"and";
     var vvm: Vvm = undefined;
 
-    vvm.memory[0] = @"and".code(0); // AND
+    vvm.memory[0] = @"and".code(); // AND
     vvm.registers.a.w[0] = 0x9112;
     vvm.registers.a.w[1] = 0x800E;
     vvm.registers.pc = 0;

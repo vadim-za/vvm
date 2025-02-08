@@ -11,7 +11,7 @@ test "Test" {
     const rol = Command.collection.rol;
     var vvm: Vvm = undefined;
 
-    vvm.memory[0] = rol.code(0); // ROL
+    vvm.memory[0] = rol.code(); // ROL
     vvm.registers.a.w[0] = 0xFEDC;
     vvm.registers.a.w[1] = 0xBA98;
     vvm.registers.pc = 0;

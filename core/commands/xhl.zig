@@ -10,7 +10,7 @@ test "Test" {
     const xhl = Command.collection.xhl;
     var vvm: Vvm = undefined;
 
-    vvm.memory[0] = xhl.code(0); // XHL
+    vvm.memory[0] = xhl.code(); // XHL
     vvm.registers.a.w[0] = 0x9110;
     vvm.registers.pc = 0;
     vvm.step();

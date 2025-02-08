@@ -18,7 +18,7 @@ test "Test" {
     for (0..stbr.variant_count) |n| {
         const value16: u16 = 0x9110 + @as(u16, @intCast(n));
 
-        vvm.memory[0] = stbr.code(n); // STBR Bn
+        vvm.memory[0] = stbr.codeVariant(n); // STBR Bn
         vvm.registers.gp.b[n] = 0;
         vvm.registers.a.w[0] = value16;
         vvm.registers.pc = 0;
