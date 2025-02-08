@@ -18,7 +18,7 @@ test "Test" {
     for (0..xwr.variant_count) |n| {
         const value_offs: u16 = @intCast(n);
 
-        vvm.memory[0] = @intCast(xwr.base_code + n); // XWR Wn
+        vvm.memory[0] = xwr.code(n); // XWR Wn
         vvm.registers.gp.w[n] = 0xC010 + value_offs;
         vvm.registers.a.w[0] = 0xA090 + value_offs;
         vvm.registers.pc = 0;

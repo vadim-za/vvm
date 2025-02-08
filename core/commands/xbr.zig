@@ -19,7 +19,7 @@ test "Test" {
         const value_offs8: u8 = @intCast(n);
         const value_offs16: u16 = value_offs8;
 
-        vvm.memory[0] = @intCast(xbr.base_code + n); // XBR Bn
+        vvm.memory[0] = xbr.code(n); // XBR Bn
         vvm.registers.gp.b[n] = 0x10 + value_offs8;
         vvm.registers.a.w[0] = 0xA090 + value_offs16;
         vvm.registers.pc = 0;

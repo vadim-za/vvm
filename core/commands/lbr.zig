@@ -15,10 +15,10 @@ test "Test" {
     const lbr = Command.collection.lbr;
     var vvm: Vvm = undefined;
 
-    for (0..lbr.variant_count) |n| {
+    inline for (0..lbr.variant_count) |n| {
         const value: u8 = 0x10 + @as(u8, @intCast(n));
 
-        vvm.memory[0] = @intCast(lbr.base_code + n); // LBR Bn
+        vvm.memory[0] = lbr.code(n); // LBR Bn
         vvm.registers.gp.b[n] = value;
         vvm.registers.a.dw = 0;
         vvm.registers.pc = 0;

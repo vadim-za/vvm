@@ -1,3 +1,4 @@
+const std = @import("std");
 const Vvm = @import("Vvm.zig");
 const command_list = @import("command_list.zig");
 
@@ -41,6 +42,12 @@ pub fn handler(self: @This(), variant_index: u8) *const Handler {
         self.impl.handler
     else
         self.impl.handler(variant_index);
+}
+
+// This one can be called at runtime! (not purely comptime)
+pub fn code(comptime self: @This(), variant_index: usize) u8 {
+    std.debug.assert(variant_index < self.variant_count);
+    return @intCast(self.base_code + variant_index);
 }
 
 // A struct contaning all commands as its fields (of Command type each)
