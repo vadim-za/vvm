@@ -6,15 +6,15 @@ core: VvmCore,
 env: Environment,
 
 pub fn init(self: *@This()) void {
-    self.env.system = self;
+    self.env.init(self);
     self.core.init();
     self.core.env = .init(Environment, &self.env);
 }
 
 fn run(self: *@This(), max_steps: usize) bool {
-    self.core.running = true;
+    self.env.running = true;
     for (0..max_steps) |_| {
-        if (!self.core.running)
+        if (!self.env.running)
             return true; // successfully finished
         self.core.step();
     }

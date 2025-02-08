@@ -4,12 +4,10 @@ const Environment = @import("Environment.zig");
 memory: Memory,
 registers: Registers,
 env: Environment,
-running: bool,
 rom_addr: u17, // lowest read-only address
 
 pub fn init(self: *@This()) void {
     self.env = .default;
-    self.running = false;
     self.rom_addr = 0x1_0000;
 }
 
@@ -29,12 +27,6 @@ pub const Registers = struct {
         b: [2]u8,
     },
 };
-
-pub fn run(self: *@This()) void {
-    self.running = true;
-    while (self.running)
-        self.step();
-}
 
 pub fn step(self: *@This()) void {
     const command_code = self.fetchCommandByte();
