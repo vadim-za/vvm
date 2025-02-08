@@ -4,7 +4,7 @@ const command_list = @import("command_list.zig");
 
 name: []const u8,
 
-// Machine codes for the command are in the range:
+// Opcodes for the command are in the range:
 // [base_code .. base_code + variant_count] (excluding the right boundary)
 base_code: u8,
 variant_count: u8,
@@ -14,7 +14,7 @@ variant_count: u8,
 //      fn handler(comptime command_code: u8) fn (*Vvm) void - for count > 1
 impl: type,
 
-// A struct contaning all commands as its fields (of Command type each).
+// A struct containing all commands as its fields (of Command type each).
 // (This is actually a backwards dependency, the Command should not depend
 // on command_collection. However it allows convenient usage by simply
 // referring to it as 'Commmand.collection'. We can also utilize some

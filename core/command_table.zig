@@ -1,17 +1,17 @@
+// This is the main opcode table used to perform commands given their opcodes.
+// Command opcode is used as the table index, the respective entry pointing
+// to the command handler.
+pub const table: HandlerTable = makeTable();
+
 const std = @import("std");
 const Vvm = @import("Vvm.zig");
 const Command = @import("Command.zig");
 
-// This is the main table used to perform commands given their codes.
-// Command code is used as the table index, the respective entry pointing
-// to the command handler.
-pub const table: HandlerTable = makeTable();
-
 const HandlerTable = [256]TableEntry;
 const TableEntry = *const Command.Handler;
-const default_entry: TableEntry = unusedOpCodeHandler;
+const default_entry: TableEntry = unusedOpcodeHandler;
 
-// Prepare a table containing command handlers in positions corresponding to command codes
+// Prepare a table containing command handlers in positions corresponding to command opcodes
 fn makeTable() HandlerTable {
     var tbl: HandlerTable = [1]TableEntry{default_entry} ** 256;
 
@@ -52,4 +52,6 @@ fn fillEntry(
     tbl[entry_index] = handler;
 }
 
-fn unusedOpCodeHandler(_: *Vvm) void {}
+// Use a handler separate from NOP for unused table entries,
+// so that we can correctly detect duplicates
+fn unusedOpcodeHandler(_: *Vvm) void {}
