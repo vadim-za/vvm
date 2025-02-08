@@ -11,11 +11,11 @@ test "Test" {
     const Env = struct {
         vvm: *Vvm,
         offs: u8,
-        pub fn in(ptr: ?*anyopaque, port: u8) u8 {
+        pub fn envIn(ptr: ?*anyopaque, port: u8) u8 {
             const self: *@This() = @alignCast(@ptrCast(ptr.?));
             return port +% self.offs;
         }
-        pub fn out(_: ?*anyopaque, _: u8, _: u8) void {}
+        pub fn envOut(_: ?*anyopaque, _: u8, _: u8) void {}
     };
 
     const in = Command.collection.in;

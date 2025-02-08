@@ -16,10 +16,10 @@ test "Test" {
         vvm: *Vvm,
         written_port: ?u8 = null,
         written_value: ?u8 = null,
-        pub fn in(_: ?*anyopaque, _: u8) u8 {
+        pub fn envIn(_: ?*anyopaque, _: u8) u8 {
             return 0;
         }
-        pub fn out(ptr: ?*anyopaque, port: u8, value: u8) void {
+        pub fn envOut(ptr: ?*anyopaque, port: u8, value: u8) void {
             const self: *@This() = @alignCast(@ptrCast(ptr.?));
             self.written_port = port;
             self.written_value = value;

@@ -8,8 +8,8 @@ pub fn init(T: type, ptr: ?*T) @This() {
     return .{
         .ptr = ptr,
         .vft = .{
-            .in = T.in,
-            .out = T.out,
+            .in = T.envIn,
+            .out = T.envOut,
         },
     };
 }
@@ -17,8 +17,8 @@ pub fn init(T: type, ptr: ?*T) @This() {
 pub const default = @This().init(Default, null);
 
 const Default = struct {
-    fn in(_: ?*anyopaque, _: u8) u8 {
+    fn envIn(_: ?*anyopaque, _: u8) u8 {
         return 0;
     }
-    fn out(_: ?*anyopaque, _: u8, _: u8) void {}
+    fn envOut(_: ?*anyopaque, _: u8, _: u8) void {}
 };
