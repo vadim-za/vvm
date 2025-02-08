@@ -72,6 +72,6 @@ Low-endian architecture, 16-bit address space
 | **2x** | XBR B0 | XBR B1 | XBR B2 | XBR B3 | XBR B4 | XBR B5 | XBR B6 | XBR B7 | XWR W0 | XWR W1 | XWR W2 | XWR W3 
 | **3x** | JIFLZ | JIFLNZ | JIFHZ | JIFHNZ | JIFZ | JIFNZ | JIFXZ | JIFXNZ
 | **4x** | ADD | SUB |  AND | OR | XOR | JMP | CALL | RET | ARWR W0 | ARWR W1 | ARWR W2 | ARWR W3
-| **5x** | ZERO | ALL | CPL | XHL | | | | | ROL | ROR | NOP | XA |
-| **6x** | LBI | LBV Byte | IN | | | | | | LWI | LWV Word | LSP | POP
-| **7x** | STBI | ARA | OUT | | SXBW | CXBW | ZXBW | AXBW | STWI | ARV Word | STSP | PUSH | SXWX | CXWX | ZXWX | AXWX
+| **5x** | ZERO | ALL | CPL | XHL | IN | OUT | | | ROL | ROR | ARA | XA | POP | PUSH
+| **6x** | LBI | LBID Word | LBV Byte | | | | | | LWI | LWID Word | LWV Word | LSP 
+| **7x** | STBI | STBID Word | NOP | | SXBW | CXBW | ZXBW | AXBW | STWI | STWID Word | ARV Word | STSP | SXWX | CXWX | ZXWX | AXWX
