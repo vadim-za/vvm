@@ -37,28 +37,32 @@ Low-endian architecture, 16-bit address space
 | ALL | Set all accumulator bits | A:=0xFFFF |
 | CPL | Complement all accumulator bits | A:=~A |
 | XHL | eXchange accumulator's HSB and LSB | HSB(A)<->LSB(A) |
+| IN | Input: read from port | LSB(A):=Port[LSB(ADDR)] |
+| OUT | Output: write into port | Port[LSB(ADDR)]:=LSB(A) |
 | ROL | ROtate extended accumulator Left | (X:A):=ROL(X:A) |
 | ROR | ROtate extended accumulator Right | (X:A):=ROR(X:A) |
-| NOP | No-operation | Do nothing |
+| ARA | Address Register from Accumulator | ADDR:=A |
 | XA | eXchange the accumulators | X<->A |
+| POP | Pop from stack | A:=[SP], SP:=SP+2 |
+| PUSH | Push to stack | SP:=SP-2, [SP]:=A |
 | LBI | Load Byte Indirect | LSB(A):=[ADDR] |
+| LBID Word | Load Byte Indirect Displaced | LSB(A):=[ADDR+Word] |
 | LBV Byte | Load Byte Value | LSB(A):=Byte |
-| IN | Input: read from port | LSB(A):=Port[LSB(ADDR)] |
 | LWI | Load Word Indirect | A:=[ADDR] |
+| LWID Word | Load Word Indirect Displaced | A:=[ADDR+Word] |
 | LWV Word | Load Word Value | A:=Word |
 | LSP | Load Stack Pointer | A:=SP |
-| POP | Pop from stack | A:=[SP], SP:=SP+2 |
 | STBI | STore Byte Indirect | [ADDR]:=LSB(A) |
-| ARA | Address Register from Accumulator | ADDR:=A |
-| OUT | Output: write into port | Port[LSB(ADDR)]:=LSB(A) |
+| STBID Word | STore Byte Indirect Displaced | [ADDR+Word]:=LSB(A) |
+| NOP | No-operation | Do nothing |
 | SXBW | Sign eXtend Byte to Word | A:=SignExtend(LSB(A)) |
 | CXBW | Copy-eXtend Byte to Word | HSB(A):=LSB(A) |
 | ZXBW | Zero-eXtend Byte to Word | HSB(A):=0 |
 | AXBW | All-eXtend Byte to Word | HSB(A):=0xFF |
 | STWI | STore Word Indirect | [ADDR]:=A |
+| STWID Word | STore Word Indirect Displaced | [ADDR+Word]:=A |
 | ARV Word | Address Register from Value | ADDR:=Word |
 | STSP | STore into Stack Pointer | SP:=A |
-| PUSH | Push to stack | SP:=SP-2, [SP]:=A |
 | SXWX | Sign eXtend Word to eXtended | (X:A):=SignExtend(LSB(A)) |
 | CXWX | Copy-eXtend Word to eXtended | X:=A |
 | ZXWX | Zero-eXtend Word to eXtended | X:=0 |
