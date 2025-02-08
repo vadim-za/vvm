@@ -48,7 +48,7 @@ fn dispatch(self: *@This(), command_code: u8) void {
     }
 }
 
-const commands = @import("commands.zig").table;
+const commands = @import("command_table.zig").table;
 
 test "Test" {
     std.testing.refAllDecls(@This());
