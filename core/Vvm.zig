@@ -14,10 +14,10 @@ pub const Registers = struct {
     sp: u16,
     addr: u16,
     a: extern union {
-        w: u16,
+        dw: u32, // (x:a)
+        w: [2]u16, // w[0]=a, w[1]=x
         b: [2]u8,
     },
-    x: u16,
 };
 
 pub fn run(self: *@This()) void {

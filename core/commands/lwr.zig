@@ -6,7 +6,7 @@ pub fn handler(comptime command_code: u8) Command.Handler {
     return struct {
         fn actualHandler(vvm: *Vvm) void {
             const index: u2 = command_code & 3;
-            vvm.registers.a.w = vvm.registers.gp.w[index];
+            vvm.registers.a.w[0] = vvm.registers.gp.w[index];
         }
     }.actualHandler;
 }
@@ -20,10 +20,10 @@ test "Test" {
 
         vvm.memory[0] = @intCast(lwr.base_code + n); // LWR Wn
         vvm.registers.gp.w[n] = value;
-        vvm.registers.a.w = 0;
+        vvm.registers.a.dw = 0;
         vvm.registers.pc = 0;
         vvm.step();
 
-        try std.testing.expectEqual(value, vvm.registers.a.w);
+        try std.testing.expectEqual(value, vvm.registers.a.w[0]);
     }
 }

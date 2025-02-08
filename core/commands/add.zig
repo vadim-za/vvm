@@ -3,9 +3,7 @@ const Vvm = @import("../Vvm.zig");
 const Command = @import("../Command.zig");
 
 pub fn handler(vvm: *Vvm) void {
-    const result: u32 = @as(u32, vvm.registers.a.w) + @as(u32, vvm.registers.x);
-    vvm.registers.a.w = @truncate(result);
-    vvm.registers.x = @intCast(result >> 16);
+    vvm.registers.a.dw = @as(u32, vvm.registers.a.w[0]) + @as(u32, vvm.registers.a.w[1]);
 }
 
 test "Test" {
@@ -13,11 +11,11 @@ test "Test" {
     var vvm: Vvm = undefined;
 
     vvm.memory[0] = @intCast(add.base_code); // ADD
-    vvm.registers.a.w = 0x9110;
-    vvm.registers.x = 0x8000;
+    vvm.registers.a.w[0] = 0x9110;
+    vvm.registers.a.w[1] = 0x8000;
     vvm.registers.pc = 0;
     vvm.step();
 
-    try std.testing.expectEqual(0x1110, vvm.registers.a.w);
-    try std.testing.expectEqual(0x1, vvm.registers.x);
+    try std.testing.expectEqual(0x1110, vvm.registers.a.w[0]);
+    try std.testing.expectEqual(0x1, vvm.registers.a.w[1]);
 }

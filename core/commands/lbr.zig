@@ -20,7 +20,7 @@ test "Test" {
 
         vvm.memory[0] = @intCast(lbr.base_code + n); // LBR Bn
         vvm.registers.gp.b[n] = value;
-        vvm.registers.a.w = 0;
+        vvm.registers.a.dw = 0;
         vvm.registers.pc = 0;
         vvm.step();
 
