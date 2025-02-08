@@ -34,7 +34,7 @@ pub const   lbv  = .{ 0x62, 1, @import("commands/lbv.zig") };
 pub const   lwi  = .{ 0x68, 1, @import("commands/lwi.zig") };
 pub const   lwid = .{ 0x69, 1, @import("commands/lwid.zig") };
 pub const   lwv  = .{ 0x6A, 1, @import("commands/lwv.zig") };
-// pub const lsp = @import("commands/lsp.zig");
+pub const   lsp  = .{ 0x6B, 1, @import("commands/lsp.zig") };
 pub const   nop  = .{ 0x72, 1, @import("commands/nop.zig") };
 
 // zig fmt: on
