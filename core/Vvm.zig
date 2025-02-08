@@ -60,6 +60,19 @@ pub fn writeMemory(self: *@This(), address: u16, value: u8) void {
         self.memory[address] = value;
 }
 
+pub fn readMemoryWord(self: *@This(), address: u16) u16 {
+    const lsb = self.memory[address];
+    const msb = self.memory[address +% 1];
+    return lsb + (@as(u16, msb) << 8);
+}
+
+pub fn writeMemoryWord(self: *@This(), address: u16, value: u16) void {
+    const lsb: u8 = @intCast(value & 0xFF);
+    const msb: u8 = @intCast(value >> 8);
+    self.writeMemory(address, lsb);
+    self.writeMemory(address +% 1, msb);
+}
+
 // Given the just fetched command code, complete fetching the command and execute it.
 fn dispatch(self: *@This(), command_code: u8) void {
     switch (command_code) {
