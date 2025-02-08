@@ -17,6 +17,7 @@ test "Test" {
     // Positive values, no sign to extend
     vvm.memory[0] = sxbw.code(); // SXBW
     vvm.registers.a.b[0] = 0x7F;
+    vvm.registers.a.b[1] = 0xFF;
     vvm.registers.pc = 0;
     vvm.step();
 
@@ -25,6 +26,7 @@ test "Test" {
     // Negative values, sign need to be extended
     vvm.memory[0] = sxbw.code(); // SXBW
     vvm.registers.a.b[0] = 0x80;
+    vvm.registers.a.b[1] = 0;
     vvm.registers.pc = 0;
     vvm.step();
 
