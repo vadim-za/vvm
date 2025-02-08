@@ -55,8 +55,22 @@ pub fn codeVariant(comptime self: @This(), variant_index: usize) u8 {
     return @intCast(self.base_code + variant_index);
 }
 
+test "codeVariant" {
+    const xbr = collection.xbr;
+    for (0..xbr.variant_count) |n|
+        try std.testing.expectEqual(
+            xbr.base_code + @as(u8, @intCast(n)),
+            xbr.codeVariant(n),
+        );
+}
+
 pub fn code(comptime self: @This()) u8 {
     return self.codeVariant(0);
+}
+
+test "code" {
+    const add = collection.add;
+    try std.testing.expectEqual(add.base_code, add.code());
 }
 
 pub fn codeWithLiteral8(comptime self: @This(), literal: u8) [2]u8 {
@@ -64,6 +78,13 @@ pub fn codeWithLiteral8(comptime self: @This(), literal: u8) [2]u8 {
         self.code(),
         literal,
     };
+}
+
+test "codeWithLiteral8" {
+    const lbv = collection.lbv;
+    const bytes = lbv.codeWithLiteral8(0x10);
+    const expected = [2]u8{ lbv.base_code, 0x10 };
+    try std.testing.expectEqualSlices(u8, &expected, &bytes);
 }
 
 pub fn codeWithLiteral16(comptime self: @This(), literal: u16) [3]u8 {
@@ -74,4 +95,9 @@ pub fn codeWithLiteral16(comptime self: @This(), literal: u16) [3]u8 {
     };
 }
 
-// -----------------------------------------------------------------------------
+test "codeWithLiteral16" {
+    const lwv = collection.lwv;
+    const bytes = lwv.codeWithLiteral16(0x1234);
+    const expected = [3]u8{ lwv.base_code, 0x34, 0x12 };
+    try std.testing.expectEqualSlices(u8, &expected, &bytes);
+}

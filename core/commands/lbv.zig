@@ -14,10 +14,6 @@ test "Test" {
     vvm.init();
 
     @memcpy(vvm.memory[0..2], &lbv.codeWithLiteral8(0x10)); // LBV 0x10
-
-    // use the occasion to test lbv.codeWithLiteral8
-    try std.testing.expectEqual(0x10, vvm.memory[1]);
-
     vvm.registers.a.w[0] = 0;
     vvm.registers.pc = 0;
     vvm.step();
