@@ -5,15 +5,17 @@ const Command = @import("../Command.zig");
 pub fn handler(vvm: *Vvm) void {
     var sp = vvm.registers.sp;
     sp -%= 1;
-    vvm.memory[sp] = vvm.registers.a.b[1];
+    vvm.writeMemory(sp, vvm.registers.a.b[1]);
     sp -%= 1;
-    vvm.memory[sp] = vvm.registers.a.b[0];
+    vvm.writeMemory(sp, vvm.registers.a.b[0]);
     vvm.registers.sp = sp;
 }
 
 test "Test" {
     const push = Command.collection.push;
+
     var vvm: Vvm = undefined;
+    vvm.init();
 
     vvm.memory[0] = push.code(); // PUSH
     vvm.registers.a.w[0] = 0x1234;

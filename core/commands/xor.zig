@@ -8,7 +8,9 @@ pub fn handler(vvm: *Vvm) void {
 
 test "Test" {
     const xor = Command.collection.xor;
+
     var vvm: Vvm = undefined;
+    vvm.init();
 
     vvm.memory[0] = xor.code(); // XOR
     vvm.registers.a.w[0] = 0x9112;

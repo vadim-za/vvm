@@ -8,7 +8,9 @@ pub fn handler(vvm: *Vvm) void {
 
 test "Test" {
     const xa = Command.collection.xa;
+
     var vvm: Vvm = undefined;
+    vvm.init();
 
     vvm.memory[0] = xa.code(); // XA
     vvm.registers.a.w[0] = 0xFED9;

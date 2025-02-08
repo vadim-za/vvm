@@ -8,7 +8,9 @@ pub fn handler(vvm: *Vvm) void {
 
 test "Test" {
     const @"or" = Command.collection.@"or";
+
     var vvm: Vvm = undefined;
+    vvm.init();
 
     vvm.memory[0] = @"or".code(); // OR
     vvm.registers.a.w[0] = 0x9112;

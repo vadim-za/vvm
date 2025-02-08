@@ -9,7 +9,9 @@ pub fn handler(vvm: *Vvm) void {
 
 test "Test" {
     const rol = Command.collection.rol;
+
     var vvm: Vvm = undefined;
+    vvm.init();
 
     vvm.memory[0] = rol.code(); // ROL
     vvm.registers.a.w[0] = 0xFEDC;

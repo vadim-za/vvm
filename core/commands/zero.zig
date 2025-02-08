@@ -8,7 +8,9 @@ pub fn handler(vvm: *Vvm) void {
 
 test "Test" {
     const zero = Command.collection.zero;
+
     var vvm: Vvm = undefined;
+    vvm.init();
 
     vvm.memory[0] = zero.code(); // ZERO
     vvm.registers.a.w[0] = 0x9110;

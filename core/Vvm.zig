@@ -1,7 +1,17 @@
 const std = @import("std");
+const Environment = @import("Environment.zig");
 
 memory: Memory,
 registers: Registers,
+env: Environment,
+running: bool,
+rom_addr: u17, // lowest read-only address
+
+pub fn init(self: *@This()) void {
+    self.env = .default;
+    self.running = false;
+    self.rom_addr = 0x1_0000;
+}
 
 pub const Memory = [1 << 16]u8;
 
@@ -21,7 +31,8 @@ pub const Registers = struct {
 };
 
 pub fn run(self: *@This()) void {
-    while (true)
+    self.running = true;
+    while (self.running)
         self.step();
 }
 
@@ -35,6 +46,11 @@ pub fn fetchCommandByte(self: *@This()) u8 {
     const byte = self.memory[self.registers.pc];
     self.registers.pc +%= 1;
     return byte;
+}
+
+pub fn writeMemory(self: *@This(), address: u16, value: u8) void {
+    if (address < self.rom_addr)
+        self.memory[address] = value;
 }
 
 // Given the just fetched command code, complete fetching the command and execute it.

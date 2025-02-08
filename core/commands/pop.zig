@@ -13,7 +13,9 @@ pub fn handler(vvm: *Vvm) void {
 
 test "Test" {
     const pop = Command.collection.pop;
+
     var vvm: Vvm = undefined;
+    vvm.init();
 
     vvm.memory[0] = pop.code(); // POP
     vvm.registers.a.dw = 0;

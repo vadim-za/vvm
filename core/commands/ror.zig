@@ -9,7 +9,9 @@ pub fn handler(vvm: *Vvm) void {
 
 test "Test" {
     const ror = Command.collection.ror;
+
     var vvm: Vvm = undefined;
+    vvm.init();
 
     vvm.memory[0] = ror.code(); // ROR
     vvm.registers.a.w[0] = 0xFED9;

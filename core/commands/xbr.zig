@@ -13,7 +13,9 @@ pub fn handler(comptime command_code: u8) Command.Handler {
 
 test "Test" {
     const xbr = Command.collection.xbr;
+
     var vvm: Vvm = undefined;
+    vvm.init();
 
     for (0..xbr.variant_count) |n| {
         const value_offs8: u8 = @intCast(n);

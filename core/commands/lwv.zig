@@ -11,7 +11,9 @@ pub fn handler(vvm: *Vvm) void {
 
 test "Test" {
     const lwv = Command.collection.lwv;
+
     var vvm: Vvm = undefined;
+    vvm.init();
 
     @memcpy(vvm.memory[0..3], &lwv.codeWithLiteral16(0x1234)); // LWV 0x1234
 

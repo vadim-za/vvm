@@ -13,7 +13,9 @@ pub fn handler(comptime command_code: u8) Command.Handler {
 
 test "Test" {
     const lwr = Command.collection.lwr;
+
     var vvm: Vvm = undefined;
+    vvm.init();
 
     for (0..lwr.variant_count) |n| {
         const value: u16 = 0x9110 + @as(u16, @intCast(n));

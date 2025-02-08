@@ -9,7 +9,9 @@ pub fn handler(vvm: *Vvm) void {
 
 test "Test" {
     const lbv = Command.collection.lbv;
+
     var vvm: Vvm = undefined;
+    vvm.init();
 
     @memcpy(vvm.memory[0..2], &lbv.codeWithLiteral8(0x10)); // LBV 0x10
 

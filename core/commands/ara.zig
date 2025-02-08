@@ -8,7 +8,9 @@ pub fn handler(vvm: *Vvm) void {
 
 test "Test" {
     const ara = Command.collection.ara;
+
     var vvm: Vvm = undefined;
+    vvm.init();
 
     vvm.memory[0] = ara.code(); // ARA
     vvm.registers.a.w[0] = 0x9110;

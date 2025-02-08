@@ -8,7 +8,9 @@ pub fn handler(vvm: *Vvm) void {
 
 test "Test" {
     const xhl = Command.collection.xhl;
+
     var vvm: Vvm = undefined;
+    vvm.init();
 
     vvm.memory[0] = xhl.code(); // XHL
     vvm.registers.a.w[0] = 0x9110;
