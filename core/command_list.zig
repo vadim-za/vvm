@@ -36,6 +36,7 @@ pub const   lwid = .{ 0x69, 1, @import("commands/lwid.zig") };
 pub const   lwv  = .{ 0x6A, 1, @import("commands/lwv.zig") };
 pub const   lsp  = .{ 0x6B, 1, @import("commands/lsp.zig") };
 pub const   stbi = .{ 0x70, 1, @import("commands/stbi.zig") };
+pub const   stbid = .{ 0x71, 1, @import("commands/stbid.zig") };
 //
 pub const   nop  = .{ 0x72, 1, @import("commands/nop.zig") };
 pub const   stsp = .{ 0x7B, 1, @import("commands/stsp.zig") };
