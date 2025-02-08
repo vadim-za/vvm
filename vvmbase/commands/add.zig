@@ -1,8 +1,6 @@
 const std = @import("std");
 const Vvm = @import("../Vvm.zig");
-const commands = @import("../commands.zig");
-
-pub const descriptor = commands.Descriptor.init(0x40);
+const Command = @import("../Command.zig");
 
 pub fn handler(vvm: *Vvm) void {
     const result: u32 = @as(u32, vvm.registers.a.w) + @as(u32, vvm.registers.x);
@@ -11,9 +9,10 @@ pub fn handler(vvm: *Vvm) void {
 }
 
 test "Test" {
+    const add = Command.collection.add;
     var vvm: Vvm = undefined;
 
-    vvm.memory[0] = @intCast(descriptor.base); // ADD
+    vvm.memory[0] = @intCast(add.base_code); // ADD
     vvm.registers.a.w = 0x9110;
     vvm.registers.x = 0x8000;
     vvm.registers.pc = 0;
