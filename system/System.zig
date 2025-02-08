@@ -11,14 +11,22 @@ pub fn init(self: *@This()) void {
     self.core.env = .init(Environment, &self.env);
 }
 
-fn run(self: *@This(), max_steps: usize) bool {
+fn run(self: *@This(), max_steps: ?usize) bool {
     self.env.running = true;
-    for (0..max_steps) |_| {
+
+    var remaining_steps = max_steps;
+    while (true) {
         if (!self.env.running)
             return true; // successfully finished
+
+        if (remaining_steps) |*steps| {
+            if (steps.* == 0)
+                return false; // seems to loop indefinitely
+            steps.* -|= 1;
+        }
+
         self.core.step();
     }
-    return false; // seems to loop indefinitely
 }
 
 test "Test" {
