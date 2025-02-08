@@ -47,5 +47,6 @@ pub const   stwid= .{ 0x79, 1, @import("commands/stwid.zig") };
 pub const   arv  = .{ 0x7A, 1, @import("commands/arv.zig") };
 pub const   stsp = .{ 0x7B, 1, @import("commands/stsp.zig") };
 pub const   sxwx = .{ 0x7C, 1, @import("commands/sxwx.zig") };
+pub const   cxwx = .{ 0x7D, 1, @import("commands/cxwx.zig") };
 
 // zig fmt: on
