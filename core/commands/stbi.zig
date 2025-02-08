@@ -11,6 +11,7 @@ test "Test" {
 
     var vvm: Vvm = undefined;
     vvm.init();
+    vvm.rom_addr = 0xF000;
 
     vvm.memory[0] = stbi.code(); // STBI
     vvm.memory[0x1002] = 0;
@@ -19,5 +20,15 @@ test "Test" {
     vvm.registers.pc = 0;
     vvm.step();
 
-    try std.testing.expectEqual(0x10, vvm.memory[0x1002]);
+    try std.testing.expectEqual(0x10, vvm.memory[0x1002]); // written
+
+    // Try to write into the rom
+    vvm.registers.a.w[0] = 0x1234;
+    vvm.memory[0xF000] = 0;
+    vvm.registers.a.b[0] = 0x10;
+    vvm.registers.addr = 0xF000;
+    vvm.registers.pc = 0;
+    vvm.step();
+
+    try std.testing.expectEqual(0, vvm.memory[0xF000]); // not written
 }
