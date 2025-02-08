@@ -14,7 +14,12 @@ variant_count: u8,
 //      fn handler(comptime command_code: u8) fn (*Vvm) void - for count > 1
 impl: type,
 
-// A struct contaning all commands as its fields (of Command type each)
+// A struct contaning all commands as its fields (of Command type each).
+// (This is actually a backwards dependency, the Command should not depend
+// on command_collection. However it allows convenient usage by simply
+// referring to it as 'Commmand.collection'. We can also utilize some
+// of its commands it to reduce the amount of code in unit tests for the
+// 'Command.code...()' functions. So we allow it as an exception.)
 pub const collection = command_collection.collectAll();
 const command_collection = @import("command_collection.zig");
 
