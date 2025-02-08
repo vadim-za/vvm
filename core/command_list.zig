@@ -41,6 +41,7 @@ pub const   nop  = .{ 0x72, 1, @import("commands/nop.zig") };
 //
 pub const   stwi = .{ 0x78, 1, @import("commands/stwi.zig") };
 pub const   stwid= .{ 0x79, 1, @import("commands/stwid.zig") };
+pub const   arv  = .{ 0x7A, 1, @import("commands/arv.zig") };
 pub const   stsp = .{ 0x7B, 1, @import("commands/stsp.zig") };
 
 // zig fmt: on

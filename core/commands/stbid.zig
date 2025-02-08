@@ -22,6 +22,7 @@ test "Test" {
     vvm.step();
 
     try std.testing.expectEqual(0x10, vvm.memory[0xEFFF]); // written
+    try std.testing.expectEqual(0x3, vvm.registers.pc);
 
     // Try to write into the ROM
     @memcpy(vvm.memory[0..3], &stbid.codeWithLiteral16(0xCFFC)); // STBID disp
@@ -32,4 +33,5 @@ test "Test" {
     vvm.step();
 
     try std.testing.expectEqual(0, vvm.memory[0xF000]); // not written
+    try std.testing.expectEqual(0x3, vvm.registers.pc);
 }
