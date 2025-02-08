@@ -1,10 +1,10 @@
 // This is the core of the virtual machine, consisting of the processor
 // and 64K of actual memory (not just address space).
-// This core is supposed to be augmented by an "Environment", which
+// This core is supposed to be augmented by an "environment", which
 // is expected to provide access to the "rest of the system" by connecting
 // the core's ports to the "actual hardware".
 // An arbitrarily large range of memory at the end of the address space
-// can be declare read-only.
+// can be declared read-only by setting the 'rom_addr' field.
 
 const std = @import("std");
 const Environment = @import("Environment.zig");
@@ -19,8 +19,8 @@ rom_addr: u17, // memory is read-only at rom_addr and above
 // The user is supposed to start with an uninitialized struct and then call
 // init(). Afterwards, the user may override the 'env' and 'rom_addr' fields.
 pub fn init(self: *@This()) void {
-    self.env = .default;
-    self.rom_addr = 0x1_0000;
+    self.env = .default; // not connected to anything
+    self.rom_addr = 0x1_0000; // the entire memory is read/write
 }
 
 pub const Memory = [1 << 16]u8; // 64K of RAM
@@ -43,6 +43,12 @@ pub const Registers = struct {
 
 // Execute a single command at PC, incrementing PC by the command size.
 // PC is incremented prior to the command execution.
+// We don't provide a run() method here, since executing the code
+// indefinitely would typically need to provide an option to stop
+// the code execution, which is supposed to be done by accessing the
+// environment through the ports. So the run() functionality
+// would need to be implemented in the context of the respective
+// larger system.
 pub fn step(self: *@This()) void {
     const command_opcode = self.fetchCommandByte();
     self.dispatch(command_opcode);
