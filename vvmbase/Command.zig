@@ -32,14 +32,14 @@ pub fn init(command_name: []const u8) @This() {
 
 pub const Handler = fn (vvm: *Vvm) void;
 
-pub fn handler(self: @This(), comptime index: u8) *const Handler {
-    if (index >= self.variant_count)
+pub fn handler(self: @This(), variant_index: u8) *const Handler {
+    if (variant_index >= self.variant_count)
         @compileError("Index out of range for " ++ self.name);
 
     return if (self.variant_count == 1)
         self.impl.handler
     else
-        self.impl.handler(index);
+        self.impl.handler(variant_index);
 }
 
 const command_collection = @import("command_collection.zig");
