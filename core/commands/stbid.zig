@@ -23,7 +23,7 @@ test "Test" {
 
     try std.testing.expectEqual(0x10, vvm.memory[0xEFFF]); // written
 
-    // Try to write into the rom
+    // Try to write into the ROM
     @memcpy(vvm.memory[0..3], &stbid.codeWithLiteral16(0xCFFC)); // STBID disp
     vvm.memory[0xF000] = 0;
     vvm.registers.a.b[0] = 0x10;

@@ -22,7 +22,7 @@ test "Test" {
 
     try std.testing.expectEqual(0x10, vvm.memory[0x1002]); // written
 
-    // Try to write into the rom
+    // Try to write into the ROM
     vvm.memory[0xF000] = 0;
     vvm.registers.a.b[0] = 0x10;
     vvm.registers.addr = 0xF000;

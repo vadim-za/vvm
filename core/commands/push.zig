@@ -30,7 +30,7 @@ test "Test" {
     try std.testing.expectEqual(0x12, vvm.memory[0x1001]);
     try std.testing.expectEqual(0x1000, vvm.registers.sp);
 
-    // Try to push against the ROM boundary
+    // Try to push across the ROM boundary
     vvm.registers.a.w[0] = 0x1234;
     vvm.memory[0xEFFF] = 0;
     vvm.memory[0xF000] = 0;

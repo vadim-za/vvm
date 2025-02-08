@@ -28,7 +28,7 @@ test "Test" {
     try std.testing.expectEqual(0x34, vvm.memory[0xEFFE]); // written
     try std.testing.expectEqual(0x12, vvm.memory[0xEFFF]); // written
 
-    // Try to write into the rom
+    // Try to write across the ROM boundary
     @memcpy(vvm.memory[0..3], &stwid.codeWithLiteral16(0xCFFB)); // STBID disp
     vvm.memory[0xEFFF] = 0;
     vvm.memory[0xF000] = 0;
