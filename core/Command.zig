@@ -69,8 +69,8 @@ pub fn codeWithLiteral8(comptime self: @This(), literal: u8) [2]u8 {
 pub fn codeWithLiteral16(comptime self: @This(), literal: u16) [3]u8 {
     return .{
         self.code(),
-        literal >> 8,
-        literal & 0xFF,
+        @intCast(literal & 0xFF), // LSB
+        @intCast(literal >> 8), // MSB
     };
 }
 
