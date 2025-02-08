@@ -11,6 +11,16 @@ pub fn init(self: *@This()) void {
     self.core.env = .init(Environment, &self.env);
 }
 
+fn run(self: *@This(), max_steps: usize) bool {
+    self.core.running = true;
+    for (0..max_steps) |_| {
+        if (!self.core.running)
+            return true; // successfully finished
+        self.core.step();
+    }
+    return false; // seems to loop indefinitely
+}
+
 test "Test" {
     var system: @This() = undefined;
     system.init();
@@ -20,8 +30,6 @@ test "Test" {
     core.memory[1] = 0x5A; // ARA
     core.memory[2] = 0x55; // OUT
     core.registers.pc = 0;
-    //@breakpoint();
-    core.run();
-
+    try std.testing.expect(system.run(10));
     try std.testing.expectEqual(3, core.registers.pc);
 }
