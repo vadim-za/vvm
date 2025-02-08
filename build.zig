@@ -6,14 +6,14 @@ pub fn build(b: *std.Build) void {
 
     const vvm = b.addExecutable(.{
         .name = "vvm",
-        .root_source_file = b.path("vvmbase/Vvm.zig"),
+        .root_source_file = b.path("core/Vvm.zig"),
         .target = target,
         .optimize = optimize,
     });
     b.installArtifact(vvm);
 
     const vvm_tests = b.addTest(.{
-        .root_source_file = b.path("vvmbase/Vvm.zig"),
+        .root_source_file = b.path("core/Vvm.zig"),
         .target = target,
         .optimize = optimize,
     });
