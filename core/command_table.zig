@@ -2,7 +2,9 @@ const std = @import("std");
 const Vvm = @import("Vvm.zig");
 const Command = @import("Command.zig");
 
-// This is the main table used to perform commands given their codes
+// This is the main table used to perform commands given their codes.
+// Command code is used as the table index, the respective entry pointing
+// to the command handler.
 pub const table: HandlerTable = makeTable();
 
 const HandlerTable = [256]TableEntry;

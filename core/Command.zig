@@ -19,6 +19,7 @@ const ListEntry = struct {
     type, // impl
 };
 
+// Construct a command from a given entry in the 'command_list'
 pub fn init(command_name: []const u8) @This() {
     const list_entry: ListEntry = @field(command_list, command_name);
 
@@ -42,5 +43,6 @@ pub fn handler(self: @This(), variant_index: u8) *const Handler {
         self.impl.handler(variant_index);
 }
 
-const command_collection = @import("command_collection.zig");
+// A struct contaning all commands as its fields (of Command type each)
 pub const collection = command_collection.collectAll();
+const command_collection = @import("command_collection.zig");
