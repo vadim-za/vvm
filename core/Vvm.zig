@@ -73,6 +73,17 @@ pub fn writeMemoryWord(self: *@This(), address: u16, value: u16) void {
     self.writeMemory(address +% 1, msb);
 }
 
+pub fn pushWord(self: *@This(), value: u16) void {
+    self.registers.sp -%= 2;
+    self.writeMemoryWord(self.registers.sp, value);
+}
+
+pub fn popWord(self: *@This()) u16 {
+    const result = self.readMemoryWord(self.registers.sp);
+    self.registers.sp +%= 2;
+    return result;
+}
+
 // Given the just fetched command code, complete fetching the command and execute it.
 fn dispatch(self: *@This(), command_code: u8) void {
     switch (command_code) {

@@ -3,12 +3,7 @@ const Vvm = @import("../Vvm.zig");
 const Command = @import("../Command.zig");
 
 pub fn handler(vvm: *Vvm) void {
-    var sp = vvm.registers.sp;
-    sp -%= 1;
-    vvm.writeMemory(sp, vvm.registers.a.b[1]);
-    sp -%= 1;
-    vvm.writeMemory(sp, vvm.registers.a.b[0]);
-    vvm.registers.sp = sp;
+    vvm.pushWord(vvm.registers.a.w[0]);
 }
 
 test "Test" {
