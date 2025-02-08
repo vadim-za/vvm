@@ -10,7 +10,7 @@ test "Test" {
     const add = Command.collection.add;
     var vvm: Vvm = undefined;
 
-    vvm.memory[0] = @intCast(add.base_code); // ADD
+    vvm.memory[0] = add.base_code; // ADD
     vvm.registers.a.w[0] = 0x9110;
     vvm.registers.a.w[1] = 0x8000;
     vvm.registers.pc = 0;
