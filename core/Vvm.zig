@@ -48,6 +48,13 @@ pub fn fetchCommandByte(self: *@This()) u8 {
     return byte;
 }
 
+// Fetch two command bytes (LSB, then MSB) and return them as a single word
+pub fn fetchCommandWord(self: *@This()) u16 {
+    const lsb = self.fetchCommandByte();
+    const msb = self.fetchCommandByte();
+    return lsb + (@as(u16, msb) << 8);
+}
+
 pub fn writeMemory(self: *@This(), address: u16, value: u8) void {
     if (address < self.rom_addr)
         self.memory[address] = value;
