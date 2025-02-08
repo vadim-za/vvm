@@ -21,7 +21,7 @@ fn makeTable() HandlerTable {
         const command = @field(collection, field.name);
         for (
             0..command.variant_count,
-            command.base_code..,
+            command.base_opcode..,
         ) |index, code|
             fillEntry(
                 &tbl,

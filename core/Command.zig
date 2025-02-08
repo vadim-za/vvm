@@ -5,8 +5,8 @@ const command_list = @import("command_list.zig");
 name: []const u8,
 
 // Opcodes for the command are in the range:
-// [base_code .. base_code + variant_count] (excluding the right boundary)
-base_code: u8,
+// [base_opcode .. base_opcode + variant_count] (excluding the right boundary)
+base_opcode: u8,
 variant_count: u8,
 
 // the 'impl' type should publish the 'handler' function:
@@ -34,7 +34,7 @@ pub fn init(command_name: []const u8) @This() {
 
     return .{
         .name = command_name,
-        .base_code = list_entry[0],
+        .base_opcode = list_entry[0],
         .variant_count = list_entry[1],
         .impl = list_entry[2],
     };
@@ -57,14 +57,14 @@ pub fn handler(self: @This(), variant_index: u8) *const Handler {
 
 pub fn opcodeVariant(comptime self: @This(), variant_index: usize) u8 {
     std.debug.assert(variant_index < self.variant_count);
-    return @intCast(self.base_code + variant_index);
+    return @intCast(self.base_opcode + variant_index);
 }
 
 test "opcodeVariant" {
     const xbr = collection.xbr;
     for (0..xbr.variant_count) |n|
         try std.testing.expectEqual(
-            xbr.base_code + @as(u8, @intCast(n)),
+            xbr.base_opcode + @as(u8, @intCast(n)),
             xbr.opcodeVariant(n),
         );
 }
@@ -75,7 +75,7 @@ pub fn opcode(comptime self: @This()) u8 {
 
 test "opcode" {
     const add = collection.add;
-    try std.testing.expectEqual(add.base_code, add.opcode());
+    try std.testing.expectEqual(add.base_opcode, add.opcode());
 }
 
 pub fn opcodeWithLiteral8(comptime self: @This(), literal: u8) [2]u8 {
@@ -88,7 +88,7 @@ pub fn opcodeWithLiteral8(comptime self: @This(), literal: u8) [2]u8 {
 test "opcodeWithLiteral8" {
     const lbv = collection.lbv;
     const bytes = lbv.opcodeWithLiteral8(0x10);
-    const expected = [2]u8{ lbv.base_code, 0x10 };
+    const expected = [2]u8{ lbv.base_opcode, 0x10 };
     try std.testing.expectEqualSlices(u8, &expected, &bytes);
 }
 
@@ -103,6 +103,6 @@ pub fn opcodeWithLiteral16(comptime self: @This(), literal: u16) [3]u8 {
 test "opcodeWithLiteral16" {
     const lwv = collection.lwv;
     const bytes = lwv.opcodeWithLiteral16(0x1234);
-    const expected = [3]u8{ lwv.base_code, 0x34, 0x12 };
+    const expected = [3]u8{ lwv.base_opcode, 0x34, 0x12 };
     try std.testing.expectEqualSlices(u8, &expected, &bytes);
 }
