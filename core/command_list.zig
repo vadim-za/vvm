@@ -28,6 +28,7 @@ pub const   nop  = .{ 0x5A, 1, @import("commands/nop.zig") };
 pub const   ara  = .{ 0x5A, 1, @import("commands/ara.zig") };
 pub const   xa   = .{ 0x5B, 1, @import("commands/xa.zig") };
 pub const   pop  = .{ 0x5C, 1, @import("commands/pop.zig") };
+pub const   push = .{ 0x5D, 1, @import("commands/push.zig") };
 // // pub const lbi = @import("commands/lbi.zig");
 //pub const   lbv  = .{ 0x61, 1, @import("commands/lbv.zig") };
 // pub const in = @import("commands/in.zig");

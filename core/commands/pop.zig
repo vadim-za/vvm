@@ -24,4 +24,5 @@ test "Test" {
     vvm.step();
 
     try std.testing.expectEqual(0x9101, vvm.registers.a.w[0]);
+    try std.testing.expectEqual(0x1002, vvm.registers.sp);
 }
