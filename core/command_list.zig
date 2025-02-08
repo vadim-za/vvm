@@ -24,7 +24,6 @@ pub const   xhl  = .{ 0x53, 1, @import("commands/xhl.zig") };
 // // pub const   out  = .{ 0x55, 1, @import("commands/out.zig") };
 pub const   rol  = .{ 0x58, 1, @import("commands/rol.zig") };
 pub const   ror  = .{ 0x59, 1, @import("commands/ror.zig") };
-pub const   nop  = .{ 0x5A, 1, @import("commands/nop.zig") };
 pub const   ara  = .{ 0x5A, 1, @import("commands/ara.zig") };
 pub const   xa   = .{ 0x5B, 1, @import("commands/xa.zig") };
 pub const   pop  = .{ 0x5C, 1, @import("commands/pop.zig") };
@@ -35,5 +34,6 @@ pub const   lbv  = .{ 0x62, 1, @import("commands/lbv.zig") };
 // pub const lwi = @import("commands/lwi.zig");
 pub const   lwv  = .{ 0x6A, 1, @import("commands/lwv.zig") };
 // pub const lsp = @import("commands/lsp.zig");
+pub const   nop  = .{ 0x72, 1, @import("commands/nop.zig") };
 
 // zig fmt: on

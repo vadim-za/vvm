@@ -9,7 +9,7 @@ pub const table: HandlerTable = makeTable();
 
 const HandlerTable = [256]TableEntry;
 const TableEntry = *const Command.Handler;
-const default_entry: TableEntry = Command.collection.nop.handler(0);
+const default_entry: TableEntry = unusedOpCodeHandler;
 
 // Prepare a table containing command handlers in positions corresponding to command codes
 fn makeTable() HandlerTable {
@@ -51,3 +51,5 @@ fn fillEntry(
 
     tbl[entry_index] = handler;
 }
+
+fn unusedOpCodeHandler(_: *Vvm) void {}
