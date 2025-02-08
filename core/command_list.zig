@@ -30,10 +30,10 @@ pub const   xa   = .{ 0x5B, 1, @import("commands/xa.zig") };
 pub const   pop  = .{ 0x5C, 1, @import("commands/pop.zig") };
 pub const   push = .{ 0x5D, 1, @import("commands/push.zig") };
 // // pub const lbi = @import("commands/lbi.zig");
-//pub const   lbv  = .{ 0x61, 1, @import("commands/lbv.zig") };
+pub const   lbv  = .{ 0x62, 1, @import("commands/lbv.zig") };
 // pub const in = @import("commands/in.zig");
 // pub const lwi = @import("commands/lwi.zig");
-//pub const   lwv  = .{ 0x69, 1, @import("commands/lwv.zig") };
+//pub const   lwv  = .{ 0x6A, 1, @import("commands/lwv.zig") };
 // pub const lsp = @import("commands/lsp.zig");
 
 // zig fmt: on

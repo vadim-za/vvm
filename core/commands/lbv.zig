@@ -1,8 +1,6 @@
 const std = @import("std");
 const Vvm = @import("../Vvm.zig");
-const commands = @import("../commands.zig");
-
-pub const descriptor = commands.Descriptor.init(0x61);
+const Command = @import("../Command.zig");
 
 pub fn handler(vvm: *Vvm) void {
     const byte = vvm.fetchCommandByte();
@@ -10,11 +8,11 @@ pub fn handler(vvm: *Vvm) void {
 }
 
 test "Test" {
+    const lbv = Command.collection.lbv;
     var vvm: Vvm = undefined;
 
-    vvm.memory[0] = @intCast(descriptor.base); // LBV
-    vvm.memory[1] = 0x10;
-    vvm.registers.a.w = 0;
+    @memcpy(vvm.memory[0..2], &lbv.codeWithLiteral8(0x10));
+    vvm.registers.a.w[0] = 0;
     vvm.registers.pc = 0;
     vvm.step();
 

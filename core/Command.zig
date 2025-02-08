@@ -59,14 +59,14 @@ pub fn code(comptime self: @This()) u8 {
     return self.codeVariant(0);
 }
 
-pub fn codeWithLiteral8(comptime self: @This(), literal: u8) u8[2] {
+pub fn codeWithLiteral8(comptime self: @This(), literal: u8) [2]u8 {
     return .{
         self.code(),
         literal,
     };
 }
 
-pub fn codeWithLiteral16(comptime self: @This(), literal: u16) u8[3] {
+pub fn codeWithLiteral16(comptime self: @This(), literal: u16) [3]u8 {
     return .{
         self.code(),
         literal >> 8,
