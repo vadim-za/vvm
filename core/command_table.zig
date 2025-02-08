@@ -1,6 +1,6 @@
-// This is the main opcode table used to perform commands given their opcodes.
-// Command opcode is used as the table index, the respective entry pointing
-// to the command handler.
+// The following decl ('table') is the main opcode table used to perform commands
+// given their opcodes. A command opcode is used as an index into this table,
+// the respective entry of the table is pointing to the command handler.
 pub const table: HandlerTable = makeTable();
 
 const std = @import("std");

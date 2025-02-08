@@ -2,11 +2,13 @@ const std = @import("std");
 const command_list = @import("command_list.zig");
 const Command = @import("Command.zig");
 
-const FullCollection = MakeFullCollectionType();
-
+// Construct a collection of all commands in 'command_list'. Comptime only.
+// See MakeFullCollectionType() for further info.
 pub fn collectAll() FullCollection {
-    return .{};
+    return .{}; // the type already defines all necessary field values as defaults
 }
+
+const FullCollection = MakeFullCollectionType();
 
 // For each pub decl in 'command_list' the constructed type contains
 // an identically named field of type Command. Thus it looks smth like:

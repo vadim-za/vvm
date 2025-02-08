@@ -1,3 +1,9 @@
+// An intermediate description of a command, constructed (at comptime)
+// from an entry in 'command_list'. These descriptions are then collected
+// into a single collection available as 'Command.collection'.
+// The latter in turn is used as a source to construct the opcode table
+// in 'command_table.zig'.
+
 const std = @import("std");
 const Vvm = @import("Vvm.zig");
 const command_list = @import("command_list.zig");
@@ -10,8 +16,8 @@ base_opcode: u8,
 variant_count: u8,
 
 // the 'impl' type should publish the 'handler' function:
-//      fn handler(vvm: *Vvm) void - for count == 1
-//      fn handler(comptime command_opcode: u8) fn (*Vvm) void - for count > 1
+//      fn handler(vvm: *Vvm) void - for variant_count == 1
+//      fn handler(comptime command_opcode: u8) Command.Handler - for variant_count > 1
 impl: type,
 
 // A struct containing all commands as its fields (of Command type each).
@@ -23,7 +29,8 @@ impl: type,
 pub const collection = command_collection.collectAll();
 const command_collection = @import("command_collection.zig");
 
-// Construct a command from a given entry in the 'command_list'
+// Construct a command from a given entry in the 'command_list'.
+// 'command_name' specifies the entry name.
 pub fn init(command_name: []const u8) @This() {
     const ListEntry = struct {
         u8, // base_command_code
@@ -44,7 +51,7 @@ pub const Handler = fn (vvm: *Vvm) void;
 
 pub fn handler(self: @This(), variant_index: u8) *const Handler {
     if (variant_index >= self.variant_count)
-        @compileError("Index out of range for " ++ self.name);
+        @compileError("Variant index out of range for " ++ self.name);
 
     return if (self.variant_count == 1)
         self.impl.handler

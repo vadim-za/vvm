@@ -1,3 +1,6 @@
+// This is the original source from which the main opcode table
+// in 'command_table.zig' is built (at comptime).
+
 // zig fmt: off
 
 pub const   lbr  = .{ 0x00, 8, @import("commands/lbr.zig") };
