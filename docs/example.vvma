@@ -89,7 +89,7 @@ Skip:
     xa                                  XRA C
     lbr b0                              JP SameSign
     xor                                 MOV A,B
-    sxbw ; HSB(A)=xor of signs          ORA A
+    sxbw ; MSB(A)=xor of signs          ORA A
     jifhz SameSign                      JP True ; B >= 0, C < 0
     lbr b0                              JMP Skip
     sxbw                            SameSign:

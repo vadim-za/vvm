@@ -4,8 +4,8 @@ const Command = @import("../Command.zig");
 
 pub fn handler(vvm: *Vvm) void {
     const lsb = vvm.fetchCommandByte();
-    const hsb = vvm.fetchCommandByte();
-    const word: u16 = (@as(u16, hsb) << 8) + lsb;
+    const msb = vvm.fetchCommandByte();
+    const word: u16 = (@as(u16, msb) << 8) + lsb;
     vvm.registers.a.w[0] = word;
 }
 

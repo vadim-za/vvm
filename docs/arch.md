@@ -18,8 +18,8 @@ Low-endian architecture, 16-bit address space
 | XWR Wn | eXchange Word Register | A<->Wn |
 | JIFLZ | Jump IF Low byte is Zero | if(LSB(A)==0) PC:=ADDR |
 | JIFLNZ | Jump IF Low byte is Not Zero | if(LSB(A)!=0) PC:=ADDR |
-| JIFHZ | Jump IF High byte is Zero | if(HSB(A)==0) PC:=ADDR |
-| JIFHNZ | Jump IF High byte is Not Zero | if(HSB(A)!=0) PC:=ADDR |
+| JIFHZ | Jump IF High byte is Zero | if(MSB(A)==0) PC:=ADDR |
+| JIFHNZ | Jump IF High byte is Not Zero | if(MSB(A)!=0) PC:=ADDR |
 | JIFZ | Jump IF accumulator is Zero | if(A==0) PC:=ADDR |
 | JIFNZ | Jump IF accumulator is Not Zero | if(A!=0) PC:=ADDR |
 | JIFXZ | Jump IF accumulator eXtension is Zero | if(X==0) PC:=ADDR |
@@ -36,7 +36,7 @@ Low-endian architecture, 16-bit address space
 | ZERO | Zero the accumulator | A:=0 |
 | ALL | Set all accumulator bits | A:=0xFFFF |
 | CPL | Complement all accumulator bits | A:=~A |
-| XHL | eXchange accumulator's HSB and LSB | HSB(A)<->LSB(A) |
+| XHL | eXchange accumulator's high and low bytes | MSB(A)<->LSB(A) |
 | IN | Input: read from port | LSB(A):=Port[LSB(ADDR)] |
 | OUT | Output: write into port | Port[LSB(ADDR)]:=LSB(A) |
 | ROL | ROtate extended accumulator Left | (X:A):=ROL(X:A) |
@@ -56,9 +56,9 @@ Low-endian architecture, 16-bit address space
 | STBID Word | STore Byte Indirect Displaced | [ADDR+Word]:=LSB(A) |
 | NOP | No-operation | Do nothing |
 | SXBW | Sign eXtend Byte to Word | A:=SignExtend(LSB(A)) |
-| CXBW | Copy-eXtend Byte to Word | HSB(A):=LSB(A) |
-| ZXBW | Zero-eXtend Byte to Word | HSB(A):=0 |
-| AXBW | All-eXtend Byte to Word | HSB(A):=0xFF |
+| CXBW | Copy-eXtend Byte to Word | MSB(A):=LSB(A) |
+| ZXBW | Zero-eXtend Byte to Word | MSB(A):=0 |
+| AXBW | All-eXtend Byte to Word | MSB(A):=0xFF |
 | STWI | STore Word Indirect | [ADDR]:=A |
 | STWID Word | STore Word Indirect Displaced | [ADDR+Word]:=A |
 | ARV Word | Address Register from Value | ADDR:=Word |
