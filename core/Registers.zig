@@ -1,8 +1,9 @@
 // VVM register file
 // See the architectural documentation for details
 
-const bid = @import("bid.zig");
+const std = @import("std");
 
+// VVM uses little endian.
 // Due to unknown host endianess we cannot alias values of different sizes,
 // therefore we choose u8 as the fundamental type and provide access helper
 // functions ('init' and 'as') for larger sizes.
@@ -20,18 +21,13 @@ pub const WordRegister = extern struct {
     b: [2]u8,
 
     pub fn initWord(word: u16) @This() {
-        return .{
-            .b = .{
-                bid.loHalf(word),
-                bid.hiHalf(word),
-            },
-        };
+        return @bitCast(std.mem.nativeToLittle(u16, word));
     }
 
-    pub fn asWord(self: *@This()) u16 {
-        return bid.combine(
-            self.b[1],
-            self.b[0],
+    pub fn asWord(self: @This()) u16 {
+        return std.mem.littleToNative(
+            u16,
+            @bitCast(self),
         );
     }
 };
@@ -41,18 +37,13 @@ const Accumulators = extern union {
     b: [2]u8, // aliasing the bytes is okay, we also need only the first 2
 
     pub fn initDword(dword: u32) @This() {
-        return .{
-            .w = .{
-                .initWord(bid.loHalf(dword)),
-                .initWord(bid.hiHalf(dword)),
-            },
-        };
+        return @bitCast(std.mem.nativeToLittle(u32, dword));
     }
 
-    pub fn asDword(self: *@This()) u32 {
-        return bid.combine(
-            self.w[1].asWord(),
-            self.w[0].asWord(),
+    pub fn asDword(self: @This()) u32 {
+        return std.mem.littleToNative(
+            u32,
+            @bitCast(self),
         );
     }
 };
