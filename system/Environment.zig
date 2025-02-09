@@ -26,7 +26,7 @@ pub fn envOut(ptr: ?*anyopaque, port: u8, value: u8) void {
     const self: *@This() = @alignCast(@ptrCast(ptr.?));
     switch (port) {
         0 => {
-            if (value & 1 == 0)
+            if (value == 0)
                 self.running = false;
         },
         1 => {
