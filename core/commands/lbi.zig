@@ -14,7 +14,7 @@ test "Test" {
 
     vvm.memory[0] = lbi.opcode(); // LBI
     vvm.memory[0x1002] = 0x10;
-    vvm.registers.a.dw = 0;
+    vvm.registers.a = .initDword(0);
     vvm.registers.addr = 0x1002;
     vvm.registers.pc = 0;
     vvm.step();
