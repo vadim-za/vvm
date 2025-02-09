@@ -3,7 +3,7 @@ const Vvm = @import("../Vvm.zig");
 const Command = @import("../Command.zig");
 
 pub fn handler(vvm: *Vvm) void {
-    vvm.pushWord(vvm.registers.a.w[0]);
+    vvm.pushWord(vvm.registers.a.w[0].asWord());
 }
 
 test "Test" {
@@ -14,7 +14,7 @@ test "Test" {
     vvm.rom_addr = 0xF000;
 
     vvm.memory[0] = push.opcode(); // PUSH
-    vvm.registers.a.w[0] = 0x1234;
+    vvm.registers.a.w[0] = .initWord(0x1234);
     vvm.memory[0x1000] = 0;
     vvm.memory[0x1001] = 0;
     vvm.registers.sp = 0x1002;
@@ -26,7 +26,7 @@ test "Test" {
     try std.testing.expectEqual(0x1000, vvm.registers.sp);
 
     // Try to push across the ROM boundary
-    vvm.registers.a.w[0] = 0x1234;
+    vvm.registers.a.w[0] = .initWord(0x1234);
     vvm.memory[0xEFFF] = 0;
     vvm.memory[0xF000] = 0;
     vvm.registers.sp = 0xF001;
