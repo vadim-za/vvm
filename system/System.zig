@@ -8,7 +8,7 @@ env: Environment,
 pub fn init(self: *@This()) void {
     self.env.init(self);
     self.core.init();
-    self.core.env = .init(Environment, &self.env);
+    self.core.ienv = .init(Environment, &self.env);
 }
 
 fn run(self: *@This(), max_steps: ?usize) bool {
