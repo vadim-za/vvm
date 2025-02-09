@@ -21,11 +21,11 @@ test "Test" {
         const value: u16 = 0x9110 + @as(u16, @intCast(n));
 
         vvm.memory[0] = lwr.opcodeVariant(n); // LWR Wn
-        vvm.registers.gp.w[n] = value;
-        vvm.registers.a.dw = 0;
+        vvm.registers.gp.w[n] = .initWord(value);
+        vvm.registers.a = .initDword(0);
         vvm.registers.pc = 0;
         vvm.step();
 
-        try std.testing.expectEqual(value, vvm.registers.a.w[0]);
+        try std.testing.expectEqual(value, vvm.registers.a.w[0].asWord());
     }
 }
