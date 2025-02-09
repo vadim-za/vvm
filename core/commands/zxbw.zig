@@ -18,5 +18,5 @@ test "Test" {
     vvm.registers.pc = 0;
     vvm.step();
 
-    try std.testing.expectEqual(0x008F, vvm.registers.a.w[0]);
+    try std.testing.expectEqual(0x008F, vvm.registers.a.w[0].asWord());
 }

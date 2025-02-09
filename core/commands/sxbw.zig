@@ -1,11 +1,13 @@
 const std = @import("std");
 const Vvm = @import("../Vvm.zig");
 const Command = @import("../Command.zig");
+const bid = @import("../bid.zig");
 
 pub fn handler(vvm: *Vvm) void {
-    const b: i8 = @bitCast(vvm.registers.a.b[0]);
-    const w: i16 = b;
-    vvm.registers.a.w[0] = @bitCast(w);
+    const ib: i8 = @bitCast(vvm.registers.a.b[0]);
+    const iw: i16 = ib;
+    const w: u16 = @bitCast(iw);
+    vvm.registers.a.b[1] = bid.hiHalf(w);
 }
 
 test "Test" {
@@ -21,7 +23,7 @@ test "Test" {
     vvm.registers.pc = 0;
     vvm.step();
 
-    try std.testing.expectEqual(0x7F, vvm.registers.a.w[0]);
+    try std.testing.expectEqual(0x7F, vvm.registers.a.w[0].asWord());
 
     // Negative values, sign need to be extended
     vvm.memory[0] = sxbw.opcode(); // SXBW
@@ -30,5 +32,5 @@ test "Test" {
     vvm.registers.pc = 0;
     vvm.step();
 
-    try std.testing.expectEqual(0xFF80, vvm.registers.a.w[0]);
+    try std.testing.expectEqual(0xFF80, vvm.registers.a.w[0].asWord());
 }
