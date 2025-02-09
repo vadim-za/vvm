@@ -6,7 +6,7 @@ pub fn handler(comptime command_opcode: u8) Command.Handler {
     return struct {
         fn actualHandler(vvm: *Vvm) void {
             const index: u2 = command_opcode & 3;
-            vvm.registers.addr = vvm.registers.gp.w[index];
+            vvm.registers.addr = vvm.registers.gp.w[index].asWord();
         }
     }.actualHandler;
 }
@@ -21,7 +21,7 @@ test "Test" {
         const value: u16 = 0x9110 + @as(u16, @intCast(n));
 
         vvm.memory[0] = arwr.opcodeVariant(n); // ARWR Wn
-        vvm.registers.gp.w[n] = value;
+        vvm.registers.gp.w[n] = .initWord(value);
         vvm.registers.addr = 0;
         vvm.registers.pc = 0;
         vvm.step();
