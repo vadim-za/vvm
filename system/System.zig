@@ -53,6 +53,17 @@ pub fn main() void {
     //     0x50, 0x5A, 0x55, // ZERO ; ARA ; OUT
     // };
 
+    // Intel 8080 code for comparison
+    // 0000:    LXI H,0x1000
+    // 0003:    MOV A,M
+    // 0004:    ORA A
+    // 0005:    JZ 0x000E
+    // 0008:    OUT 0x01
+    // 000A:    INX H
+    // 000B:    JMP
+    // 000E:
+    // 14 vs 24 bytes (70% more)
+
     const code = [_]u8{
         0x6A, 0x01, 0x00, // 0x00: LWV 0x0001
         0x18, // 0x03: STWR W0 ; W0 == 0x0001
