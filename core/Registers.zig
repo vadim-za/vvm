@@ -49,7 +49,7 @@ const Accumulators = extern union {
         };
     }
 
-    pub fn asDword(self: *@This()) u16 {
+    pub fn asDword(self: *@This()) u32 {
         return bid.combine(
             self.w[1].asWord(),
             self.w[0].asWord(),
