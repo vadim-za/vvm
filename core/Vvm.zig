@@ -8,7 +8,7 @@
 
 const std = @import("std");
 const Registers = @import("Registers.zig");
-const Environment = @import("Environment.zig");
+const IEnv = @import("IEnv.zig");
 
 pub const bid = @import("bid.zig");
 
@@ -16,7 +16,7 @@ pub const bid = @import("bid.zig");
 // It is however recommended to call init() before accessing any of these.
 memory: Memory,
 registers: Registers,
-env: Environment, // connection to the rest of the system
+ienv: IEnv, // connection to the rest of the system
 rom_addr: u17, // memory is read-only at rom_addr and above
 
 pub const Memory = [1 << 16]u8; // 64K of RAM
@@ -25,7 +25,7 @@ pub const WordRegister = Registers.WordRegister;
 // The user is supposed to start with an uninitialized struct and then call
 // init(). Afterwards, the user may override the 'env' and 'rom_addr' fields.
 pub fn init(self: *@This()) void {
-    self.env = .default; // not connected to anything
+    self.ienv = .default; // not connected to anything
     self.rom_addr = 0x1_0000; // the entire memory is read/write
 }
 

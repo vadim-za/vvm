@@ -4,8 +4,8 @@ const Command = @import("../Command.zig");
 
 pub fn handler(vvm: *Vvm) void {
     const port: u8 = @truncate(vvm.registers.addr);
-    vvm.env.vft.out(
-        vvm.env.ptr,
+    vvm.ienv.vft.out(
+        vvm.ienv.ptr,
         port,
         vvm.registers.a.b[0],
     );
@@ -31,7 +31,7 @@ test "Test" {
     var vvm: Vvm = undefined;
     var env = Env{ .vvm = &vvm };
     vvm.init();
-    vvm.env = .init(Env, &env);
+    vvm.ienv = .init(Env, &env);
 
     vvm.memory[0] = out.opcode(); // OUT
     vvm.registers.a.b[0] = 0x10;

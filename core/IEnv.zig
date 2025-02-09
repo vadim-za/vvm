@@ -1,4 +1,5 @@
-// This is a connector to the system's "environment" part.
+// Interface to the Environment.
+// This is a connector to "the rest of the system".
 // Don't set the fields yourself, use the init() function.
 
 ptr: ?*anyopaque,
@@ -7,17 +8,17 @@ vft: struct {
     out: *const fn (ptr: ?*anyopaque, port: u8, value: u8) void,
 },
 
-// Construct the environment connector, supplying the actual
-// environment type T and the pointer to the actual environment
+// Construct the environment interface, supplying the actual
+// environment type Env and the pointer to the actual environment
 // object (or you may pass null for stateless environments).
-// The environment type T needs to implement a number of standard
+// The environment type Env needs to implement a number of standard
 // environment methods, to which the 'vft' field will connect itself.
-pub fn init(T: type, ptr: ?*T) @This() {
+pub fn init(Env: type, ptr: ?*Env) @This() {
     return .{
         .ptr = ptr,
         .vft = .{
-            .in = T.envIn,
-            .out = T.envOut,
+            .in = Env.envIn,
+            .out = Env.envOut,
         },
     };
 }
