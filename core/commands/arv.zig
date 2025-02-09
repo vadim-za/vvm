@@ -1,12 +1,12 @@
 const std = @import("std");
 const Vvm = @import("../Vvm.zig");
 const Command = @import("../Command.zig");
+const bid = @import("../bid.zig");
 
 pub fn handler(vvm: *Vvm) void {
-    const lsb = vvm.fetchCommandByte();
-    const msb = vvm.fetchCommandByte();
-    const word: u16 = (@as(u16, msb) << 8) + lsb;
-    vvm.registers.addr = word;
+    const lob = vvm.fetchCommandByte();
+    const hib = vvm.fetchCommandByte();
+    vvm.registers.addr = bid.combine(hib,lob);
 }
 
 test "Test" {
