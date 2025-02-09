@@ -63,6 +63,8 @@ pub fn main() void {
     // 000B:    JMP
     // 000E:
     // 14 vs 24 bytes (70% more)
+    // If INX instruction is not available we need to replace INX H with DAD H
+    // and add an LXI D,0x0001 instruction. 17 vs 24 bytes (40% more)
 
     const code = [_]u8{
         0x6A, 0x01, 0x00, // 0x00: LWV 0x0001
