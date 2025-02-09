@@ -47,6 +47,7 @@ pub fn main() void {
     system.init();
 
     //@import("examples/print_a.zig").run();
-    @import("examples/out_string.zig").run();
+    //@import("examples/out_string.zig").run();
     //@import("examples/print_input.zig").run();
+    @import("examples/print_delayed.zig").run();
 }
