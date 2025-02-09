@@ -6,7 +6,7 @@
 pub const   lbr  = .{ 0x00, 8, @import("commands/lbr.zig") };
 pub const   lwr  = .{ 0x08, 4, @import("commands/lwr.zig") };
 pub const   stbr = .{ 0x10, 8, @import("commands/stbr.zig") };
-// pub const   stwr = .{ 0x18, 4, @import("commands/stwr.zig") };
+pub const   stwr = .{ 0x18, 4, @import("commands/stwr.zig") };
 pub const   xbr  = .{ 0x20, 8, @import("commands/xbr.zig") };
 // pub const   xwr  = .{ 0x28, 4, @import("commands/xwr.zig") };
 // pub const   jif  = .{ 0x30, 8, @import("commands/jif.zig") };
