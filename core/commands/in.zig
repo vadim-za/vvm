@@ -26,7 +26,7 @@ test "Test" {
     vvm.env = .init(Env, &env);
 
     vvm.memory[0] = in.opcode(); // IN
-    vvm.registers.a.dw = 0;
+    vvm.registers.a = .initDword(0);
     vvm.registers.addr = 0x1234;
     vvm.registers.pc = 0;
     vvm.step();
