@@ -7,6 +7,7 @@
 const std = @import("std");
 const Vvm = @import("Vvm.zig");
 const command_list = @import("command_list.zig");
+const bid = @import("bid.zig");
 
 name: []const u8,
 
@@ -102,8 +103,8 @@ test "opcodeWithLiteral8" {
 pub fn opcodeWithLiteral16(comptime self: @This(), literal: u16) [3]u8 {
     return .{
         self.opcode(),
-        @intCast(literal & 0xFF), // LSB
-        @intCast(literal >> 8), // MSB
+        bid.loHalf(literal),
+        bid.hiHalf(literal),
     };
 }
 
