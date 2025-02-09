@@ -22,7 +22,7 @@ test "Test" {
 
         vvm.memory[0] = lbr.opcodeVariant(n); // LBR Bn
         vvm.registers.gp.b[n] = value;
-        vvm.registers.a.dw = 0;
+        vvm.registers.a = .initDword(0);
         vvm.registers.pc = 0;
         vvm.step();
 
