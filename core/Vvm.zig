@@ -49,7 +49,7 @@ pub fn fetchCommandByte(self: *@This()) u8 {
     return byte;
 }
 
-// Fetch two command bytes (LSB, then MSB) and return them as a single word
+// Fetch two command bytes (LoB, then HiB) and return them as a single word
 pub fn fetchCommandWord(self: *@This()) u16 {
     const lob = self.fetchCommandByte();
     const hib = self.fetchCommandByte();
