@@ -16,7 +16,7 @@ sp: u16,
 addr: u16,
 a: Accumulators,
 
-const WordRegister = extern struct {
+pub const WordRegister = extern struct {
     b: [2]u8,
 
     pub fn initWord(word: u16) @This() {

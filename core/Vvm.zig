@@ -19,6 +19,7 @@ env: Environment, // connection to the rest of the system
 rom_addr: u17, // memory is read-only at rom_addr and above
 
 pub const Memory = [1 << 16]u8; // 64K of RAM
+pub const WordRegister = Registers.WordRegister;
 
 // The user is supposed to start with an uninitialized struct and then call
 // init(). Afterwards, the user may override the 'env' and 'rom_addr' fields.
