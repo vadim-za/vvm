@@ -1,7 +1,6 @@
 const std = @import("std");
 const Vvm = @import("../Vvm.zig");
 const Command = @import("../Command.zig");
-const bid = @import("../bid.zig");
 
 pub fn handler(vvm: *Vvm) void {
     const w: i16 = @bitCast(vvm.registers.a.w[0]);
