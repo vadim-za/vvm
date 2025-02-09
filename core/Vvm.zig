@@ -7,6 +7,7 @@
 // can be declared read-only by setting the 'rom_addr' field.
 
 const std = @import("std");
+const bid = @import("bid.zig");
 const Environment = @import("Environment.zig");
 
 // All these fields may be initialized/manipulated by the user.
@@ -63,9 +64,9 @@ pub fn fetchCommandByte(self: *@This()) u8 {
 
 // Fetch two command bytes (LSB, then MSB) and return them as a single word
 pub fn fetchCommandWord(self: *@This()) u16 {
-    const lsb = self.fetchCommandByte();
-    const msb = self.fetchCommandByte();
-    return lsb + (@as(u16, msb) << 8);
+    const lob = self.fetchCommandByte();
+    const hib = self.fetchCommandByte();
+    return bid.combine(hib, lob);
 }
 
 // Write a byte to memory. Attempts to write to read-only memory range are blocked.
@@ -76,18 +77,18 @@ pub fn writeMemory(self: *@This(), address: u16, value: u8) void {
 
 // Convenience helper function to read a 2-byte word from memory.
 pub fn readMemoryWord(self: *@This(), address: u16) u16 {
-    const lsb = self.memory[address];
-    const msb = self.memory[address +% 1];
-    return lsb + (@as(u16, msb) << 8);
+    const lob = self.memory[address];
+    const hib = self.memory[address +% 1];
+    return bid.combine(hib, lob);
 }
 
 // Convenience helper function to write a 2-byte word to memory.
 // Attempts to write to read-only memory range are blocked on per-byte level.
 pub fn writeMemoryWord(self: *@This(), address: u16, value: u16) void {
-    const lsb: u8 = @intCast(value & 0xFF);
-    const msb: u8 = @intCast(value >> 8);
-    self.writeMemory(address, lsb);
-    self.writeMemory(address +% 1, msb);
+    const lob = bid.loHalf(value);
+    const hib = bid.hiHalf(value);
+    self.writeMemory(address, lob);
+    self.writeMemory(address +% 1, hib);
 }
 
 // Push a word to the stack. SP doesn't need to be even-aligned.
