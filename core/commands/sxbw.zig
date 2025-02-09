@@ -1,13 +1,11 @@
 const std = @import("std");
 const Vvm = @import("../Vvm.zig");
 const Command = @import("../Command.zig");
-const bid = @import("../bid.zig");
 
 pub fn handler(vvm: *Vvm) void {
-    const ib: i8 = @bitCast(vvm.registers.a.b[0]);
-    const iw: i16 = ib;
-    const w: u16 = @bitCast(iw);
-    vvm.registers.a.b[1] = bid.hiHalf(w);
+    const b: i8 = @bitCast(vvm.registers.a.b[0]);
+    const w: i16 = b;
+    vvm.registers.a.w[0] = .initWord(@bitCast(w));
 }
 
 test "Test" {

@@ -7,9 +7,10 @@
 // can be declared read-only by setting the 'rom_addr' field.
 
 const std = @import("std");
-const bid = @import("bid.zig");
 const Registers = @import("Registers.zig");
 const Environment = @import("Environment.zig");
+
+pub const bid = @import("bid.zig");
 
 // All these fields may be initialized/manipulated by the user.
 // It is however recommended to call init() before accessing any of these.

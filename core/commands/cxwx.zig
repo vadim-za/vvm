@@ -13,10 +13,10 @@ test "Test" {
     vvm.init();
 
     vvm.memory[0] = cxwx.opcode(); // CXWX
-    vvm.registers.a.w[0] = 0x8F12;
-    vvm.registers.a.w[1] = 0;
+    vvm.registers.a.w[0] = .initWord(0x8F12);
+    vvm.registers.a.w[1] = .initWord(0);
     vvm.registers.pc = 0;
     vvm.step();
 
-    try std.testing.expectEqual(0x8F128F12, vvm.registers.a.dw);
+    try std.testing.expectEqual(0x8F128F12, vvm.registers.a.asDword());
 }
