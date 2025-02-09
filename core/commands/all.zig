@@ -3,7 +3,7 @@ const Vvm = @import("../Vvm.zig");
 const Command = @import("../Command.zig");
 
 pub fn handler(vvm: *Vvm) void {
-    vvm.registers.a.w[0] = 0xFFFF;
+    vvm.registers.a.w[0] = .initWord(0xFFFF);
 }
 
 test "Test" {
@@ -13,9 +13,9 @@ test "Test" {
     vvm.init();
 
     vvm.memory[0] = all.opcode(); // ALL
-    vvm.registers.a.w[0] = 0x9110;
+    vvm.registers.a.w[0] = .initWord(0x9110);
     vvm.registers.pc = 0;
     vvm.step();
 
-    try std.testing.expectEqual(0xFFFF, vvm.registers.a.w[0]);
+    try std.testing.expectEqual(0xFFFF, vvm.registers.a.w[0].asWord());
 }
