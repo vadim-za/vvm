@@ -4,13 +4,13 @@ const System = @import("System.zig");
 
 system: *System, // manually set by the owning System
 running: bool = false,
-output: std.fs.File.Writer,
+output: std.io.AnyWriter,
 
 // System is not fully initialized yet at the time of the call
 pub fn init(self: *@This(), system: *System) void {
     self.* = .{
         .system = system,
-        .output = std.io.getStdOut().writer(),
+        .output = std.io.getStdOut().writer().any(),
     };
 }
 
