@@ -22,7 +22,7 @@ test "Test" {
 
         vvm.memory[0] = stbr.opcodeVariant(n); // STBR Bn
         vvm.registers.gp.b[n] = 0;
-        vvm.registers.a.w[0] = value16;
+        vvm.registers.a.w[0] = .initWord(value16);
         vvm.registers.pc = 0;
         vvm.step();
 
