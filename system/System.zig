@@ -12,11 +12,11 @@ pub fn init(self: *@This()) void {
 }
 
 fn run(self: *@This(), max_steps: ?usize) bool {
-    self.env.running = true;
+    self.env.cpu_mode = 1;
 
     var remaining_steps = max_steps;
     while (true) {
-        if (!self.env.running)
+        if (self.env.cpu_mode == 0)
             return true; // successfully finished
 
         if (remaining_steps) |*steps| {
