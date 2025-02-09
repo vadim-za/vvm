@@ -8,6 +8,7 @@
 
 const std = @import("std");
 const bid = @import("bid.zig");
+const Registers = @import("Registers.zig");
 const Environment = @import("Environment.zig");
 
 // All these fields may be initialized/manipulated by the user.
@@ -17,30 +18,14 @@ registers: Registers,
 env: Environment, // connection to the rest of the system
 rom_addr: u17, // memory is read-only at rom_addr and above
 
+pub const Memory = [1 << 16]u8; // 64K of RAM
+
 // The user is supposed to start with an uninitialized struct and then call
 // init(). Afterwards, the user may override the 'env' and 'rom_addr' fields.
 pub fn init(self: *@This()) void {
     self.env = .default; // not connected to anything
     self.rom_addr = 0x1_0000; // the entire memory is read/write
 }
-
-pub const Memory = [1 << 16]u8; // 64K of RAM
-
-// See the architectural documentation for details
-pub const Registers = struct {
-    gp: extern union {
-        b: [8]u8,
-        w: [4]u16,
-    },
-    pc: u16,
-    sp: u16,
-    addr: u16,
-    a: extern union {
-        dw: u32, // (x:a)
-        w: [2]u16, // w[0]=a, w[1]=x
-        b: [2]u8,
-    },
-};
 
 // Execute a single command at PC, incrementing PC by the command size.
 // PC is incremented prior to the command execution.

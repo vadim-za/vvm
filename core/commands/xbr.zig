@@ -23,11 +23,17 @@ test "Test" {
 
         vvm.memory[0] = xbr.opcodeVariant(n); // XBR Bn
         vvm.registers.gp.b[n] = 0x10 + value_offs8;
-        vvm.registers.a.w[0] = 0xA090 + value_offs16;
+        vvm.registers.a.w[0] = .initWord(0xA090 + value_offs16);
         vvm.registers.pc = 0;
         vvm.step();
 
-        try std.testing.expectEqual(0xA010 + value_offs16, vvm.registers.a.w[0]);
-        try std.testing.expectEqual(0x90 + value_offs8, vvm.registers.gp.b[n]);
+        try std.testing.expectEqual(
+            0xA010 + value_offs16,
+            vvm.registers.a.w[0].asWord(),
+        );
+        try std.testing.expectEqual(
+            0x90 + value_offs8,
+            vvm.registers.gp.b[n],
+        );
     }
 }
