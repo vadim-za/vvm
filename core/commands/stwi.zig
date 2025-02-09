@@ -3,7 +3,10 @@ const Vvm = @import("../Vvm.zig");
 const Command = @import("../Command.zig");
 
 pub fn handler(vvm: *Vvm) void {
-    vvm.writeMemoryWord(vvm.registers.addr, vvm.registers.a.w[0]);
+    vvm.writeMemoryWord(
+        vvm.registers.addr,
+        vvm.registers.a.w[0].asWord(),
+    );
 }
 
 test "Test" {
@@ -16,7 +19,7 @@ test "Test" {
     vvm.memory[0] = stwi.opcode(); // STWI
     vvm.memory[0x1002] = 0;
     vvm.memory[0x1003] = 0;
-    vvm.registers.a.w[0] = 0x1234;
+    vvm.registers.a.w[0] = .initWord(0x1234);
     vvm.registers.addr = 0x1002;
     vvm.registers.pc = 0;
     vvm.step();
@@ -27,7 +30,7 @@ test "Test" {
     // Try to write across the ROM boundary
     vvm.memory[0xEFFE] = 0;
     vvm.memory[0xF000] = 0;
-    vvm.registers.a.w[0] = 0x1234;
+    vvm.registers.a.w[0] = .initWord(0x1234);
     vvm.registers.addr = 0xEFFE;
     vvm.registers.pc = 0;
     vvm.step();

@@ -6,7 +6,7 @@ pub fn handler(vvm: *Vvm) void {
     const displacement = vvm.fetchCommandWord();
     vvm.writeMemoryWord(
         vvm.registers.addr +% displacement,
-        vvm.registers.a.w[0],
+        vvm.registers.a.w[0].asWord(),
     );
 }
 
@@ -20,7 +20,7 @@ test "Test" {
     @memcpy(vvm.memory[0..3], &stwid.opcodeWithLiteral16(0xCFFA)); // STWID disp
     vvm.memory[0xEFFE] = 0;
     vvm.memory[0xEFFF] = 0;
-    vvm.registers.a.w[0] = 0x1234;
+    vvm.registers.a.w[0] = .initWord(0x1234);
     vvm.registers.addr = 0x2004;
     vvm.registers.pc = 0;
     vvm.step();
@@ -33,7 +33,7 @@ test "Test" {
     @memcpy(vvm.memory[0..3], &stwid.opcodeWithLiteral16(0xCFFB)); // STBID disp
     vvm.memory[0xEFFF] = 0;
     vvm.memory[0xF000] = 0;
-    vvm.registers.a.w[0] = 0x1234;
+    vvm.registers.a.w[0] = .initWord(0x1234);
     vvm.registers.addr = 0x2004;
     vvm.registers.pc = 0;
     vvm.step();
