@@ -3,7 +3,7 @@ const Vvm = @import("../Vvm.zig");
 const Command = @import("../Command.zig");
 
 pub fn handler(vvm: *Vvm) void {
-    vvm.registers.addr = vvm.registers.a.w[0];
+    vvm.registers.addr = vvm.registers.a.w[0].asWord();
 }
 
 test "Test" {
@@ -13,7 +13,7 @@ test "Test" {
     vvm.init();
 
     vvm.memory[0] = ara.opcode(); // ARA
-    vvm.registers.a.w[0] = 0x9110;
+    vvm.registers.a.w[0] = .initWord(0x9110);
     vvm.registers.addr = 0;
     vvm.registers.pc = 0;
     vvm.step();

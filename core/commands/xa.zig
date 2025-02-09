@@ -3,7 +3,11 @@ const Vvm = @import("../Vvm.zig");
 const Command = @import("../Command.zig");
 
 pub fn handler(vvm: *Vvm) void {
-    std.mem.swap(u16, &vvm.registers.a.w[0], &vvm.registers.a.w[1]);
+    std.mem.swap(
+        Vvm.WordRegister,
+        &vvm.registers.a.w[0],
+        &vvm.registers.a.w[1],
+    );
 }
 
 test "Test" {
@@ -13,11 +17,11 @@ test "Test" {
     vvm.init();
 
     vvm.memory[0] = xa.opcode(); // XA
-    vvm.registers.a.w[0] = 0xFED9;
-    vvm.registers.a.w[1] = 0xBA98;
+    vvm.registers.a.w[0] = .initWord(0xFED9);
+    vvm.registers.a.w[1] = .initWord(0xBA98);
     vvm.registers.pc = 0;
     vvm.step();
 
-    try std.testing.expectEqual(0xBA98, vvm.registers.a.w[0]);
-    try std.testing.expectEqual(0xFED9, vvm.registers.a.w[1]);
+    try std.testing.expectEqual(0xBA98, vvm.registers.a.w[0].asWord());
+    try std.testing.expectEqual(0xFED9, vvm.registers.a.w[1].asWord());
 }
