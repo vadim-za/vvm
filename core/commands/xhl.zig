@@ -1,6 +1,5 @@
 const std = @import("std");
 const Vvm = @import("../Vvm.zig");
-const Command = @import("../Command.zig");
 
 pub fn handler(vvm: *Vvm) void {
     std.mem.swap(u8, &vvm.registers.a.b[0], &vvm.registers.a.b[1]);

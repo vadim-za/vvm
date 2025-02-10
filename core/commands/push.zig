@@ -1,6 +1,5 @@
 const std = @import("std");
 const Vvm = @import("../Vvm.zig");
-const Command = @import("../Command.zig");
 
 pub fn handler(vvm: *Vvm) void {
     vvm.pushWord(vvm.registers.a.w[0].asWord());
