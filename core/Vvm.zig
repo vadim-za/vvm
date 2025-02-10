@@ -9,12 +9,15 @@
 const std = @import("std");
 const Registers = @import("Registers.zig");
 const IEnv = @import("IEnv.zig");
+const Command = @import("Command.zig");
 
 // A struct containing all commands as its fields (of Command type each).
 pub const commands = @import("command_collection.zig").collectAll();
 
 // This could get useful as utility
 pub const bid = @import("bid.zig");
+
+const opcode_table = @import("opcode_table.zig").table;
 
 // All these fields may be initialized/manipulated by the user.
 // It is however recommended to call init() before accessing any of these.
@@ -98,33 +101,32 @@ pub fn popWord(self: *@This()) u16 {
 
 // Given the just fetched command opcode, complete fetching the command and execute it.
 fn dispatch(self: *@This(), command_opcode: u8) void {
-    //const modifier = .always_inline;
-    const modifier = .auto;
     switch (command_opcode) {
         // We want the compiler to generate a dispatched jump instruction,
         // so use 'inline else'. Try achieving the same in C++ in a similarly
         // nice way, hehe (maybe some good optimizer can unwrap a function
         // pointer table to the same kind of code?)
-        inline else => |opcode| {
-            const handler = comptime opcode_table[opcode];
-            switch (comptime handler) {
-                .zero => |h| {
-                    @call(modifier, h, .{self});
-                },
-                .one => |h| {
-                    const byte = self.fetchCommandByte();
-                    @call(modifier, h, .{ self, byte });
-                },
-                .two => |h| {
-                    const word = self.fetchCommandWord();
-                    @call(modifier, h, .{ self, word });
-                },
-            }
-        },
+        inline else => |opcode| self.invoke(opcode_table[opcode]),
     }
 }
 
-const opcode_table = @import("opcode_table.zig").table;
+inline fn invoke(self: *@This(), comptime handler: Command.Handler) void {
+    const modifier = .always_inline;
+
+    switch (handler) {
+        .zero => |h| {
+            @call(modifier, h, .{self});
+        },
+        .one => |h| {
+            const byte = self.fetchCommandByte();
+            @call(modifier, h, .{ self, byte });
+        },
+        .two => |h| {
+            const word = self.fetchCommandWord();
+            @call(modifier, h, .{ self, word });
+        },
+    }
+}
 
 test "Test" {
     // Ensure the other tests are performed
