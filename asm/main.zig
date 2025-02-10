@@ -13,6 +13,6 @@ pub fn main() !void {
     var result: std.ArrayList(u8) = .init(alloc);
     var out = result.writer().any();
     try out.print("ABCD", .{});
-    std.debug.print("{s}\n", .{result.items});
+    std.debug.print("{x}\n", .{result.items});
     result.deinit();
 }
