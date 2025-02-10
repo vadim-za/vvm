@@ -94,9 +94,9 @@ pub fn handler(self: @This(), variant_index: u8) Handler {
         );
 
     return if (self.variant_count == 1)
-        return .init(self.impl.handler, self.name)
+        .init(self.impl.handler, self.name)
     else
-        return .init(self.impl.handler(variant_index), self.name);
+        .init(self.impl.handler(variant_index), self.name);
 }
 
 // -----------------------------------------------------------------------------
