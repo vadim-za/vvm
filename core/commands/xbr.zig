@@ -1,6 +1,5 @@
 const std = @import("std");
 const Vvm = @import("../Vvm.zig");
-const Command = @import("../Command.zig");
 
 pub fn handler(comptime command_opcode: u8) fn (*Vvm) void {
     return struct {
