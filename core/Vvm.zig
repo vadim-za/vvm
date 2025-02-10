@@ -112,14 +112,14 @@ fn dispatch(self: *@This(), command_opcode: u8) void {
 
 inline fn invoke(self: *@This(), comptime handler: Command.Handler) void {
     switch (handler) {
-        .zero => |h| {
+        .opcode_only => |h| {
             h(self);
         },
-        .one => |h| {
+        .extra_byte => |h| {
             const byte = self.fetchCommandByte();
             h(self, byte);
         },
-        .two => |h| {
+        .extra_word => |h| {
             const word = self.fetchCommandWord();
             h(self, word);
         },

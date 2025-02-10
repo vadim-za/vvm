@@ -39,34 +39,35 @@ pub fn init(command_name: []const u8) @This() {
     };
 }
 
-pub const ExtraBytes = enum(u2) {
-    zero = 0,
-    one = 1,
-    two = 2,
+// The values are equal to the total number of bytes of the command
+pub const Bytes = enum(u2) {
+    opcode_only = 1,
+    extra_byte = 2,
+    extra_word = 3,
 };
 
-pub const Handler = union(ExtraBytes) {
-    zero: *const fn (vvm: *Vvm) void,
-    one: *const fn (vvm: *Vvm, byte: u8) void,
-    two: *const fn (vvm: *Vvm, word: u16) void,
+pub const Handler = union(Bytes) {
+    opcode_only: *const fn (vvm: *Vvm) void,
+    extra_byte: *const fn (vvm: *Vvm, byte: u8) void,
+    extra_word: *const fn (vvm: *Vvm, word: u16) void,
 
     pub fn init(handler_func: anytype, command_name: []const u8) @This() {
         return switch (@TypeOf(handler_func)) {
             (fn (vvm: *Vvm) void) => .{
-                .zero = handler_func,
+                .opcode_only = handler_func,
             },
             (fn (vvm: *Vvm, byte: u8) void) => .{
-                .one = handler_func,
+                .extra_byte = handler_func,
             },
             (fn (vvm: *Vvm, word: u16) void) => .{
-                .two = handler_func,
+                .extra_word = handler_func,
             },
             else => @compileError("Unsupported handler type for " ++ command_name),
         };
     }
 
     pub fn eq(self: @This(), other: @This()) bool {
-        if (@as(ExtraBytes, self) != @as(ExtraBytes, other))
+        if (@as(Bytes, self) != @as(Bytes, other))
             return false;
         return switch (self) {
             inline else => |payload, tag| payload == @field(
@@ -74,6 +75,10 @@ pub const Handler = union(ExtraBytes) {
                 @tagName(tag),
             ),
         };
+    }
+
+    pub fn commandByteCount(self: @This()) u2 {
+        return @intFromEnum(self);
     }
 };
 
