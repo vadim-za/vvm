@@ -1,21 +1,21 @@
 const std = @import("std");
 const VvmCore = @import("VvmCore");
 const System = @import("System.zig");
+const Timer = @import("timer.zig").SystemTimer;
 
 system: *System, // manually set by the owning System
 cpu_mode: u8 = 0,
 output: std.io.AnyWriter,
 keyinput_mode: u8 = 0,
 
-timeout_4ms: u8 = 0, // in 4ms units
-prev_timestamp_ms: i64, // in ms
+timer: Timer,
 
 // System is not fully initialized yet at the time of the call
 pub fn init(self: *@This(), system: *System) void {
     self.* = .{
         .system = system,
         .output = std.io.getStdOut().writer().any(),
-        .prev_timestamp_ms = std.time.milliTimestamp(),
+        .timer = .init(),
     };
 }
 
@@ -43,18 +43,8 @@ pub fn envOut(ptr: ?*anyopaque, port: u8, value: u8) void {
     switch (port) {
         0 => {
             self.cpu_mode = value;
-            if (value == 2) {
-                const time_ms = std.time.milliTimestamp();
-                const elapsed_ms = time_ms -% self.prev_timestamp_ms;
-                const timeout_ms = @as(i64, self.timeout_4ms) * 4;
-                if (0 <= elapsed_ms and elapsed_ms < timeout_ms) {
-                    const wait_ms: u64 = @intCast(timeout_ms - elapsed_ms);
-                    std.time.sleep(wait_ms * 1_000_000);
-                    self.prev_timestamp_ms +%= timeout_ms; // accommodate sleep()'s jitter
-                } else {
-                    self.prev_timestamp_ms = time_ms; // already overtime, reset
-                }
-            }
+            if (value == 2)
+                self.timer.wait();
         },
         1 => {
             self.output.writeByte(value) catch {};
@@ -63,7 +53,7 @@ pub fn envOut(ptr: ?*anyopaque, port: u8, value: u8) void {
             self.keyinput_mode = value;
         },
         3 => {
-            self.timeout_4ms = value;
+            self.timer.timeout_4ms = value;
         },
         else => {},
     }
