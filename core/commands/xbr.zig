@@ -1,6 +1,8 @@
 const std = @import("std");
 const Vvm = @import("../Vvm.zig");
 
+pub const variant_type = .byte_register;
+
 pub fn handler(comptime command_opcode: u8) fn (*Vvm) void {
     return struct {
         fn actualHandler(vvm: *Vvm) void {

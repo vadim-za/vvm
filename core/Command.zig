@@ -39,6 +39,8 @@ pub fn init(command_name: []const u8) @This() {
     };
 }
 
+// -----------------------------------------------------------------------------
+
 // The values are equal to the total number of bytes of the command
 pub const Bytes = enum(u2) {
     opcode_only = 1,
@@ -90,6 +92,17 @@ pub fn handler(self: @This(), variant_index: u8) Handler {
         .init(self.impl.handler, self.name)
     else
         .init(self.impl.handler(variant_index), self.name);
+}
+
+// -----------------------------------------------------------------------------
+
+pub const VariantType = enum {
+    byte_register,
+    word_register,
+};
+
+pub fn variantType(self: @This()) VariantType {
+    return self.impl.variant_type;
 }
 
 // -----------------------------------------------------------------------------
