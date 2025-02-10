@@ -19,21 +19,24 @@ pub fn init(self: *@This(), system: *System) void {
     };
 }
 
+fn readKey(self: *@This()) u8 {
+    const builtin = @import("builtin");
+
+    if (builtin.os.tag == .windows and self.keyinput_mode == 1) {
+        const windows = @import("windows.zig");
+        return windows.getKeyboardInput(false);
+    } else {
+        const reader = std.io.getStdIn().reader();
+        return reader.readByte() catch 0;
+    }
+}
+
 // ------------------ "virtual" methods
 
 pub fn envIn(ptr: ?*anyopaque, port: u8) u8 {
     const self: *@This() = @alignCast(@ptrCast(ptr.?));
     return switch (port) {
-        2 => {
-            const builtin = @import("builtin");
-            if (builtin.os.tag == .windows and self.keyinput_mode == 1) {
-                const windows = @import("windows.zig");
-                return windows.getKeyboardInput(false);
-            } else {
-                const reader = std.io.getStdIn().reader();
-                return reader.readByte() catch 0;
-            }
-        },
+        2 => self.readKey(),
         else => 0xFF,
     };
 }
