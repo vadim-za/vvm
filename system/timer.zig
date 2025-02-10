@@ -20,7 +20,8 @@ fn Timer(api: type) type {
             const timeout_ms = @as(i64, self.timeout_4ms) * 4;
 
             // Notice that elapsed_ms can be negative because of sleeps()'s jitter
-            if (elapsed_ms < timeout_ms) {
+            // Also don't sleep if timeout_ms == 0 as it has explicit timer reset semantics
+            if (timeout_ms > 0 and elapsed_ms < timeout_ms) {
                 const wait_ms: u64 = @intCast(timeout_ms - elapsed_ms);
 
                 api.sleep(wait_ms * 1_000_000);
@@ -130,12 +131,12 @@ test "Test" {
     try std.testing.expectEqual(3 * ms_to_ns, test_api.slept_ns);
 
     // Pretend we exited too early again (at 77ms) and wait for 0ms
-    // This should result in a 1ms wait
+    // This should reset the timer (no sleep)
     timer.timeout_4ms = 0;
     test_api.next_milli_timestamp = 77;
     test_api.slept_ns = null;
     timer.wait();
-    try std.testing.expectEqual(78, timer.prev_timestamp_ms);
+    try std.testing.expectEqual(77, timer.prev_timestamp_ms);
     try std.testing.expectEqual(null, test_api.next_milli_timestamp); // was queried
-    try std.testing.expectEqual(1 * ms_to_ns, test_api.slept_ns);
+    try std.testing.expectEqual(null, test_api.slept_ns); // didn't sleep
 }
