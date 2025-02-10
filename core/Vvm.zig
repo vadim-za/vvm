@@ -111,19 +111,17 @@ fn dispatch(self: *@This(), command_opcode: u8) void {
 }
 
 inline fn invoke(self: *@This(), comptime handler: Command.Handler) void {
-    const modifier = .always_inline;
-
     switch (handler) {
         .zero => |h| {
-            @call(modifier, h, .{self});
+            h(self);
         },
         .one => |h| {
             const byte = self.fetchCommandByte();
-            @call(modifier, h, .{ self, byte });
+            h(self, byte);
         },
         .two => |h| {
             const word = self.fetchCommandWord();
-            @call(modifier, h, .{ self, word });
+            h(self, word);
         },
     }
 }
