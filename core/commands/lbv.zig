@@ -1,6 +1,8 @@
 const std = @import("std");
 const Vvm = @import("../Vvm.zig");
 
+pub const variant_type = .none;
+
 pub fn handler(vvm: *Vvm, byte: u8) void {
     vvm.registers.a.b[0] = byte;
 }

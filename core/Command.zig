@@ -88,31 +88,35 @@ pub fn handler(self: @This(), variant_index: u8) Handler {
     if (variant_index >= self.variant_count)
         @compileError("Variant index out of range for " ++ self.name);
 
-    if (self.variant_count == 1) {
-        if (self.hasVariantType())
-            @compileError("variant_type unexpected with 1-variant " ++ self.name);
-        return .init(self.impl.handler, self.name);
-    } else {
-        _ = self.variantType(); // compile-time consistency check
+    if (self.variantType().variantCount() != self.variant_count)
+        @compileError(
+            "variant_count not consistent with variant_type for " ++ self.name,
+        );
+
+    return if (self.variant_count == 1)
+        return .init(self.impl.handler, self.name)
+    else
         return .init(self.impl.handler(variant_index), self.name);
-    }
 }
 
 // -----------------------------------------------------------------------------
 
 pub const VariantType = enum {
+    none,
     byte_register,
     word_register,
+
+    pub fn variantCount(self: @This()) u8 {
+        return switch (self) {
+            .none => 1,
+            .byte_register => 8,
+            .word_register => 4,
+        };
+    }
 };
 
-const variant_type_decl_name = "variant_type";
-
 pub fn variantType(self: @This()) VariantType {
-    return @field(self.impl, variant_type_decl_name);
-}
-
-fn hasVariantType(self: @This()) bool {
-    return @hasDecl(self.impl, variant_type_decl_name);
+    return self.impl.variant_type;
 }
 
 // -----------------------------------------------------------------------------
