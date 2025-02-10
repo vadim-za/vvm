@@ -49,5 +49,6 @@ pub fn main() void {
     //@import("examples/print_a.zig").run();
     //@import("examples/out_string.zig").run();
     //@import("examples/print_input.zig").run();
-    @import("examples/print_delayed.zig").run();
+    @import("examples/realtime_input.zig").run();
+    //@import("examples/print_delayed.zig").run();
 }
