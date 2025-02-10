@@ -38,7 +38,7 @@ pub fn build(b: *std.Build) void {
         .target = target,
         .optimize = optimize,
     });
-    //@"asm".root_module.addImport("VvmCore", VvmCore);
+    @"asm".root_module.addImport("VvmCore", VvmCore);
     b.installArtifact(@"asm");
 
     const asm_tests = b.addTest(.{
@@ -46,7 +46,7 @@ pub fn build(b: *std.Build) void {
         .target = target,
         .optimize = optimize,
     });
-    //asm_tests.root_module.addImport("VvmCore", VvmCore);
+    asm_tests.root_module.addImport("VvmCore", VvmCore);
 
     const run_core_tests = b.addRunArtifact(core_tests);
     const run_system_tests = b.addRunArtifact(system_tests);
