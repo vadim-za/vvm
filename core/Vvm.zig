@@ -47,14 +47,14 @@ pub fn step(self: *@This()) void {
 }
 
 // Fetch exactly one byte at PC and post-increment the PC
-pub fn fetchCommandByte(self: *@This()) u8 {
+fn fetchCommandByte(self: *@This()) u8 {
     const byte = self.memory[self.registers.pc];
     self.registers.pc +%= 1;
     return byte;
 }
 
 // Fetch two command bytes (LoB, then HiB) and return them as a single word
-pub fn fetchCommandWord(self: *@This()) u16 {
+fn fetchCommandWord(self: *@This()) u16 {
     const lob = self.fetchCommandByte();
     const hib = self.fetchCommandByte();
     return bid.combine(hib, lob);
@@ -98,16 +98,29 @@ pub fn popWord(self: *@This()) u16 {
 
 // Given the just fetched command opcode, complete fetching the command and execute it.
 fn dispatch(self: *@This(), command_opcode: u8) void {
+    //const modifier = .always_inline;
+    const modifier = .auto;
     switch (command_opcode) {
         // We want the compiler to generate a dispatched jump instruction,
         // so use 'inline else'. Try achieving the same in C++ in a similarly
         // nice way, hehe (maybe some good optimizer can unwrap a function
         // pointer table to the same kind of code?)
-        inline else => |opcode| @call(
-            .always_inline,
-            comptime opcode_table[opcode],
-            .{self},
-        ),
+        inline else => |opcode| {
+            const handler = comptime opcode_table[opcode];
+            switch (comptime handler) {
+                .zero => |h| {
+                    @call(modifier, h, .{self});
+                },
+                .one => |h| {
+                    const byte = self.fetchCommandByte();
+                    @call(modifier, h, .{ self, byte });
+                },
+                .two => |h| {
+                    const word = self.fetchCommandWord();
+                    @call(modifier, h, .{ self, word });
+                },
+            }
+        },
     }
 }
 

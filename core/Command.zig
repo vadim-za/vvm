@@ -39,16 +39,52 @@ pub fn init(command_name: []const u8) @This() {
     };
 }
 
-pub const Handler = fn (vvm: *Vvm) void;
+pub const ExtraBytes = enum(u2) {
+    zero = 0,
+    one = 1,
+    two = 2,
+};
 
-pub fn handler(self: @This(), variant_index: u8) *const Handler {
+pub const Handler = union(ExtraBytes) {
+    zero: *const fn (vvm: *Vvm) void,
+    one: *const fn (vvm: *Vvm, byte: u8) void,
+    two: *const fn (vvm: *Vvm, word: u16) void,
+
+    pub fn init(handler_func: anytype, command_name: []const u8) @This() {
+        return switch (@TypeOf(handler_func)) {
+            (fn (vvm: *Vvm) void) => .{
+                .zero = handler_func,
+            },
+            (fn (vvm: *Vvm, byte: u8) void) => .{
+                .one = handler_func,
+            },
+            (fn (vvm: *Vvm, word: u16) void) => .{
+                .two = handler_func,
+            },
+            else => @compileError("Unsupported handler type for " ++ command_name),
+        };
+    }
+
+    pub fn eq(self: @This(), other: @This()) bool {
+        if (@as(ExtraBytes, self) != @as(ExtraBytes, other))
+            return false;
+        return switch (self) {
+            inline else => |payload, tag| payload == @field(
+                other,
+                @tagName(tag),
+            ),
+        };
+    }
+};
+
+pub fn handler(self: @This(), variant_index: u8) Handler {
     if (variant_index >= self.variant_count)
         @compileError("Variant index out of range for " ++ self.name);
 
     return if (self.variant_count == 1)
-        self.impl.handler
+        .init(self.impl.handler, self.name)
     else
-        self.impl.handler(variant_index);
+        .init(self.impl.handler(variant_index), self.name);
 }
 
 // -----------------------------------------------------------------------------

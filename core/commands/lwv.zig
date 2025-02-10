@@ -1,11 +1,7 @@
 const std = @import("std");
 const Vvm = @import("../Vvm.zig");
-const bid = @import("../bid.zig");
 
-pub fn handler(vvm: *Vvm) void {
-    const lob = vvm.fetchCommandByte();
-    const hib = vvm.fetchCommandByte();
-    const word = bid.combine(hib, lob);
+pub fn handler(vvm: *Vvm, word: u16) void {
     vvm.registers.a.w[0] = .initWord(word);
 }
 

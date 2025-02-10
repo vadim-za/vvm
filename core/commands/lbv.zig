@@ -1,8 +1,7 @@
 const std = @import("std");
 const Vvm = @import("../Vvm.zig");
 
-pub fn handler(vvm: *Vvm) void {
-    const byte = vvm.fetchCommandByte();
+pub fn handler(vvm: *Vvm, byte: u8) void {
     vvm.registers.a.b[0] = byte;
 }
 

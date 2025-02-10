@@ -8,8 +8,8 @@ const Vvm = @import("Vvm.zig");
 const Command = @import("Command.zig");
 
 const HandlerTable = [256]TableEntry;
-const TableEntry = *const Command.Handler;
-const default_entry: TableEntry = unusedOpcodeHandler;
+const TableEntry = Command.Handler;
+const default_entry: TableEntry = .init(unusedOpcodeHandler, "default_entry");
 
 // Prepare a table containing command handlers in positions corresponding to command opcodes
 fn makeTable() HandlerTable {
@@ -42,8 +42,7 @@ fn fillEntry(
     handler: TableEntry,
     command_name: []const u8,
 ) void {
-    const duplicate_fill = tbl[entry_index] != default_entry and
-        handler != default_entry;
+    const duplicate_fill = !tbl[entry_index].eq(default_entry);
     if (comptime duplicate_fill)
         @compileError("Duplicate entry fill at index " ++
             std.fmt.comptimePrint("0x{X}", .{entry_index}) ++
