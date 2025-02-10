@@ -99,12 +99,11 @@ fn dispatch(self: *@This(), command_opcode: u8) void {
         // so use 'inline else'. Try achieving the same in C++ in a similarly
         // nice way, hehe (maybe some good optimizer can unwrap a function
         // pointer table to the same kind of code?)
-        inline else => |opcode| (comptime commands[opcode])(self),
+        inline else => |opcode| (comptime opcode_table[opcode])(self),
     }
 }
 
-// The opcode table
-const commands = @import("command_table.zig").table;
+const opcode_table = @import("opcode_table.zig").table;
 
 test "Test" {
     // Ensure the other tests are performed
