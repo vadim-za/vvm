@@ -17,7 +17,7 @@ pub fn build(b: *std.Build) void {
     });
 
     const system = b.addExecutable(.{
-        .name = "system",
+        .name = "vvm",
         .root_source_file = b.path("system/System.zig"),
         .target = target,
         .optimize = optimize,
