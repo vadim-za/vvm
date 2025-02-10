@@ -26,7 +26,7 @@ test "Test" {
         }
     };
 
-    const out = Command.collection.out;
+    const out = Vvm.commands.out;
 
     var vvm: Vvm = undefined;
     var env = Env{ .vvm = &vvm };

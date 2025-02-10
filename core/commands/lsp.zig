@@ -7,7 +7,7 @@ pub fn handler(vvm: *Vvm) void {
 }
 
 test "Test" {
-    const lsp = Command.collection.lsp;
+    const lsp = Vvm.commands.lsp;
 
     var vvm: Vvm = undefined;
     vvm.init();

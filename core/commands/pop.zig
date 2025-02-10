@@ -7,7 +7,7 @@ pub fn handler(vvm: *Vvm) void {
 }
 
 test "Test" {
-    const pop = Command.collection.pop;
+    const pop = Vvm.commands.pop;
 
     var vvm: Vvm = undefined;
     vvm.init();

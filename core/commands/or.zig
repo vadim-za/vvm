@@ -9,7 +9,7 @@ pub fn handler(vvm: *Vvm) void {
 }
 
 test "Test" {
-    const @"or" = Command.collection.@"or";
+    const @"or" = Vvm.commands.@"or";
 
     var vvm: Vvm = undefined;
     vvm.init();

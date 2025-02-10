@@ -8,7 +8,7 @@ pub fn handler(vvm: *Vvm) void {
 }
 
 test "Test" {
-    const lbv = Command.collection.lbv;
+    const lbv = Vvm.commands.lbv;
 
     var vvm: Vvm = undefined;
     vvm.init();

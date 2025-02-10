@@ -10,6 +10,10 @@ const std = @import("std");
 const Registers = @import("Registers.zig");
 const IEnv = @import("IEnv.zig");
 
+// A struct containing all commands as its fields (of Command type each).
+pub const commands = @import("command_collection.zig").collectAll();
+
+// This could get useful as utility
 pub const bid = @import("bid.zig");
 
 // All these fields may be initialized/manipulated by the user.
@@ -94,7 +98,6 @@ pub fn popWord(self: *@This()) u16 {
 
 // Given the just fetched command opcode, complete fetching the command and execute it.
 fn dispatch(self: *@This(), command_opcode: u8) void {
-    @breakpoint();
     switch (command_opcode) {
         // We want the compiler to generate a dispatched jump instruction,
         // so use 'inline else'. Try achieving the same in C++ in a similarly

@@ -8,7 +8,7 @@ pub fn handler(vvm: *Vvm) void {
 }
 
 test "Test" {
-    const stbid = Command.collection.stbid;
+    const stbid = Vvm.commands.stbid;
 
     var vvm: Vvm = undefined;
     vvm.init();

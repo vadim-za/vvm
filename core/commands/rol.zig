@@ -10,7 +10,7 @@ pub fn handler(vvm: *Vvm) void {
 }
 
 test "Test" {
-    const rol = Command.collection.rol;
+    const rol = Vvm.commands.rol;
 
     var vvm: Vvm = undefined;
     vvm.init();

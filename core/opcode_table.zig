@@ -15,10 +15,10 @@ const default_entry: TableEntry = unusedOpcodeHandler;
 fn makeTable() HandlerTable {
     var tbl: HandlerTable = [1]TableEntry{default_entry} ** 256;
 
-    // Go over all fields in 'Command.collection' and prepare the respective table entries
-    const collection = &Command.collection;
-    for (@typeInfo(@TypeOf(collection.*)).@"struct".fields) |*field| {
-        const command = @field(collection, field.name);
+    // Go over all fields in 'Vvm.commands' and prepare the respective table entries
+    const commands = &Vvm.commands;
+    for (@typeInfo(@TypeOf(commands.*)).@"struct".fields) |*field| {
+        const command = @field(commands, field.name);
         for (
             0..command.variant_count,
             command.base_opcode..,

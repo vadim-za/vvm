@@ -7,7 +7,7 @@ pub fn handler(vvm: *Vvm) void {
 }
 
 test "Test" {
-    const zxbw = Command.collection.zxbw;
+    const zxbw = Vvm.commands.zxbw;
 
     var vvm: Vvm = undefined;
     vvm.init();

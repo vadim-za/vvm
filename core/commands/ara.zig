@@ -7,7 +7,7 @@ pub fn handler(vvm: *Vvm) void {
 }
 
 test "Test" {
-    const ara = Command.collection.ara;
+    const ara = Vvm.commands.ara;
 
     var vvm: Vvm = undefined;
     vvm.init();

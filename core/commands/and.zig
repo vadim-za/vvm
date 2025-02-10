@@ -9,7 +9,7 @@ pub fn handler(vvm: *Vvm) void {
 }
 
 test "Test" {
-    const @"and" = Command.collection.@"and";
+    const @"and" = Vvm.commands.@"and";
 
     var vvm: Vvm = undefined;
     vvm.init();

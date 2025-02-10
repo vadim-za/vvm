@@ -10,7 +10,7 @@ pub fn handler(vvm: *Vvm) void {
 }
 
 test "Test" {
-    const stwi = Command.collection.stwi;
+    const stwi = Vvm.commands.stwi;
 
     var vvm: Vvm = undefined;
     vvm.init();

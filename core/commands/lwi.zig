@@ -9,7 +9,7 @@ pub fn handler(vvm: *Vvm) void {
 }
 
 test "Test" {
-    const lwi = Command.collection.lwi;
+    const lwi = Vvm.commands.lwi;
 
     var vvm: Vvm = undefined;
     vvm.init();

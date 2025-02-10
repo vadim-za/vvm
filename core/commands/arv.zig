@@ -6,11 +6,11 @@ const bid = @import("../bid.zig");
 pub fn handler(vvm: *Vvm) void {
     const lob = vvm.fetchCommandByte();
     const hib = vvm.fetchCommandByte();
-    vvm.registers.addr = bid.combine(hib,lob);
+    vvm.registers.addr = bid.combine(hib, lob);
 }
 
 test "Test" {
-    const arv = Command.collection.arv;
+    const arv = Vvm.commands.arv;
 
     var vvm: Vvm = undefined;
     vvm.init();

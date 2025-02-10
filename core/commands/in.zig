@@ -18,7 +18,7 @@ test "Test" {
         pub fn envOut(_: ?*anyopaque, _: u8, _: u8) void {}
     };
 
-    const in = Command.collection.in;
+    const in = Vvm.commands.in;
 
     var vvm: Vvm = undefined;
     var env = Env{ .vvm = &vvm, .offs = 0xF0 };

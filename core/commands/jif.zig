@@ -29,7 +29,7 @@ fn condition(vvm: *Vvm, comptime condition_index: u3) bool {
 }
 
 test "Test" {
-    const jif = Command.collection.jif;
+    const jif = Vvm.commands.jif;
 
     var vvm: Vvm = undefined;
     vvm.init();

@@ -7,7 +7,7 @@ pub fn handler(vvm: *Vvm) void {
 }
 
 test "Test" {
-    const jmp = Command.collection.jmp;
+    const jmp = Vvm.commands.jmp;
 
     var vvm: Vvm = undefined;
     vvm.init();

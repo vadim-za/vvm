@@ -9,7 +9,7 @@ pub fn handler(vvm: *Vvm) void {
 }
 
 test "Test" {
-    const xor = Command.collection.xor;
+    const xor = Vvm.commands.xor;
 
     var vvm: Vvm = undefined;
     vvm.init();

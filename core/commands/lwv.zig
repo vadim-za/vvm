@@ -11,7 +11,7 @@ pub fn handler(vvm: *Vvm) void {
 }
 
 test "Test" {
-    const lwv = Command.collection.lwv;
+    const lwv = Vvm.commands.lwv;
 
     var vvm: Vvm = undefined;
     vvm.init();

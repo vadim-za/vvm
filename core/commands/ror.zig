@@ -10,7 +10,7 @@ pub fn handler(vvm: *Vvm) void {
 }
 
 test "Test" {
-    const ror = Command.collection.ror;
+    const ror = Vvm.commands.ror;
 
     var vvm: Vvm = undefined;
     vvm.init();

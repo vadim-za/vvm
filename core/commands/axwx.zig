@@ -7,7 +7,7 @@ pub fn handler(vvm: *Vvm) void {
 }
 
 test "Test" {
-    const axwx = Command.collection.axwx;
+    const axwx = Vvm.commands.axwx;
 
     var vvm: Vvm = undefined;
     vvm.init();

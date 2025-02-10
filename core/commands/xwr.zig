@@ -16,7 +16,7 @@ pub fn handler(comptime command_opcode: u8) Command.Handler {
 }
 
 test "Test" {
-    const xwr = Command.collection.xwr;
+    const xwr = Vvm.commands.xwr;
 
     var vvm: Vvm = undefined;
     vvm.init();

@@ -11,7 +11,7 @@ pub fn handler(vvm: *Vvm) void {
 }
 
 test "Test" {
-    const xa = Command.collection.xa;
+    const xa = Vvm.commands.xa;
 
     var vvm: Vvm = undefined;
     vvm.init();

@@ -12,7 +12,7 @@ pub fn handler(comptime command_opcode: u8) Command.Handler {
 }
 
 test "Test" {
-    const lbr = Command.collection.lbr;
+    const lbr = Vvm.commands.lbr;
 
     var vvm: Vvm = undefined;
     vvm.init();

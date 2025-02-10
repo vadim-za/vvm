@@ -9,7 +9,7 @@ pub fn handler(vvm: *Vvm) void {
 }
 
 test "Test" {
-    const sxbw = Command.collection.sxbw;
+    const sxbw = Vvm.commands.sxbw;
 
     var vvm: Vvm = undefined;
     vvm.init();
