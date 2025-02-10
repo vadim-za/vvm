@@ -101,11 +101,11 @@ pub fn popWord(self: *@This()) u16 {
 
 // Given the just fetched command opcode, complete fetching the command and execute it.
 fn dispatch(self: *@This(), command_opcode: u8) void {
+    // We want the compiler to generate a dispatched jump instruction,
+    // so use a switch with 'inline else'. Try achieving the same in C++
+    // in a similarly nice way, hehe (maybe some good optimizer can unwrap
+    // a function pointer table to the same kind of code?)
     switch (command_opcode) {
-        // We want the compiler to generate a dispatched jump instruction,
-        // so use 'inline else'. Try achieving the same in C++ in a similarly
-        // nice way, hehe (maybe some good optimizer can unwrap a function
-        // pointer table to the same kind of code?)
         inline else => |opcode| self.invoke(opcode_table[opcode]),
     }
 }
