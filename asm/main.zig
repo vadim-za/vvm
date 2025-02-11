@@ -1,5 +1,6 @@
 const std = @import("std");
 const VvmCore = @import("VvmCore");
+const asm_streams = @import("asm_streams.zig");
 
 const source =
     \\ lbv 0x10
@@ -10,17 +11,14 @@ pub fn main() !void {
     const alloc = gpa.allocator();
     defer _ = gpa.deinit();
 
-    var result: std.ArrayList(u8) = .init(alloc);
-    var in_stream = std.io.fixedBufferStream(source);
+    var in = asm_streams.Input.init(source);
+    var out: asm_streams.Output = .init(alloc);
 
-    var in = in_stream.reader().any();
-    var out = result.writer().any();
-    while (true) {
-        const byte = in.readByte() catch break;
+    while (in.readByte()) |byte| {
         try out.writeByte(byte);
     }
 
     //try out.print("ABCD", .{});
-    std.debug.print("{x}\n", .{result.items});
-    result.deinit();
+    std.debug.print("{x}\n", .{out.data.items});
+    out.deinit();
 }
