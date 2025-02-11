@@ -8,8 +8,6 @@ pub fn collectAll() FullCollection {
     return .{}; // the type already defines all necessary field values as defaults
 }
 
-const FullCollection = MakeFullCollectionType();
-
 // For each entry in 'command_list.commands' the constructed type contains
 // a named field of type Command, the name being taken from the entry.
 // It looks smth like:
@@ -20,7 +18,7 @@ const FullCollection = MakeFullCollectionType();
 // }
 // This allows accessing the collection items simply as 'collection.lbr',
 // 'collection.lwr' etc.
-fn MakeFullCollectionType() type {
+const FullCollection: type = blk: {
     const list_entries = &command_list.commands;
     const total_count = list_entries.len;
 
@@ -39,7 +37,7 @@ fn MakeFullCollectionType() type {
         };
     }
 
-    return @Type(.{
+    break :blk @Type(.{
         .@"struct" = .{
             .layout = .auto,
             .fields = &fields,
@@ -47,4 +45,4 @@ fn MakeFullCollectionType() type {
             .is_tuple = false,
         },
     });
-}
+};
