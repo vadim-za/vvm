@@ -1,10 +1,11 @@
 const std = @import("std");
 const Vvm = @import("../Vvm.zig");
 
-pub fn handler(vvm: *Vvm) void {
-    const displacement = vvm.fetchCommandWord();
+pub const variant_type = .none;
+
+pub fn handler(vvm: *Vvm, word: u16) void {
     vvm.registers.a.w[0] = .initWord(
-        vvm.readMemoryWord(vvm.registers.addr +% displacement),
+        vvm.readMemoryWord(vvm.registers.addr +% word),
     );
 }
 
