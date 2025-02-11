@@ -12,7 +12,7 @@ pub fn main() !void {
     defer _ = gpa.deinit();
 
     var in = asm_streams.Input.init(source);
-    var out: asm_streams.Output = .init(alloc);
+    var out: asm_streams.Output = .{ .data = .init(alloc) };
 
     while (in.readByte()) |byte| {
         try out.writeByte(byte);
