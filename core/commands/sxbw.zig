@@ -1,6 +1,8 @@
 const std = @import("std");
 const Vvm = @import("../Vvm.zig");
 
+pub const variant_type = .none;
+
 pub fn handler(vvm: *Vvm) void {
     const b: i8 = @bitCast(vvm.registers.a.b[0]);
     const w: i16 = b;
