@@ -3,8 +3,8 @@
 
 // zig fmt: off
 
-// pub const   lbr  = .{ 0x00, 8, @import("commands/lbr.zig") };
-// pub const   lwr  = .{ 0x08, 4, @import("commands/lwr.zig") };
+pub const   lbr  = .{ 0x00, 8, @import("commands/lbr.zig") };
+pub const   lwr  = .{ 0x08, 4, @import("commands/lwr.zig") };
 // pub const   stbr = .{ 0x10, 8, @import("commands/stbr.zig") };
 // pub const   stwr = .{ 0x18, 4, @import("commands/stwr.zig") };
 pub const   xbr  = .{ 0x20, 8, @import("commands/xbr.zig") };
