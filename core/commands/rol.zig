@@ -1,6 +1,8 @@
 const std = @import("std");
 const Vvm = @import("../Vvm.zig");
 
+pub const variant_type = .none;
+
 pub fn handler(vvm: *Vvm) void {
     const xa = vvm.registers.a.asDword();
     vvm.registers.a = .initDword(
