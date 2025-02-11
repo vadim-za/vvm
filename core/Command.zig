@@ -9,7 +9,7 @@ const Vvm = @import("Vvm.zig");
 const command_list = @import("command_list.zig");
 const bid = @import("bid.zig");
 
-name: []const u8,
+name: [:0]const u8,
 
 // Opcodes for the command are in the range:
 // [base_opcode .. base_opcode + variant_count] (excluding the right boundary)
@@ -21,22 +21,8 @@ variant_count: u8,
 //      fn handler(comptime command_opcode: u8) Command.Handler - for variant_count > 1
 impl: type,
 
-// Construct a command from a given entry in the 'command_list'.
-// 'command_name' specifies the entry name.
-pub fn init(command_name: []const u8) @This() {
-    const ListEntry = struct {
-        u8, // base_command_code
-        u8, // variant_count
-        type, // impl
-    };
-    const list_entry: ListEntry = @field(command_list, command_name);
-
-    return .{
-        .name = command_name,
-        .base_opcode = list_entry[0],
-        .variant_count = list_entry[1],
-        .impl = list_entry[2],
-    };
+pub fn init(list_entry: command_list.Entry) @This() {
+    return command_list.toCommand(list_entry);
 }
 
 // -----------------------------------------------------------------------------

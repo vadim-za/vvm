@@ -10,26 +10,27 @@ pub fn collectAll() FullCollection {
 
 const FullCollection = MakeFullCollectionType();
 
-// For each pub decl in 'command_list' the constructed type contains
-// an identically named field of type Command. Thus it looks smth like:
+// For each entry in 'command_list.commands' the constructed type contains
+// a named field of type Command, the name being taken from the entry. It looks smth like:
 // struct {
-//      lbr: Command = .init("lbr"),
-//      lwr: Command = .init("lwr"),
+//      lbr: Command = .init(command_list.commands[0]),
+//      lwr: Command = .init(command_list.commands[1]),
 //      ...
 // }
+// This allows accessing the collection items simply as 'collection.lbr',
+// 'collection.lwr' etc.
 fn MakeFullCollectionType() type {
-    const list_entries = @typeInfo(command_list).@"struct".decls;
+    const list_entries = &command_list.commands;
     const total_count = list_entries.len;
 
     const StructField = std.builtin.Type.StructField;
     var fields: [total_count]StructField = undefined;
 
-    for (list_entries, &fields) |*decl, *field| {
-        const name = decl.name;
-        const command = Command.init(name);
+    for (list_entries, &fields) |list_entry, *field| {
+        const command = Command.init(list_entry);
 
         field.* = .{
-            .name = name,
+            .name = command.name,
             .type = Command,
             .default_value = &command,
             .is_comptime = false, // will be used only in purely comptime code anyway
