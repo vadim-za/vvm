@@ -105,12 +105,14 @@ pub const VariantType = enum {
     none,
     byte_register,
     word_register,
+    condition,
 
     pub fn variantCount(self: @This()) u8 {
         return switch (self) {
             .none => 1,
             .byte_register => 8,
             .word_register => 4,
+            .condition => 8,
         };
     }
 };
