@@ -11,7 +11,8 @@ pub fn collectAll() FullCollection {
 const FullCollection = MakeFullCollectionType();
 
 // For each entry in 'command_list.commands' the constructed type contains
-// a named field of type Command, the name being taken from the entry. It looks smth like:
+// a named field of type Command, the name being taken from the entry.
+// It looks smth like:
 // struct {
 //      lbr: Command = .init(command_list.commands[0]),
 //      lwr: Command = .init(command_list.commands[1]),
