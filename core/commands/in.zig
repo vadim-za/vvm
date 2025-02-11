@@ -1,6 +1,8 @@
 const std = @import("std");
 const Vvm = @import("../Vvm.zig");
 
+pub const variant_type = .none;
+
 pub fn handler(vvm: *Vvm) void {
     const port: u8 = @truncate(vvm.registers.addr);
     vvm.registers.a.b[0] = vvm.ienv.vft.in(vvm.ienv.ptr, port);
