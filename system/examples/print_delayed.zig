@@ -20,7 +20,7 @@ pub fn run() void {
         0x5A, // 11: ARA
         0x60, // 12: LBI
         0x7A, 0x2F, 0x00, // 13: ARV 0x002F
-        0x30, // 16: JIFLZ
+        0x30, // 16: JIF LZ
         0x48, // 17: ARWR W0 ; ADDR = 0x0001
         0x55, // 18: OUT
         0x09, // 19: LWR W1 ; A = running_ptr

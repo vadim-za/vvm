@@ -16,14 +16,15 @@ Low-endian architecture, 16-bit address space
 | STWR Wn | STore to Word Register | Wn:=A |
 | XBR Bn | eXchange Byte Register | LSB(A)<->Bn |
 | XWR Wn | eXchange Word Register | A<->Wn |
-| JIFLZ | Jump IF Low byte is Zero | if(LSB(A)==0) PC:=ADDR |
-| JIFLNZ | Jump IF Low byte is Not Zero | if(LSB(A)!=0) PC:=ADDR |
-| JIFHZ | Jump IF High byte is Zero | if(MSB(A)==0) PC:=ADDR |
-| JIFHNZ | Jump IF High byte is Not Zero | if(MSB(A)!=0) PC:=ADDR |
-| JIFZ | Jump IF accumulator is Zero | if(A==0) PC:=ADDR |
-| JIFNZ | Jump IF accumulator is Not Zero | if(A!=0) PC:=ADDR |
-| JIFXZ | Jump IF accumulator eXtension is Zero | if(X==0) PC:=ADDR |
-| JIFXNZ | Jump IF accumulator eXtension is Not Zero | if(X!=0) PC:=ADDR |
+| JIF cond | Jump IF condition | if(cond) PC:=ADDR |
+| | LZ: Low byte is Zero | LoB(A)==0 |
+| | LNZ: Low byte is Not Zero | LoB(A)!=0 |
+| | HZ: High byte is Zero | HiB(A)==0 |
+| | HNZ: High byte is Not Zero | HiB(A)!=0 |
+| | Z: accumulator is Zero | A==0 |
+| | NZ: accumulator is Not Zero | A!=0 |
+| | XZ: accumulator eXtension is Zero | X==0 |
+| | XNZ: accumulator eXtension is Not Zero | X!=0 |
 | ADD | unsigned Add, 32-bit result in (X:A)  | (X:A):=A+X |
 | SUB | unsigned Subtract, 32-bit result in (X:A) | (X:A):=A-X |
 | AND | Bitwise And | A:=A&X |
@@ -74,7 +75,7 @@ Low-endian architecture, 16-bit address space
 | **0x** | LBR B0 | LBR B1 | LBR B2 | LBR B3 | LBR B4 | LBR B5 | LBR B6 | LBR B7 | LWR W0 | LWR W1 | LWR W2 | LWR W3
 | **1x** | STBR B0 | STBR B1 | STBR B2 | STBR B3 | STBR B4 | STBR B5 | STBR B6 | STBR B7 | STWR W0 | STWR W1 | STWR W2 | STWR W3 
 | **2x** | XBR B0 | XBR B1 | XBR B2 | XBR B3 | XBR B4 | XBR B5 | XBR B6 | XBR B7 | XWR W0 | XWR W1 | XWR W2 | XWR W3 
-| **3x** | JIFLZ | JIFLNZ | JIFHZ | JIFHNZ | JIFZ | JIFNZ | JIFXZ | JIFXNZ
+| **3x** | JIF LZ | JIF LNZ | JIF HZ | JIF HNZ | JIF Z | JIF NZ | JIF XZ | JIF XNZ
 | **4x** | ADD | SUB |  AND | OR | XOR | JMP | CALL | RET | ARWR W0 | ARWR W1 | ARWR W2 | ARWR W3
 | **5x** | ZERO | ALL | CPL | XHL | IN | OUT | | | ROL | ROR | ARA | XA | POP | PUSH
 | **6x** | LBI | LBID Word | LBV Byte | | | | | | LWI | LWID Word | LWV Word | LSP 
