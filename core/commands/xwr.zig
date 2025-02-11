@@ -1,15 +1,15 @@
 const std = @import("std");
 const Vvm = @import("../Vvm.zig");
-const Command = @import("../Command.zig");
 
-pub fn handler(comptime command_opcode: u8) Command.Handler {
+pub const variant_type = .word_register;
+
+pub fn handler(comptime variant_index: u8) fn(*Vvm) void {
     return struct {
         fn actualHandler(vvm: *Vvm) void {
-            const index: u2 = command_opcode & 3;
             std.mem.swap(
                 Vvm.WordRegister,
                 &vvm.registers.a.w[0],
-                &vvm.registers.gp.w[index],
+                &vvm.registers.gp.w[variant_index],
             );
         }
     }.actualHandler;
