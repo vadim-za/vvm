@@ -1,9 +1,10 @@
 const std = @import("std");
 const Vvm = @import("../Vvm.zig");
 
-pub fn handler(vvm: *Vvm) void {
-    const displacement = vvm.fetchCommandWord();
-    vvm.writeMemory(vvm.registers.addr +% displacement, vvm.registers.a.b[0]);
+pub const variant_type = .none;
+
+pub fn handler(vvm: *Vvm, word: u16) void {
+    vvm.writeMemory(vvm.registers.addr +% word, vvm.registers.a.b[0]);
 }
 
 test "Test" {
