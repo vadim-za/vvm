@@ -55,13 +55,13 @@ pub const Handler = union(Bytes) {
 
     pub fn init(handler_func: anytype, command_name: []const u8) @This() {
         return switch (@TypeOf(handler_func)) {
-            (fn (vvm: *Vvm) void) => .{
+            fn (vvm: *Vvm) void => .{
                 .opcode_only = handler_func,
             },
-            (fn (vvm: *Vvm, byte: u8) void) => .{
+            fn (vvm: *Vvm, byte: u8) void => .{
                 .extra_byte = handler_func,
             },
-            (fn (vvm: *Vvm, word: u16) void) => .{
+            fn (vvm: *Vvm, word: u16) void => .{
                 .extra_word = handler_func,
             },
             else => @compileError("Unsupported handler type for " ++ command_name),
