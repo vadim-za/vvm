@@ -1,8 +1,9 @@
 const std = @import("std");
 const SourceInput = @import("SourceInput.zig");
 const LineInput = @import("LineInput.zig");
-const ResultOutput = @import("ArrayListOutput.zig");
+const PassOutput = @import("PassOutput.zig");
 const Label = @import("Label.zig");
+const Command = @import("Command.zig");
 
 source_in: *SourceInput,
 line_in: LineInput,
@@ -27,30 +28,29 @@ pub fn deinit(self: *const @This()) void {
 
 pub const Error = error{ SyntaxError, OutOfMemory };
 
-pub fn translate(self: *@This()) Error!void {
-    if (try self.readLine() == null)
+pub fn translate(self: *@This(), out: *PassOutput) Error!void {
+    if (try self.parseLine(out) == null)
         return;
     self.current_line_number += 1;
 }
 
-fn readLine(self: *@This()) !?void {
+fn parseLine(self: *@This(), out: *PassOutput) !?void {
     const in = &self.line_in;
     if (in.c == null)
         return null;
 
     self.current_pos_number = in.current_pos_number;
     if (!in.isAtWhitespace())
-        try self.readLabel();
+        try self.parseLabel();
 
     self.skipWhitespace();
-    try self.readCommand();
+    if (in.c == null)
+        return; // no command
+
+    try Command.translate(self, out);
 }
 
-fn readCommand(self: *@This()) !void {
-    _ = self; // autofix
-}
-
-fn readLabel(self: *@This()) !void {
+fn parseLabel(self: *@This()) !void {
     const in = &self.line_in;
     var id_bytes: std.BoundedArray(u8, Label.max_length) = .{};
 
@@ -70,9 +70,10 @@ fn readLabel(self: *@This()) !void {
     }
 
     self.skipWhitespace();
+
     if (in.c != ':')
         return self.raiseError("label must be followed by a colon", .{});
-    in.next();
+    self.nextAndUpdatePos();
 
     const label = Label.init(
         id_bytes.constSlice(),
@@ -81,11 +82,68 @@ fn readLabel(self: *@This()) !void {
     try self.labels.append(label);
 }
 
-pub fn skipWhitespace(self: *@This()) void {
+fn nextAndUpdatePos(self: *@This()) void {
+    const in = &self.line_in;
+    in.next();
+    self.current_pos_number = in.current_pos_number;
+}
+
+fn skipWhitespace(self: *@This()) void {
     const in = &self.line_in;
     while (in.isAtWhitespace())
-        in.next();
-    self.current_pos_number = in.current_pos_number;
+        self.nextAndUpdatePos();
+}
+
+pub fn parseOptionallyWhitespacedComma(self: *@This()) !void {
+    const in = &self.line_in;
+    self.skipWhitespace();
+    if (in.c != ',')
+        return self.raiseError("comma expected", .{});
+    self.skipWhitespace();
+}
+
+pub fn parseByteRegisterName(self: *@This()) !u8 {
+    const in = &self.line_in;
+    self.skipWhitespace();
+    if (!in.isAtUpper('B'))
+        return self.raiseError("expected byte register name 'Bn'", .{});
+    self.nextAndUpdatePos();
+
+    if (!in.isAtDigit())
+        return self.raiseError("digit expected", .{});
+    self.nextAndUpdatePos();
+
+    const n: u8 = in.c.? - '0';
+
+    if (n >= 8)
+        return self.raiseError(
+            "byte register index must be between 0 and 7",
+            .{},
+        );
+
+    return @intCast(n);
+}
+
+pub fn parseWordRegisterName(self: *@This()) !u8 {
+    const in = &self.line_in;
+    self.skipWhitespace();
+    if (!in.isAtUpper('W'))
+        return self.raiseError("expected word register name 'Wn'", .{});
+    self.nextAndUpdatePos();
+
+    if (!in.isAtDigit())
+        return self.raiseError("digit expected", .{});
+    self.nextAndUpdatePos();
+
+    const n: u8 = in.c.? - '0';
+
+    if (n >= 8)
+        return self.raiseError(
+            "byte register index must be between 0 and 7",
+            .{},
+        );
+
+    return @intCast(n);
 }
 
 pub fn raiseError(self: *@This(), comptime fmt: []const u8, args: anytype) !void {

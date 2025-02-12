@@ -1,39 +1,29 @@
 const std = @import("std");
 const VvmCore = @import("VvmCore");
-const Asm = @import("Asm.zig");
+const Parser = @import("Parser.zig");
+const PassOutput = @import("PassOutput.zig");
 
 name: []const u8,
 bytes: VvmCore.Command.Bytes,
-semantics: Semantics,
+base_opcode: u8,
+variant_count: u8,
+variant_type: VvmCore.Command.VariantType,
 
-pub const Semantics = union(enum) {
-    opcode: OpcodeCommand,
-    meta: MetaCommand,
-};
+pub fn translate(self: @This(), parser: *Parser, out: *PassOutput) !void {
+    const opcode: u8 = switch (self.variant_type) {
+        .none => self.base_opcode,
+        .byte_register => try self.parseByteRegister(parser),
+        .word_register => try self.parseWordRegister(parser),
+        .condition => try self.parseCondition(parser),
+    };
+    try out.writeByte(opcode);
 
-const OpcodeCommand = @import("OpcodeCommand.zig");
+    if (self.variant_type != .none and self.bytes != .opcode_only)
+        try parser.readOptionallyWhitespacedComma();
 
-const MetaCommand = struct {
-    handler: *const fn (@"asm": *Asm) void,
-};
-
-pub const MetaHandler = union(VvmCore.Command.Bytes) {
-    opcode_only: *const fn (@"asm": *Asm) void,
-    extra_byte: *const fn (@"asm": *Asm, byte: u8) void,
-    extra_word: *const fn (@"asm": *Asm, word: u16) void,
-
-    pub fn init(handler_func: anytype, command_name: []const u8) @This() {
-        return switch (@TypeOf(handler_func)) {
-            fn (vvm: *Vvm) void => .{
-                .opcode_only = handler_func,
-            },
-            fn (vvm: *Vvm, byte: u8) void => .{
-                .extra_byte = handler_func,
-            },
-            fn (vvm: *Vvm, word: u16) void => .{
-                .extra_word = handler_func,
-            },
-            else => @compileError("Unsupported handler type for " ++ command_name),
-        };
+    switch (self.bytes) {
+        .opcode_only => {},
+        .extra_byte => try out.writeByte(try parser.parseByteValue()),
+        .extra_word => try out.writeWord(try parser.parseWordValue()),
     }
-};
+}
