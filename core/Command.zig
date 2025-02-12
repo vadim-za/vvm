@@ -64,10 +64,6 @@ pub const Handler = union(Bytes) {
             ),
         };
     }
-
-    pub fn commandByteCount(self: @This()) u2 {
-        return @intFromEnum(self);
-    }
 };
 
 pub fn handler(self: @This(), variant_index: u8) Handler {
@@ -83,6 +79,10 @@ pub fn handler(self: @This(), variant_index: u8) Handler {
         .init(self.impl.handler, self.name)
     else
         .init(self.impl.handler(variant_index), self.name);
+}
+
+pub fn bytes(self: @This()) Bytes {
+    return self.handler(0);
 }
 
 // -----------------------------------------------------------------------------

@@ -4,6 +4,7 @@ const LineInput = @import("LineInput.zig");
 const PassOutput = @import("PassOutput.zig");
 const Label = @import("Label.zig");
 const Command = @import("Command.zig");
+const commands = @import("commands.zig");
 
 source_in: *SourceInput,
 line_in: LineInput,
@@ -254,7 +255,8 @@ fn parseCommandHere(self: *@This(), out: *PassOutput) !void {
         return self.raiseError("bad instruction name", .{});
 
     const name = name_bytes.slice();
-    const command = commands.find(name);
+    _ = std.ascii.upperString(name, name);
+    const command = commands.findUppercase(name);
     if (!command)
         return self.raiseError(
             "unknown instruction name '{s}'",
