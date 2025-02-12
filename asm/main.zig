@@ -1,9 +1,11 @@
 const std = @import("std");
 const VvmCore = @import("VvmCore");
-const asm_streams = @import("asm_streams.zig");
+const SourceInput = @import("SourceInput.zig");
+const ResultOutput = @import("ArrayListOutput.zig");
+const Asm = @import("Asm.zig");
 
 const source =
-    \\ lbv 0x10
+    \\label: lbv 0x10
 ;
 
 pub fn main() !void {
@@ -11,14 +13,24 @@ pub fn main() !void {
     const alloc = gpa.allocator();
     defer _ = gpa.deinit();
 
-    var in = asm_streams.Input.init(source);
-    var out: asm_streams.Output = .{ .data = .init(alloc) };
+    var in = SourceInput.init(source);
+    var out: ResultOutput = .{ .data = .init(alloc) };
+    defer out.deinit();
 
-    while (in.c) |byte| : (in.next()) {
-        try out.writeByte(byte);
-    }
+    var @"asm" = Asm.init(alloc, &in);
+    defer @"asm".deinit();
+    @"asm".translate() catch |err| {
+        switch (err) {
+            error.OutOfMemory => std.debug.print("Out of memory\n", .{}),
+            error.SyntaxError => {}, // error message already printed
+        }
+        return err;
+    };
+
+    // while (in.c) |byte| : (in.next()) {
+    //     try out.writeByte(byte);
+    // }
 
     //try out.print("ABCD", .{});
-    std.debug.print("{x}\n", .{out.data.items});
-    out.deinit();
+    //std.debug.print("{x}\n", .{out.data.items});
 }

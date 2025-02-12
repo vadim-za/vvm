@@ -1,59 +1,92 @@
 const std = @import("std");
-const streams = @import("asm_streams.zig");
-const ResultOutput = streams.Output;
-const NullOutput = @import("streams/NullOutput.zig");
+const SourceInput = @import("SourceInput.zig");
+const LineInput = @import("LineInput.zig");
+const ResultOutput = @import("ArrayListOutput.zig");
+const Label = @import("Label.zig");
 
-const Label = struct {
-    const max_length = 8;
-
-    id_bytes: [max_length]u8,
-    line: usize,
-    addr: u16,
-
-    fn lessThan(context: void, lhs: Label, rhs: Label) bool {
-        _ = context; // autofix
-        return switch (std.mem.order(u8, lhs.id(), rhs.id())) {
-            .lt => true,
-            .gt => false,
-            .eq => lhs.line < rhs.line,
-        };
-    }
-
-    fn id(self: *@This()) []u8 {
-        return std.mem.sliceTo(&self.id_bytes, 0);
-    }
-};
-
+source_in: *SourceInput,
+line_in: LineInput,
+current_line_number: usize,
 labels: std.ArrayList(Label),
-c: u8,
 
-fn pass1(self: *@This(), input: *Input) void {
-    self.c = input.readByte() orelse return;
+pub fn init(alloc: std.mem.Allocator, source_in: *SourceInput) @This() {
+    return .{
+        .source_in = source_in,
+        .line_in = .init(source_in),
+        .current_line_number = 1,
+        .labels = .init(alloc),
+    };
 }
 
-fn readLine(self: *@This(), input: *Input) ?void {
-    self.c = input.readByte() orelse return null;
-    if (!isNormalWhitespace(self.c))
-        readLabel();
-    while (self.c != '\n') {
-        self.c = input.readByte() orelse break;
+pub fn deinit(self: *const @This()) void {
+    self.labels.deinit();
+}
+
+pub const Error = error{ SyntaxError, OutOfMemory };
+
+pub fn translate(self: *@This()) Error!void {
+    if (try self.readLine() == null)
+        return;
+    self.current_line_number += 1;
+}
+
+fn readLine(self: *@This()) !?void {
+    const in = &self.line_in;
+    if (in.c == null)
+        return null;
+
+    if (!in.isAtWhitespace())
+        try self.readLabel();
+
+    self.skipWhitespace();
+    try self.readCommand();
+}
+
+fn readCommand(self: *@This()) !void {
+    _ = self; // autofix
+}
+
+fn readLabel(self: *@This()) !void {
+    const in = &self.line_in;
+    var id_bytes: std.BoundedArray(u8, Label.max_length) = .{};
+
+    if (!in.isAtAlphabetic())
+        return self.raiseError("Label must begin with a letter", .{});
+
+    id_bytes.append(in.c.?) catch unreachable; // there must be always space for one character
+    in.next();
+
+    while (in.isAtAlphanumeric()) {
+        id_bytes.append(in.c.?) catch
+            return self.raiseError("label too long", .{});
+        in.next();
     }
+
+    self.skipWhitespace();
+    if (in.c != ':')
+        return self.raiseError("label must be followed by a colon", .{});
+    in.next();
+
+    const label = Label.init(
+        id_bytes.constSlice(),
+        self.current_line_number,
+    );
+    try self.labels.append(label);
 }
 
-fn readLabel(self: *@This(), input: *Input) ?void {
-    var len: usize = 0;
-    var id_bytes: [Label.max_length]u8 = undefined;
-    while (std.ascii.isAlphanumeric(self.c)) {
-        if(len >= Label.max_length)
-            break;
-        id_bytes[len] = self.c;
-        len += 1;
-        self.c = input.readByte() orelse error unexpected EOF;
-    }
-
-    _ = input; // autofix
+fn skipWhitespace(self: *@This()) void {
+    const in = &self.line_in;
+    while (in.isAtWhitespace())
+        in.next();
 }
 
-fn isNormalWhitespace(c: u8) bool {
-    return c == 32 or c == 9;
+fn raiseError(self: *@This(), comptime fmt: []const u8, args: anytype) !void {
+    std.debug.print(
+        "({}:{}) " ++ fmt ++ "\n",
+        .{
+            self.current_line_number,
+            self.line_in.current_pos_number,
+        } ++ args,
+    );
+    return error.SyntaxError;
 }
