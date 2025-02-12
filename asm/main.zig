@@ -19,7 +19,8 @@ pub fn main() !void {
     var in = SourceInput.init(source);
     var code_out: ArrayListOutput = .{ .data = .init(alloc) };
     defer code_out.deinit();
-    var out: PassOutput = .init(null);
+    //var out: PassOutput = .init(null);
+    var out: PassOutput = .init(&code_out);
 
     var parser: Parser = .init(alloc, &in);
     defer parser.deinit();
@@ -30,4 +31,6 @@ pub fn main() !void {
         }
         return;
     };
+
+    std.debug.print("{any}\n", .{code_out.data.items});
 }

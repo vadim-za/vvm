@@ -225,7 +225,7 @@ pub fn parseConstantExpression(self: *@This(), T: type) !T {
             '+' => sum +|= try self.parseConstantTerm(T),
             '-' => sum -|= try self.parseConstantTerm(T),
             else => return sum,
-        };
+        } else return sum;
     }
 }
 
