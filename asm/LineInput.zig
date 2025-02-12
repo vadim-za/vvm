@@ -36,9 +36,23 @@ pub fn isAtAlphabetic(self: @This()) bool {
         false;
 }
 
+pub fn isAtDigit(self: @This()) bool {
+    return if (self.c) |c|
+        std.ascii.isDigit(c)
+    else
+        false;
+}
+
 pub fn isAtAlphanumeric(self: @This()) bool {
     return if (self.c) |c|
         std.ascii.isAlphanumeric(c)
+    else
+        false;
+}
+
+pub fn isAtUpper(self: @This(), upper: u8) bool {
+    return if (self.c) |c|
+        std.ascii.toUpper(c) == upper
     else
         false;
 }

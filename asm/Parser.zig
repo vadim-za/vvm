@@ -81,14 +81,14 @@ fn readLabel(self: *@This()) !void {
     try self.labels.append(label);
 }
 
-fn skipWhitespace(self: *@This()) void {
+pub fn skipWhitespace(self: *@This()) void {
     const in = &self.line_in;
     while (in.isAtWhitespace())
         in.next();
     self.current_pos_number = in.current_pos_number;
 }
 
-fn raiseError(self: *@This(), comptime fmt: []const u8, args: anytype) !void {
+pub fn raiseError(self: *@This(), comptime fmt: []const u8, args: anytype) !void {
     std.debug.print(
         "({}:{}) " ++ fmt ++ "\n",
         .{

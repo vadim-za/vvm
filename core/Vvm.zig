@@ -9,13 +9,12 @@
 const std = @import("std");
 const Registers = @import("Registers.zig");
 const IEnv = @import("IEnv.zig");
-const Command = @import("Command.zig");
+
+pub const Command = @import("Command.zig");
+pub const bid = @import("bid.zig");
 
 // A struct containing all commands as its fields (of Command type each).
 pub const commands = @import("command_collection.zig").collectAll();
-
-// This could get useful as utility
-pub const bid = @import("bid.zig");
 
 const opcode_table = @import("opcode_table.zig").table;
 

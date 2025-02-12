@@ -2,7 +2,7 @@ const std = @import("std");
 const VvmCore = @import("VvmCore");
 const SourceInput = @import("SourceInput.zig");
 const ResultOutput = @import("ArrayListOutput.zig");
-const Asm = @import("Asm.zig");
+const Parser = @import("Parser.zig");
 
 const source =
     \\label1245678: lbv 0x10
@@ -17,9 +17,9 @@ pub fn main() !void {
     var out: ResultOutput = .{ .data = .init(alloc) };
     defer out.deinit();
 
-    var @"asm" = Asm.init(alloc, &in);
-    defer @"asm".deinit();
-    @"asm".translate() catch |err| {
+    var parser: Parser = .init(alloc, &in);
+    defer parser.deinit();
+    parser.translate() catch |err| {
         switch (err) {
             error.OutOfMemory => std.debug.print("Out of memory\n", .{}),
             error.SyntaxError => {}, // error message already printed
