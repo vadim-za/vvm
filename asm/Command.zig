@@ -12,18 +12,28 @@ variant_type: VvmCore.Command.VariantType,
 pub fn translate(self: @This(), parser: *Parser, out: *PassOutput) !void {
     const opcode: u8 = switch (self.variant_type) {
         .none => self.base_opcode,
-        .byte_register => try self.parseByteRegister(parser),
-        .word_register => try self.parseWordRegister(parser),
+        .byte_register => try parser.parseRegisterName(
+            parser,
+            'B',
+            "byte",
+            8,
+        ),
+        .word_register => try parser.parseRegisterName(
+            parser,
+            'W',
+            "word",
+            4,
+        ),
         .condition => try self.parseCondition(parser),
     };
     try out.writeByte(opcode);
 
     if (self.variant_type != .none and self.bytes != .opcode_only)
-        try parser.readOptionallyWhitespacedComma();
+        try parser.parseOptionallyWhitespacedComma();
 
     switch (self.bytes) {
         .opcode_only => {},
-        .extra_byte => try out.writeByte(try parser.parseByteValue()),
-        .extra_word => try out.writeWord(try parser.parseWordValue()),
+        .extra_byte => try out.writeByte(try parser.parseConstantExpression(u8)),
+        .extra_word => try out.writeWord(try parser.parseConstantExpression(u16)),
     }
 }

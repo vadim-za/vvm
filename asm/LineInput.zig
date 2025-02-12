@@ -22,6 +22,13 @@ pub fn next(self: *@This()) void {
         null;
 }
 
+pub fn isAtWhitespaceOrEol(self: @This()) bool {
+    return if (self.c) |c|
+        (c == 32 or c == 9)
+    else
+        true;
+}
+
 pub fn isAtWhitespace(self: @This()) bool {
     return if (self.c) |c|
         (c == 32 or c == 9)
