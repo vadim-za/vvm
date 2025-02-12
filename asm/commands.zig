@@ -14,10 +14,9 @@ const table: [command_count]Command = blk: {
 
     for (&temp_table, vvm_commands_fields) |*entry, *field| {
         const desc = @field(vvm_commands, field.name);
-        const uppercase_name = comptimeToUpperString(field.name);
 
         entry.* = .{
-            .name = &uppercase_name,
+            .name = comptimeToUpperString(field.name),
             .bytes = desc.bytes(),
             .base_opcode = desc.base_opcode,
             .variant_count = desc.variant_count,
@@ -30,13 +29,15 @@ const table: [command_count]Command = blk: {
     break :blk temp_table;
 };
 
-fn comptimeToUpperString(comptime s: []const u8) [s.len]u8 {
+fn comptimeToUpperString(comptime s: []const u8) []const u8 {
     var upper: [s.len]u8 = undefined;
     _ = std.ascii.upperString(
         &upper,
         s,
     );
-    return upper;
+
+    const const_upper = upper;
+    return &const_upper;
 }
 
 fn lessThanFn(context: void, lhs: Command, rhs: Command) bool {
