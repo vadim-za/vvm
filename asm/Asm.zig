@@ -7,13 +7,16 @@ const Label = @import("Label.zig");
 source_in: *SourceInput,
 line_in: LineInput,
 current_line_number: usize,
+current_pos_number: usize,
 labels: std.ArrayList(Label),
 
 pub fn init(alloc: std.mem.Allocator, source_in: *SourceInput) @This() {
+    const line_in: LineInput = .init(source_in);
     return .{
         .source_in = source_in,
-        .line_in = .init(source_in),
+        .line_in = line_in,
         .current_line_number = 1,
+        .current_pos_number = line_in.current_pos_number,
         .labels = .init(alloc),
     };
 }
@@ -35,6 +38,7 @@ fn readLine(self: *@This()) !?void {
     if (in.c == null)
         return null;
 
+    self.current_pos_number = in.current_pos_number;
     if (!in.isAtWhitespace())
         try self.readLabel();
 
@@ -81,6 +85,7 @@ fn skipWhitespace(self: *@This()) void {
     const in = &self.line_in;
     while (in.isAtWhitespace())
         in.next();
+    self.current_pos_number = in.current_pos_number;
 }
 
 fn raiseError(self: *@This(), comptime fmt: []const u8, args: anytype) !void {
@@ -88,7 +93,7 @@ fn raiseError(self: *@This(), comptime fmt: []const u8, args: anytype) !void {
         "({}:{}) " ++ fmt ++ "\n",
         .{
             self.current_line_number,
-            self.line_in.current_pos_number,
+            self.current_pos_number,
         } ++ args,
     );
     return error.SyntaxError;
