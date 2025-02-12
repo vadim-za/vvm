@@ -5,9 +5,11 @@ const ArrayListOutput = @import("ArrayListOutput.zig");
 const PassOutput = @import("PassOutput.zig");
 const Parser = @import("Parser.zig");
 
-const source =
-    \\label1245678: lbv 0x10
-;
+// const source =
+//     \\label12: lbv 0x10
+// ;
+
+const source = @embedFile("examples/test.vvma");
 
 pub fn main() !void {
     var gpa = std.heap.GeneralPurposeAllocator(.{}){};

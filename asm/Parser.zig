@@ -150,7 +150,7 @@ fn parseUnsignedNumberHere(self: *@This(), T: type) !T {
         in.next();
 
     var is_hex = false;
-    if (digit_count == 0 and in.c == 'x') {
+    if (digit_count == 1 and in.c == 'x') {
         is_hex = true;
         digit_count = 0; // reset
         in.next();
@@ -168,6 +168,7 @@ fn parseUnsignedNumberHere(self: *@This(), T: type) !T {
                     break;
             },
         }
+        in.next();
     }
 
     return value;
@@ -303,6 +304,7 @@ fn parseCommandHere(self: *@This(), out: *PassOutput) !void {
 
     self.skipWhitespace();
     try command.translate(self, out);
+    self.skipWhitespace();
 
     if (in.c != null)
         return self.raiseError("end of line expected", .{});
