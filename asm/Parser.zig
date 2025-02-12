@@ -20,12 +20,13 @@ pub fn init(alloc: std.mem.Allocator, source_in: *SourceInput) @This() {
         .line_in = line_in,
         .current_line_number = 1,
         .current_pos_number = line_in.current_pos_number,
-        .labels = .init(alloc),
+        .label_table = .init(alloc),
+        .sorted_labels = null,
     };
 }
 
 pub fn deinit(self: *const @This()) void {
-    self.labels.deinit();
+    self.label_table.deinit();
 }
 
 pub const Error = error{ SyntaxError, OutOfMemory };
@@ -84,7 +85,7 @@ pub fn parseRegisterName(
     if (!in.isAtUpper(prefix_uppercase_char))
         return self.raiseError(
             "expected {s} register name '{c}n'",
-            .{ prefix_uppercase_char, kind },
+            .{ kind, prefix_uppercase_char },
         );
     self.nextAndUpdatePos();
 
@@ -101,6 +102,42 @@ pub fn parseRegisterName(
         );
 
     return @intCast(n);
+}
+
+pub fn parseCondition(self: *@This()) !u8 {
+    const in = &self.line_in;
+    self.skipWhitespace();
+
+    var invert: u8 = 0;
+
+    if (in.c == null)
+        return self.raiseError("condition name expected", .{});
+
+    var register_code: ?u8 =
+        switch (std.ascii.toUpper(in.c.?)) {
+        'H' => 1,
+        'L' => 0,
+        'X' => 3,
+        else => null,
+    };
+    if (register_code != null)
+        in.next()
+    else
+        register_code = 2; // accumulator
+
+    if (in.c == null)
+        return self.raiseError("condition name expected", .{});
+
+    if (std.ascii.toUpper(in.c.?) == 'N') {
+        invert = 1;
+        in.next();
+    }
+
+    if (in.c == null or std.ascii.toUpper(in.c.?) != 'Z')
+        return self.raiseError("condition name expected", .{});
+    self.nextAndUpdatePos();
+
+    return invert + register_code.? * 2;
 }
 
 fn parseUnsignedNumberHere(self: *@This(), T: type) !T {
@@ -126,12 +163,14 @@ fn parseUnsignedNumberHere(self: *@This(), T: type) !T {
             'A'...'F' => value = value *| base +| ((c - 'A') + 10),
             else => {
                 if (digit_count == 0)
-                    self.raiseError("digit expected", .{})
+                    return self.raiseError("digit expected", .{})
                 else
                     break;
             },
         }
     }
+
+    return value;
 }
 
 fn parseLabelAsValueHere(self: *@This(), T: type) !T {
@@ -164,7 +203,7 @@ fn parseConstantTerm(self: *@This(), T: type) !T {
     while (in.c) |c| {
         switch (c) {
             '+' => {},
-            '-' => sign = -sign,
+            '-' => sign = 0 -| sign,
             else => break,
         }
         self.nextAndUpdatePos();
@@ -177,8 +216,8 @@ fn parseConstantTerm(self: *@This(), T: type) !T {
 
 pub fn parseConstantExpression(self: *@This(), T: type) !T {
     const in = &self.line_in;
-    const sum = try self.parseConstantTerm(T);
 
+    var sum = try self.parseConstantTerm(T);
     while (true) {
         self.skipWhitespace();
         if (in.c) |c| switch (c) {
@@ -191,7 +230,7 @@ pub fn parseConstantExpression(self: *@This(), T: type) !T {
 
 fn parseLabelNameHere(self: *@This()) !Label.Name {
     const in = &self.line_in;
-    var name: Label.Name = .{};
+    var name: std.BoundedArray(u8, Label.max_length) = .{};
 
     if (!in.isAtAlphabetic())
         return self.raiseError("Label must begin with a letter", .{});
@@ -208,7 +247,7 @@ fn parseLabelNameHere(self: *@This()) !Label.Name {
         in.next();
     }
 
-    return name;
+    return Label.initName(name.constSlice());
 }
 
 fn parseLabelDefinitionHere(self: *@This()) !void {
@@ -222,7 +261,7 @@ fn parseLabelDefinitionHere(self: *@This()) !void {
     self.nextAndUpdatePos();
 
     const label = Label.init(
-        name.constSlice(),
+        name,
         self.current_line_number,
     );
     try self.label_table.append(label);
@@ -256,21 +295,24 @@ fn parseCommandHere(self: *@This(), out: *PassOutput) !void {
 
     const name = name_bytes.slice();
     _ = std.ascii.upperString(name, name);
-    const command = commands.findUppercase(name);
-    if (!command)
+    const command = commands.findUppercase(name) orelse
         return self.raiseError(
-            "unknown instruction name '{s}'",
-            .{name},
-        );
+        "unknown instruction name '{s}'",
+        .{name},
+    );
 
     self.skipWhitespace();
     try command.translate(self, out);
 
     if (in.c != null)
-        return self.raiseError("end of line expected");
+        return self.raiseError("end of line expected", .{});
 }
 
-pub fn raiseError(self: *@This(), comptime fmt: []const u8, args: anytype) !void {
+pub fn raiseError(
+    self: *@This(),
+    comptime fmt: []const u8,
+    args: anytype,
+) error{SyntaxError} {
     std.debug.print(
         "({}:{}) " ++ fmt ++ "\n",
         .{

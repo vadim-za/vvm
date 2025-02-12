@@ -7,14 +7,18 @@ name_bytes: Name,
 line: usize,
 addr: ?u16 = null,
 
-pub fn init(name_: []const u8, line: usize) @This() {
-    var self = @This(){
-        .id_bytes = undefined,
+pub fn init(name_: Name, line: usize) @This() {
+    return .{
+        .name_bytes = name_,
         .line = line,
     };
-    @memset(&self.name_bytes, 0);
-    @memcpy(self.name_bytes[0..name_.len], name_);
-    return self;
+}
+
+pub fn initName(name_: []const u8) Name {
+    var name_bytes: Name = undefined;
+    @memset(&name_bytes, 0);
+    @memcpy(name_bytes[0..name_.len], name_);
+    return name_bytes;
 }
 
 pub fn lessThan(context: void, lhs: @This(), rhs: @This()) bool {

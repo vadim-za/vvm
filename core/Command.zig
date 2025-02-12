@@ -142,9 +142,9 @@ pub fn opcodeWithLiteral8(comptime self: @This(), literal: u8) [2]u8 {
 
 test "opcodeWithLiteral8" {
     const lbv = Vvm.commands.lbv;
-    const bytes = lbv.opcodeWithLiteral8(0x10);
+    const opcode_bytes = lbv.opcodeWithLiteral8(0x10);
     const expected = [2]u8{ lbv.base_opcode, 0x10 };
-    try std.testing.expectEqualSlices(u8, &expected, &bytes);
+    try std.testing.expectEqualSlices(u8, &expected, &opcode_bytes);
 }
 
 pub fn opcodeWithLiteral16(comptime self: @This(), literal: u16) [3]u8 {
@@ -157,7 +157,7 @@ pub fn opcodeWithLiteral16(comptime self: @This(), literal: u16) [3]u8 {
 
 test "opcodeWithLiteral16" {
     const lwv = Vvm.commands.lwv;
-    const bytes = lwv.opcodeWithLiteral16(0x1234);
+    const opcode_bytes = lwv.opcodeWithLiteral16(0x1234);
     const expected = [3]u8{ lwv.base_opcode, 0x34, 0x12 };
-    try std.testing.expectEqualSlices(u8, &expected, &bytes);
+    try std.testing.expectEqualSlices(u8, &expected, &opcode_bytes);
 }

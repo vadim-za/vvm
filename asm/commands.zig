@@ -4,7 +4,7 @@ const Command = @import("Command.zig");
 
 const vvm_commands = VvmCore.commands;
 const vvm_commands_fields =
-    @typeInfo(@Type(vvm_commands)).@"struct".fields;
+    @typeInfo(@TypeOf(vvm_commands)).@"struct".fields;
 const command_count = vvm_commands_fields.len;
 
 const table: [command_count]Command = blk: {
@@ -12,10 +12,17 @@ const table: [command_count]Command = blk: {
 
     for (&temp_table, vvm_commands_fields) |*entry, *field| {
         const desc = @field(vvm_commands, field.name);
-        const uppercase_name: [field.name.len]u8 = undefined;
+        const uppercase_name: [field.name.len]u8 = inner_blk: {
+            var temp: [field.name.len]u8 = undefined;
+            _ = std.ascii.upperString(
+                &temp,
+                field.name,
+            );
+            break :inner_blk temp;
+        };
 
         entry.* = .{
-            .name = std.ascii.upperString(uppercase_name, field.name),
+            .name = &uppercase_name,
             .bytes = desc.bytes(),
             .base_opcode = desc.base_opcode,
             .variant_count = desc.variant_count,
@@ -23,6 +30,7 @@ const table: [command_count]Command = blk: {
         };
     }
 
+    @setEvalBranchQuota(10000);
     std.sort.heap(Command, &temp_table, {}, lessThanFn);
 
     break :blk temp_table;
@@ -37,7 +45,7 @@ fn compareFn(context: []const u8, item: Command) std.math.Order {
     return std.mem.order(u8, context, item.name);
 }
 
-pub fn findUppercase(uppercase_name: []const u8) ?*Command {
+pub fn findUppercase(uppercase_name: []const u8) ?*const Command {
     return if (std.sort.binarySearch(
         Command,
         &table,
