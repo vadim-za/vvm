@@ -42,15 +42,20 @@ fn parseLine(self: *@This(), out: *PassOutput) !?void {
     if (in.c == null)
         return null;
 
-    self.current_pos_number = in.current_pos_number;
+    self.updatePos();
     if (!in.isAtWhitespace())
         try self.parseLabelDefinitionHere();
 
-    self.skipWhitespace();
+    self.skipWhitespaceAndUpdatePos();
     if (in.c == null)
         return; // no command
 
     try self.parseCommandHere(out);
+}
+
+fn updatePos(self: *@This()) void {
+    const in = &self.line_in;
+    self.current_pos_number = in.current_pos_number;
 }
 
 fn nextAndUpdatePos(self: *@This()) void {
@@ -59,18 +64,20 @@ fn nextAndUpdatePos(self: *@This()) void {
     self.current_pos_number = in.current_pos_number;
 }
 
-fn skipWhitespace(self: *@This()) void {
+fn skipWhitespaceAndUpdatePos(self: *@This()) void {
     const in = &self.line_in;
     while (in.isAtWhitespace())
-        self.nextAndUpdatePos();
+        in.next();
+
+    self.updatePos();
 }
 
 pub fn parseOptionallyWhitespacedComma(self: *@This()) !void {
     const in = &self.line_in;
-    self.skipWhitespace();
+    self.skipWhitespaceAndUpdatePos();
     if (in.c != ',')
         return self.raiseError("comma expected", .{});
-    self.skipWhitespace();
+    self.skipWhitespaceAndUpdatePos();
 }
 
 pub fn parseRegisterName(
@@ -80,18 +87,24 @@ pub fn parseRegisterName(
     total_number: u8,
 ) !u8 {
     const in = &self.line_in;
-    self.skipWhitespace();
+    self.skipWhitespaceAndUpdatePos();
 
-    if (!in.isAtUpper(prefix_uppercase_char))
-        return self.raiseError(
-            "expected {s} register name '{c}n'",
-            .{ kind, prefix_uppercase_char },
-        );
-    self.nextAndUpdatePos();
+    {
+        defer self.updatePos();
+        if (!in.isAtUpper(prefix_uppercase_char))
+            return self.raiseError(
+                "expected {s} register name '{c}n'",
+                .{ kind, prefix_uppercase_char },
+            );
+        in.next();
+    }
 
-    if (!in.isAtDigit())
-        return self.raiseError("digit expected", .{});
-    self.nextAndUpdatePos();
+    {
+        defer self.updatePos();
+        if (!in.isAtDigit())
+            return self.raiseError("digit expected", .{});
+        in.next();
+    }
 
     const n: u8 = in.c.? - '0';
 
@@ -104,40 +117,55 @@ pub fn parseRegisterName(
     return @intCast(n);
 }
 
-pub fn parseCondition(self: *@This()) !u8 {
+fn parseConditionRegisterHere(self: *@This()) ?u8 {
     const in = &self.line_in;
-    self.skipWhitespace();
-
-    var invert: u8 = 0;
-
-    if (in.c == null)
-        return self.raiseError("condition name expected", .{});
 
     var register_code: ?u8 =
-        switch (std.ascii.toUpper(in.c.?)) {
+        switch (std.ascii.toUpper(in.c orelse return null)) {
         'H' => 1,
         'L' => 0,
         'X' => 3,
         else => null,
     };
+
     if (register_code != null)
         in.next()
     else
         register_code = 2; // accumulator
 
-    if (in.c == null)
-        return self.raiseError("condition name expected", .{});
+    return register_code;
+}
 
-    if (std.ascii.toUpper(in.c.?) == 'N') {
+fn parseConditionBaseHere(self: *@This()) ?u8 {
+    const in = &self.line_in;
+
+    var invert: u1 = 0;
+    if (std.ascii.toUpper(in.c orelse return null) == 'N') {
         invert = 1;
         in.next();
     }
 
-    if (in.c == null or std.ascii.toUpper(in.c.?) != 'Z')
-        return self.raiseError("condition name expected", .{});
-    self.nextAndUpdatePos();
+    if (std.ascii.toUpper(in.c orelse return null) == 'Z') {
+        in.next();
+        return invert;
+    }
 
-    return invert + register_code.? * 2;
+    return null;
+}
+
+fn parseConditionNameHere(self: *@This()) ?u8 {
+    const reg = self.parseConditionRegisterHere() orelse return null;
+    const base = self.parseConditionBaseHere() orelse return null;
+
+    return base + reg * 2;
+}
+
+pub fn parseCondition(self: *@This()) !u8 {
+    self.skipWhitespaceAndUpdatePos();
+
+    defer self.updatePos();
+    return self.parseConditionNameHere() orelse
+        return self.raiseError("bad condition name", .{});
 }
 
 fn parseUnsignedNumberHere(self: *@This(), T: type) !T {
@@ -198,7 +226,7 @@ fn parseConstantTermWithoutSignHere(self: *@This(), T: type) !T {
 
 fn parseConstantTerm(self: *@This(), T: type) !T {
     const in = &self.line_in;
-    self.skipWhitespace();
+    self.skipWhitespaceAndUpdatePos();
 
     var sign: T = 1;
     while (in.c) |c| {
@@ -208,7 +236,7 @@ fn parseConstantTerm(self: *@This(), T: type) !T {
             else => break,
         }
         self.nextAndUpdatePos();
-        self.skipWhitespace();
+        self.skipWhitespaceAndUpdatePos();
     }
 
     const unsigned = try self.parseConstantTermWithoutSignHere(T);
@@ -220,7 +248,7 @@ pub fn parseConstantExpression(self: *@This(), T: type) !T {
 
     var sum = try self.parseConstantTerm(T);
     while (true) {
-        self.skipWhitespace();
+        self.skipWhitespaceAndUpdatePos();
         if (in.c) |c| switch (c) {
             '+' => sum +|= try self.parseConstantTerm(T),
             '-' => sum -|= try self.parseConstantTerm(T),
@@ -255,7 +283,7 @@ fn parseLabelDefinitionHere(self: *@This()) !void {
     const in = &self.line_in;
 
     const name = try self.parseLabelNameHere();
-    self.skipWhitespace();
+    self.skipWhitespaceAndUpdatePos();
 
     if (in.c != ':')
         return self.raiseError("label must be followed by a colon", .{});
@@ -302,9 +330,9 @@ fn parseCommandHere(self: *@This(), out: *PassOutput) !void {
         .{name},
     );
 
-    self.skipWhitespace();
+    self.skipWhitespaceAndUpdatePos();
     try command.translate(self, out);
-    self.skipWhitespace();
+    self.skipWhitespaceAndUpdatePos();
 
     if (in.c != null)
         return self.raiseError("end of line expected", .{});
