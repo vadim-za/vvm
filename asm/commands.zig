@@ -53,3 +53,8 @@ pub fn findUppercase(uppercase_name: []const u8) ?*const Command {
         compareFn,
     )) |index| &table[index] else null;
 }
+
+pub fn dumpTable() void {
+    for(&table) |entry|
+        std.debug.print("{s} {}\n",.{entry.name, entry});
+}

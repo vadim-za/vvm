@@ -28,11 +28,4 @@ pub fn main() !void {
         }
         return;
     };
-
-    // while (in.c) |byte| : (in.next()) {
-    //     try out.writeByte(byte);
-    // }
-
-    //try out.print("ABCD", .{});
-    //std.debug.print("{x}\n", .{out.data.items});
 }
