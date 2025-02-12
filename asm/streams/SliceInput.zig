@@ -7,7 +7,7 @@ pub fn init(slice: []const u8) @This() {
     };
 }
 
-pub fn readByte(self: *@This()) ?u8 {
+pub fn readByte(self: *@This()) !?u8 {
     if (self.pos < self.slice.len) {
         const byte = self.slice[self.pos];
         self.pos += 1;

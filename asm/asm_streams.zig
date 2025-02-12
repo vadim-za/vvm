@@ -1,2 +1,2 @@
-pub const Input = @import("streams/SliceInput.zig");
-pub const Output = @import("streams/ArrayListOutput.zig");
+pub const Input = @import("SourceInput.zig");
+pub const Output = @import("ArrayListOutput.zig");

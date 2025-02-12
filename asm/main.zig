@@ -14,7 +14,7 @@ pub fn main() !void {
     var in = asm_streams.Input.init(source);
     var out: asm_streams.Output = .{ .data = .init(alloc) };
 
-    while (in.readByte()) |byte| {
+    while (in.c) |byte| : (in.next()) {
         try out.writeByte(byte);
     }
 
