@@ -58,7 +58,10 @@ fn readLabel(self: *@This()) !void {
 
     while (in.isAtAlphanumeric()) {
         id_bytes.append(in.c.?) catch
-            return self.raiseError("label too long", .{});
+            return self.raiseError(
+            "label too long (max length = {})",
+            .{Label.max_length},
+        );
         in.next();
     }
 

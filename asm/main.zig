@@ -5,7 +5,7 @@ const ResultOutput = @import("ArrayListOutput.zig");
 const Asm = @import("Asm.zig");
 
 const source =
-    \\label: lbv 0x10
+    \\label1245678: lbv 0x10
 ;
 
 pub fn main() !void {
@@ -24,7 +24,7 @@ pub fn main() !void {
             error.OutOfMemory => std.debug.print("Out of memory\n", .{}),
             error.SyntaxError => {}, // error message already printed
         }
-        return err;
+        return;
     };
 
     // while (in.c) |byte| : (in.next()) {
