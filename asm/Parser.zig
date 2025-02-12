@@ -9,7 +9,6 @@ const commands = @import("commands.zig");
 source_in: *SourceInput,
 line_in: LineInput,
 current_line_number: usize,
-current_pos_number: usize,
 label_table: std.ArrayList(Label),
 sorted_labels: ?*[]const Label,
 
@@ -19,7 +18,6 @@ pub fn init(alloc: std.mem.Allocator, source_in: *SourceInput) @This() {
         .source_in = source_in,
         .line_in = line_in,
         .current_line_number = 1,
-        .current_pos_number = line_in.current_pos_number,
         .label_table = .init(alloc),
         .sorted_labels = null,
     };
@@ -42,42 +40,33 @@ fn parseLine(self: *@This(), out: *PassOutput) !?void {
     if (in.c == null)
         return null;
 
-    self.updatePos();
     if (!in.isAtWhitespace())
         try self.parseLabelDefinitionHere();
 
-    self.skipWhitespaceAndUpdatePos();
+    self.skipWhitespace();
     if (in.c == null)
         return; // no command
 
     try self.parseCommandHere(out);
 }
 
-fn updatePos(self: *@This()) void {
-    const in = &self.line_in;
-    self.current_pos_number = in.current_pos_number;
-}
-
-fn nextAndUpdatePos(self: *@This()) void {
-    const in = &self.line_in;
-    in.next();
-    self.current_pos_number = in.current_pos_number;
-}
-
-fn skipWhitespaceAndUpdatePos(self: *@This()) void {
+fn skipWhitespace(self: *@This()) void {
     const in = &self.line_in;
     while (in.isAtWhitespace())
         in.next();
-
-    self.updatePos();
 }
 
 pub fn parseOptionallyWhitespacedComma(self: *@This()) !void {
     const in = &self.line_in;
-    self.skipWhitespaceAndUpdatePos();
-    if (in.c != ',')
-        return self.raiseError("comma expected", .{});
-    self.skipWhitespaceAndUpdatePos();
+    self.skipWhitespace();
+
+    const pos = in.current_pos_number;
+    if (in.c == ',')
+        in.next()
+    else
+        return self.raiseError(pos, "comma expected", .{});
+
+    self.skipWhitespace();
 }
 
 pub fn parseRegisterName(
@@ -87,29 +76,32 @@ pub fn parseRegisterName(
     total_number: u8,
 ) !u8 {
     const in = &self.line_in;
-    self.skipWhitespaceAndUpdatePos();
+    self.skipWhitespace();
 
     {
-        defer self.updatePos();
-        if (!in.isAtUpper(prefix_uppercase_char))
+        const pos = in.current_pos_number;
+        if (in.isAtUpper(prefix_uppercase_char))
+            in.next()
+        else
             return self.raiseError(
+                pos,
                 "expected {s} register name '{c}n'",
                 .{ kind, prefix_uppercase_char },
             );
-        in.next();
     }
 
-    {
-        defer self.updatePos();
-        if (!in.isAtDigit())
-            return self.raiseError("digit expected", .{});
-        in.next();
-    }
+    const pos = in.current_pos_number;
+
+    if (in.isAtDigit())
+        in.next()
+    else
+        return self.raiseError(pos, "digit expected", .{});
 
     const n: u8 = in.c.? - '0';
 
     if (n >= total_number)
         return self.raiseError(
+            pos,
             "byte register index must be between 0 and {}",
             .{total_number},
         );
@@ -117,27 +109,34 @@ pub fn parseRegisterName(
     return @intCast(n);
 }
 
-fn parseConditionRegisterHere(self: *@This()) ?u8 {
+// This function always succeeds, since condition register may be empty
+fn parseConditionRegisterHere(self: *@This()) u8 {
     const in = &self.line_in;
 
-    var register_code: ?u8 =
-        switch (std.ascii.toUpper(in.c orelse return null)) {
-        'H' => 1,
-        'L' => 0,
-        'X' => 3,
-        else => null,
-    };
+    var register_code: ?u8 = if (in.c) |c|
+        switch (std.ascii.toUpper(c)) {
+            'H' => 1,
+            'L' => 0,
+            'X' => 3,
+            else => null,
+        }
+    else
+        null;
 
     if (register_code != null)
         in.next()
     else
         register_code = 2; // accumulator
 
-    return register_code;
+    return register_code.?;
 }
 
-fn parseConditionBaseHere(self: *@This()) ?u8 {
+// This is an auxiliary function of parseCondition(), it return null on error
+fn parseConditionNameHere(self: *@This()) ?u8 {
     const in = &self.line_in;
+    self.skipWhitespace();
+
+    const reg = self.parseConditionRegisterHere();
 
     var invert: u1 = 0;
     if (std.ascii.toUpper(in.c orelse return null) == 'N') {
@@ -145,65 +144,73 @@ fn parseConditionBaseHere(self: *@This()) ?u8 {
         in.next();
     }
 
-    if (std.ascii.toUpper(in.c orelse return null) == 'Z') {
-        in.next();
-        return invert;
-    }
+    if (std.ascii.toUpper(in.c orelse return null) == 'Z')
+        in.next()
+    else
+        return null;
 
-    return null;
-}
-
-fn parseConditionNameHere(self: *@This()) ?u8 {
-    const reg = self.parseConditionRegisterHere() orelse return null;
-    const base = self.parseConditionBaseHere() orelse return null;
-
-    return base + reg * 2;
+    return invert + reg * 2;
 }
 
 pub fn parseCondition(self: *@This()) !u8 {
-    self.skipWhitespaceAndUpdatePos();
+    const in = &self.line_in;
+    self.skipWhitespace();
+    const pos = in.current_pos_number;
 
-    defer self.updatePos();
-    return self.parseConditionNameHere() orelse
-        return self.raiseError("bad condition name", .{});
+    if (self.parseConditionNameHere()) |condition_code|
+        return condition_code
+    else
+        return self.raiseError(pos, "bad condition name", .{});
 }
 
-fn parseUnsignedNumberHere(self: *@This(), T: type) !T {
+fn tryParseUnsignedDecimalHere(self: *@This(), T: type) !?T {
     const in = &self.line_in;
 
     var value: T = 0;
     var digit_count: usize = 0;
 
-    while (in.c == '0') : (digit_count += 1)
-        in.next();
-
-    var is_hex = false;
-    if (digit_count == 1 and in.c == 'x') {
-        is_hex = true;
-        digit_count = 0; // reset
-        in.next();
-    }
-    const base: T = if (is_hex) 16 else 10;
-
     while (in.c) |c| : (digit_count += 1) {
-        switch (std.ascii.toUpper(c)) {
-            '0'...'9' => value = value *| base +| (c - '0'),
-            'A'...'F' => value = value *| base +| ((c - 'A') + 10),
-            else => {
-                if (digit_count == 0)
-                    return self.raiseError("digit expected", .{})
-                else
-                    break;
-            },
+        switch (c) {
+            '0'...'9' => value = value *| 10 +| (c - '0'),
+            else => break,
         }
         in.next();
     }
 
-    return value;
+    return if (digit_count > 0) value else null;
 }
 
-fn parseLabelAsValueHere(self: *@This(), T: type) !T {
-    const name = try self.parseLabelNameHere();
+fn tryParseUnsignedHexHere(self: *@This(), T: type) !?T {
+    const in = &self.line_in;
+
+    if (in.c == '$')
+        in.next()
+    else
+        return null;
+
+    const pos = in.current_pos_number;
+
+    var value: T = 0;
+    var digit_count: usize = 0;
+
+    while (in.c) |c| : (digit_count += 1) {
+        switch (c) {
+            '0'...'9' => value = value *| 16 +| (c - '0'),
+            'A'...'F' => value = value *| 16 +| ((c - 'A') + 10),
+            'a'...'f' => value = value *| 16 +| ((c - 'a') + 10),
+            else => break,
+        }
+        in.next();
+    }
+
+    return if (digit_count > 0)
+        value
+    else
+        self.raiseError(pos, "bad hexadecimal number", .{});
+}
+
+fn tryParseLabelAsValueHere(self: *@This(), T: type) !?T {
+    const name = (try self.tryParseLabelNameHere()) orelse return null;
     _ = name; // autofix
     if (self.sorted_labels) |labels| {
         _ = labels; // autofix
@@ -212,35 +219,39 @@ fn parseLabelAsValueHere(self: *@This(), T: type) !T {
     return 0;
 }
 
-fn parseConstantTermWithoutSignHere(self: *@This(), T: type) !T {
+fn parseUnsignedConstantTermHere(self: *@This(), T: type) !T {
     const in = &self.line_in;
+    const pos = in.current_pos_number;
 
-    if (in.isAtDigit())
-        return self.parseUnsignedNumberHere(T);
+    if (try self.tryParseUnsignedDecimalHere(T)) |value|
+        return value;
 
-    if (in.isAtAlphabetic())
-        return self.parseLabelAsValueHere(T);
+    if (try self.tryParseUnsignedHexHere(T)) |value|
+        return value;
 
-    return self.raiseError("unexpected character", .{});
+    if (try self.tryParseLabelAsValueHere(T)) |value|
+        return value;
+
+    return self.raiseError(pos, "a number or a label is expected", .{});
 }
 
 fn parseConstantTerm(self: *@This(), T: type) !T {
     const in = &self.line_in;
-    self.skipWhitespaceAndUpdatePos();
+    self.skipWhitespace();
 
-    var sign: T = 1;
+    var negate = false;
     while (in.c) |c| {
         switch (c) {
             '+' => {},
-            '-' => sign = 0 -| sign,
+            '-' => negate = !negate,
             else => break,
         }
-        self.nextAndUpdatePos();
-        self.skipWhitespaceAndUpdatePos();
+        in.next();
+        self.skipWhitespace();
     }
 
-    const unsigned = try self.parseConstantTermWithoutSignHere(T);
-    return unsigned *| sign;
+    const value = try self.parseUnsignedConstantTermHere(T);
+    return if (negate) 0 -| value else value;
 }
 
 pub fn parseConstantExpression(self: *@This(), T: type) !T {
@@ -248,7 +259,7 @@ pub fn parseConstantExpression(self: *@This(), T: type) !T {
 
     var sum = try self.parseConstantTerm(T);
     while (true) {
-        self.skipWhitespaceAndUpdatePos();
+        self.skipWhitespace();
         if (in.c) |c| switch (c) {
             '+' => sum +|= try self.parseConstantTerm(T),
             '-' => sum -|= try self.parseConstantTerm(T),
@@ -257,19 +268,18 @@ pub fn parseConstantExpression(self: *@This(), T: type) !T {
     }
 }
 
-fn parseLabelNameHere(self: *@This()) !Label.Name {
+fn tryParseLabelNameHere(self: *@This()) !?Label.Name {
     const in = &self.line_in;
-    var name: std.BoundedArray(u8, Label.max_length) = .{};
+    const pos = in.current_pos_number;
 
     if (!in.isAtAlphabetic())
-        return self.raiseError("Label must begin with a letter", .{});
+        return null;
 
-    name.append(in.c.?) catch unreachable; // there must be always space for one character
-    in.next();
-
+    var name: std.BoundedArray(u8, Label.max_length) = .{};
     while (in.isAtAlphanumeric()) {
         name.append(in.c.?) catch
             return self.raiseError(
+            pos,
             "label too long (max length = {})",
             .{Label.max_length},
         );
@@ -281,13 +291,21 @@ fn parseLabelNameHere(self: *@This()) !Label.Name {
 
 fn parseLabelDefinitionHere(self: *@This()) !void {
     const in = &self.line_in;
+    const pos = in.current_pos_number;
 
-    const name = try self.parseLabelNameHere();
-    self.skipWhitespaceAndUpdatePos();
+    const name = (try self.tryParseLabelNameHere()) orelse
+        return self.raiseError(pos, "label expected", .{});
+    self.skipWhitespace();
 
-    if (in.c != ':')
-        return self.raiseError("label must be followed by a colon", .{});
-    self.nextAndUpdatePos();
+    const pos_after_label = in.current_pos_number;
+    if (in.c == ':')
+        in.next()
+    else
+        return self.raiseError(
+            pos_after_label,
+            "label must be followed by a colon",
+            .{},
+        );
 
     const label = Label.init(
         name,
@@ -298,21 +316,22 @@ fn parseLabelDefinitionHere(self: *@This()) !void {
 
 fn parseCommandHere(self: *@This(), out: *PassOutput) !void {
     const in = &self.line_in;
+    const pos = in.current_pos_number;
+
     const max_name = 8;
     var name_bytes: std.BoundedArray(u8, max_name) = .{};
 
     if (!in.isAtAlphabetic())
         return self.raiseError(
+            pos,
             "instruction name must begin with a letter",
             .{},
         );
 
-    name_bytes.append(in.c.?) catch unreachable; // there must be always space for one character
-    in.next();
-
     while (in.isAtAlphabetic()) {
         name_bytes.append(in.c.?) catch
             return self.raiseError(
+            pos,
             "instruction name too long (max length = {})",
             .{max_name},
         );
@@ -320,26 +339,33 @@ fn parseCommandHere(self: *@This(), out: *PassOutput) !void {
     }
 
     if (!in.isAtWhitespaceOrEol())
-        return self.raiseError("bad instruction name", .{});
+        return self.raiseError(pos, "bad instruction name", .{});
 
     const name = name_bytes.slice();
     _ = std.ascii.upperString(name, name);
     const command = commands.findUppercase(name) orelse
         return self.raiseError(
+        pos,
         "unknown instruction name '{s}'",
         .{name},
     );
 
-    self.skipWhitespaceAndUpdatePos();
+    self.skipWhitespace();
     try command.translate(self, out);
-    self.skipWhitespaceAndUpdatePos();
+    self.skipWhitespace();
 
+    const pos_after_command = in.current_pos_number;
     if (in.c != null)
-        return self.raiseError("end of line expected", .{});
+        return self.raiseError(
+            pos_after_command,
+            "end of line expected",
+            .{},
+        );
 }
 
 pub fn raiseError(
     self: *@This(),
+    pos: usize,
     comptime fmt: []const u8,
     args: anytype,
 ) error{SyntaxError} {
@@ -347,7 +373,7 @@ pub fn raiseError(
         "({}:{}) " ++ fmt ++ "\n",
         .{
             self.current_line_number,
-            self.current_pos_number,
+            pos,
         } ++ args,
     );
     return error.SyntaxError;

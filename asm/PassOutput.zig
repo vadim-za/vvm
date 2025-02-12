@@ -19,7 +19,7 @@ pub fn writeByte(self: *@This(), byte: u8, parser: *Parser) !void {
 
     self.addr, const overflow = @addWithOverflow(self.addr, 1);
     if (overflow != 0)
-        return parser.raiseError("instruction address overflow", .{});
+        return parser.raiseError(1, "instruction address overflow", .{});
 }
 
 pub fn writeWord(self: *@This(), word: u16, parser: *Parser) !void {
