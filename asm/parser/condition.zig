@@ -54,3 +54,19 @@ pub fn parseCondition(parser: *Parser) !u8 {
     else
         return parser.raiseError(pos, "bad condition name", .{});
 }
+
+test "Test" {
+    const SourceInput = @import("../SourceInput.zig");
+
+    const conditions = [_][]const u8{
+        "lz", "lnz", "hz", "hnz", "z", "nz", "xz", "xnz",
+        "LZ", "LNZ", "HZ", "HNZ", "Z", "NZ", "XZ", "XNZ",
+    };
+    for (conditions, 0..) |source, index| {
+        var in = SourceInput.init(source);
+        var parser: Parser = .init(std.testing.allocator, &in);
+        defer parser.deinit();
+        const parsed_index = try parseCondition(&parser);
+        try std.testing.expectEqual(index % 8, parsed_index);
+    }
+}
