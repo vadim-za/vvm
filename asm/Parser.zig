@@ -268,7 +268,7 @@ pub fn parseConstantExpression(self: *@This(), T: type) !T {
     return sum;
 }
 
-fn tryParseLabelNameHere(self: *@This()) !?Label.Name {
+fn tryParseLabelNameHere(self: *@This()) !?Label.StoredName {
     const in = &self.line_in;
     const pos = in.current_pos_number;
 
@@ -286,14 +286,14 @@ fn tryParseLabelNameHere(self: *@This()) !?Label.Name {
         in.next();
     }
 
-    return Label.initName(name.constSlice());
+    return Label.initStoredName(name.constSlice());
 }
 
 fn parseLabelDefinitionHere(self: *@This()) !void {
     const in = &self.line_in;
     const pos = in.current_pos_number;
 
-    const name = (try self.tryParseLabelNameHere()) orelse
+    const stored_name = (try self.tryParseLabelNameHere()) orelse
         return self.raiseError(pos, "label expected", .{});
     self.skipWhitespace();
 
@@ -307,11 +307,10 @@ fn parseLabelDefinitionHere(self: *@This()) !void {
             .{},
         );
 
-    const label = Label.init(
-        name,
-        self.current_line_number,
-    );
-    try self.label_table.append(label);
+    try self.label_table.append(.{
+        .stored_name = stored_name,
+        .line = self.current_line_number,
+    });
 }
 
 fn parseCommandHere(self: *@This(), out: *PassOutput) !void {
@@ -319,7 +318,7 @@ fn parseCommandHere(self: *@This(), out: *PassOutput) !void {
     const pos = in.current_pos_number;
 
     const max_name = 8;
-    var name_bytes: std.BoundedArray(u8, max_name) = .{};
+    var name_buffer: std.BoundedArray(u8, max_name) = .{};
 
     if (!in.isAtAlphabetic())
         return self.raiseError(
@@ -329,7 +328,7 @@ fn parseCommandHere(self: *@This(), out: *PassOutput) !void {
         );
 
     while (in.isAtAlphabetic()) {
-        name_bytes.append(in.c.?) catch
+        name_buffer.append(in.c.?) catch
             return self.raiseError(
             pos,
             "instruction name too long (max length = {})",
@@ -341,7 +340,7 @@ fn parseCommandHere(self: *@This(), out: *PassOutput) !void {
     if (!in.isAtWhitespaceOrEol())
         return self.raiseError(pos, "bad instruction name", .{});
 
-    const name = name_bytes.slice();
+    const name = name_buffer.slice();
     _ = std.ascii.upperString(name, name);
     const command = commands.findUppercase(name) orelse
         return self.raiseError(

@@ -1,24 +1,17 @@
 const std = @import("std");
 
 pub const max_length = 8;
-pub const Name = [max_length]u8;
+pub const StoredName = [max_length]u8;
 
-name_bytes: Name,
+stored_name: StoredName,
 line: usize,
 addr: ?u16 = null,
 
-pub fn init(name_: Name, line: usize) @This() {
-    return .{
-        .name_bytes = name_,
-        .line = line,
-    };
-}
-
-pub fn initName(name_: []const u8) Name {
-    var name_bytes: Name = undefined;
-    @memset(&name_bytes, 0);
-    @memcpy(name_bytes[0..name_.len], name_);
-    return name_bytes;
+pub fn initStoredName(str: []const u8) StoredName {
+    var stored_name: StoredName = undefined;
+    @memset(&stored_name, 0);
+    @memcpy(stored_name[0..str.len], str);
+    return stored_name;
 }
 
 pub fn lessThan(context: void, lhs: @This(), rhs: @This()) bool {
@@ -31,5 +24,5 @@ pub fn lessThan(context: void, lhs: @This(), rhs: @This()) bool {
 }
 
 pub fn name(self: *@This()) []u8 {
-    return std.mem.sliceTo(&self.name_bytes, 0);
+    return std.mem.sliceTo(&self.stored_name, 0);
 }
