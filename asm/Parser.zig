@@ -108,56 +108,8 @@ pub fn parseRegisterName(
     return @intCast(n);
 }
 
-// This function always succeeds, since condition register may be empty
-fn parseConditionRegisterHere(self: *@This()) u8 {
-    const in = &self.line_in;
-
-    var register_code: ?u8 = switch (in.c orelse 0) {
-        'H' => 1,
-        'L' => 0,
-        'X' => 3,
-        else => null,
-    };
-
-    if (register_code != null)
-        in.next()
-    else
-        register_code = 2; // accumulator
-
-    return register_code.?;
-}
-
-// This is an auxiliary function of parseCondition(), it return null on error
-fn parseConditionNameHere(self: *@This()) ?u8 {
-    const in = &self.line_in;
-    self.skipWhitespace();
-
-    const reg = self.parseConditionRegisterHere();
-
-    var invert: u1 = 0;
-    if (std.ascii.toUpper(in.c orelse 0) == 'N') {
-        invert = 1;
-        in.next();
-    }
-
-    if (std.ascii.toUpper(in.c orelse 0) == 'Z')
-        in.next()
-    else
-        return null;
-
-    return invert + reg * 2;
-}
-
-pub fn parseCondition(self: *@This()) !u8 {
-    const in = &self.line_in;
-    self.skipWhitespace();
-    const pos = in.current_pos_number;
-
-    if (self.parseConditionNameHere()) |condition_code|
-        return condition_code
-    else
-        return self.raiseError(pos, "bad condition name", .{});
-}
+pub const parseCondition =
+    @import("parser/condition.zig").parseCondition;
 
 pub const parseConstantExpression =
     @import("parser/expression.zig").parseConstantExpression;
