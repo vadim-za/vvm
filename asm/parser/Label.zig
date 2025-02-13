@@ -23,6 +23,15 @@ pub fn lessThan(context: void, lhs: @This(), rhs: @This()) bool {
     };
 }
 
-pub fn name(self: *@This()) []u8 {
+pub fn compare(context: []const u8, item: @This()) std.math.Order {
+    return std.mem.order(u8, context, item.name());
+}
+
+pub fn sameNameAs(self: @This(), other: @This()) bool {
+    // stored_name has trailing zeroes, so we can simply use std.mem.order
+    return std.mem.order(u8, &self.stored_name, &other.stored_name) == .eq;
+}
+
+pub fn name(self: @This()) []u8 {
     return std.mem.sliceTo(&self.stored_name, 0);
 }

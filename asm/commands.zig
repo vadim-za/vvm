@@ -24,7 +24,7 @@ const table: [command_count]Command = blk: {
         };
     }
 
-    std.sort.heap(Command, &temp_table, {}, lessThanFn);
+    std.sort.heap(Command, &temp_table, {}, lessThan);
 
     break :blk temp_table;
 };
@@ -40,12 +40,12 @@ fn comptimeToUpperString(comptime s: []const u8) []const u8 {
     return &const_upper;
 }
 
-fn lessThanFn(context: void, lhs: Command, rhs: Command) bool {
+fn lessThan(context: void, lhs: Command, rhs: Command) bool {
     _ = context;
     return std.mem.order(u8, lhs.name, rhs.name) == .lt;
 }
 
-fn compareFn(context: []const u8, item: Command) std.math.Order {
+fn compare(context: []const u8, item: Command) std.math.Order {
     return std.mem.order(u8, context, item.name);
 }
 
@@ -54,7 +54,7 @@ pub fn findUppercase(uppercase_name: []const u8) ?*const Command {
         Command,
         &table,
         uppercase_name,
-        compareFn,
+        compare,
     )) |index| &table[index] else null;
 }
 

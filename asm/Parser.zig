@@ -3,14 +3,14 @@ const SourceInput = @import("SourceInput.zig");
 const PassOutput = @import("PassOutput.zig");
 const LineInput = @import("parser/LineInput.zig");
 const Label = @import("parser/Label.zig");
+const Labels = @import("parser/Labels.zig");
 const Command = @import("Command.zig");
 const commands = @import("commands.zig");
 
 source_in: *SourceInput,
 line_in: LineInput,
 current_line_number: usize,
-label_table: std.ArrayList(Label),
-sorted_labels: ?*[]const Label,
+labels: Labels,
 
 pub fn init(alloc: std.mem.Allocator, source_in: *SourceInput) @This() {
     const line_in: LineInput = .init(source_in);
@@ -18,13 +18,12 @@ pub fn init(alloc: std.mem.Allocator, source_in: *SourceInput) @This() {
         .source_in = source_in,
         .line_in = line_in,
         .current_line_number = 1,
-        .label_table = .init(alloc),
-        .sorted_labels = null,
+        .labels = .init(alloc),
     };
 }
 
 pub fn deinit(self: *const @This()) void {
-    self.label_table.deinit();
+    self.labels.deinit();
 }
 
 pub const Error = error{ SyntaxError, OutOfMemory };
@@ -209,8 +208,7 @@ fn tryParseUnsignedHexHere(self: *@This(), T: type) !?T {
 fn tryParseLabelAsValueHere(self: *@This(), T: type) !?T {
     const name = (try self.tryParseLabelNameHere()) orelse return null;
     _ = name; // autofix
-    if (self.sorted_labels) |labels| {
-        _ = labels; // autofix
+    if (self.labels.finalized) {
         unreachable; // todo
     }
     return 0;
@@ -307,7 +305,7 @@ fn parseLabelDefinitionHere(self: *@This()) !void {
             .{},
         );
 
-    try self.label_table.append(.{
+    try self.labels.push(.{
         .stored_name = stored_name,
         .line = self.current_line_number,
     });
@@ -368,10 +366,26 @@ pub fn raiseError(
     comptime fmt: []const u8,
     args: anytype,
 ) error{SyntaxError} {
+    return self.raiseErrorAtLine(
+        self.current_line_number,
+        pos,
+        fmt,
+        args,
+    );
+}
+
+pub fn raiseErrorAtLine(
+    self: *@This(),
+    line: usize,
+    pos: usize,
+    comptime fmt: []const u8,
+    args: anytype,
+) error{SyntaxError} {
+    _ = self;
     std.debug.print(
         "({}:{}) " ++ fmt ++ "\n",
         .{
-            self.current_line_number,
+            line,
             pos,
         } ++ args,
     );
