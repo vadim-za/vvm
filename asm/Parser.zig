@@ -49,7 +49,7 @@ fn parseLine(self: *@This(), out: *PassOutput) !?void {
     try self.parseCommandHere(out);
 }
 
-fn skipWhitespace(self: *@This()) void {
+pub fn skipWhitespace(self: *@This()) void {
     const in = &self.line_in;
     while (in.isAtWhitespace())
         in.next();
@@ -159,114 +159,10 @@ pub fn parseCondition(self: *@This()) !u8 {
         return self.raiseError(pos, "bad condition name", .{});
 }
 
-fn tryParseUnsignedDecimalHere(self: *@This(), T: type) !?T {
-    const in = &self.line_in;
+pub const parseConstantExpression =
+    @import("parser/expression.zig").parseConstantExpression;
 
-    var value: T = 0;
-    var digit_count: usize = 0;
-
-    while (in.c) |c| : (digit_count += 1) {
-        switch (c) {
-            '0'...'9' => value = value *| 10 +| (c - '0'),
-            else => break,
-        }
-        in.next();
-    }
-
-    return if (digit_count > 0) value else null;
-}
-
-fn tryParseUnsignedHexHere(self: *@This(), T: type) !?T {
-    const in = &self.line_in;
-
-    if (in.c == '$')
-        in.next()
-    else
-        return null;
-
-    const pos = in.current_pos_number;
-
-    var value: T = 0;
-    var digit_count: usize = 0;
-
-    while (in.c) |c| : (digit_count += 1) {
-        switch (c) {
-            '0'...'9' => value = value *| 16 +| (c - '0'),
-            'A'...'F' => value = value *| 16 +| ((c - 'A') + 10),
-            'a'...'f' => value = value *| 16 +| ((c - 'a') + 10),
-            else => break,
-        }
-        in.next();
-    }
-
-    return if (digit_count > 0)
-        value
-    else
-        self.raiseError(pos, "bad hexadecimal number", .{});
-}
-
-fn tryParseLabelAsValueHere(self: *@This(), T: type) !?T {
-    const name = (try self.tryParseLabelNameHere()) orelse return null;
-    _ = name; // autofix
-    if (self.labels.finalized) {
-        unreachable; // todo
-    }
-    return 0;
-}
-
-fn parseUnsignedConstantTermHere(self: *@This(), T: type) !T {
-    const in = &self.line_in;
-    const pos = in.current_pos_number;
-
-    if (try self.tryParseUnsignedDecimalHere(T)) |value|
-        return value;
-
-    if (try self.tryParseUnsignedHexHere(T)) |value|
-        return value;
-
-    if (try self.tryParseLabelAsValueHere(T)) |value|
-        return value;
-
-    return self.raiseError(pos, "a number or a label is expected", .{});
-}
-
-fn parseConstantTerm(self: *@This(), T: type) !T {
-    const in = &self.line_in;
-    self.skipWhitespace();
-
-    var negate: ?bool = null;
-    switch (in.c orelse 0) {
-        '+' => negate = false,
-        '-' => negate = true,
-        else => {},
-    }
-
-    if (negate != null) {
-        in.next();
-        self.skipWhitespace();
-    } else negate = false;
-
-    const value = try self.parseUnsignedConstantTermHere(T);
-    return if (negate.?) 0 -| value else value;
-}
-
-pub fn parseConstantExpression(self: *@This(), T: type) !T {
-    const in = &self.line_in;
-
-    var sum = try self.parseConstantTerm(T);
-    while (true) {
-        self.skipWhitespace();
-        switch (in.c orelse 0) {
-            '+' => sum +|= try self.parseConstantTerm(T),
-            '-' => sum -|= try self.parseConstantTerm(T),
-            else => break,
-        }
-    }
-
-    return sum;
-}
-
-fn tryParseLabelNameHere(self: *@This()) !?Label.StoredName {
+pub fn tryParseLabelNameHere(self: *@This()) !?Label.StoredName {
     const in = &self.line_in;
     const pos = in.current_pos_number;
 
