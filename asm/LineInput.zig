@@ -56,10 +56,3 @@ pub fn isAtAlphanumeric(self: @This()) bool {
     else
         false;
 }
-
-pub fn isAtUpper(self: @This(), upper: u8) bool {
-    return if (self.c) |c|
-        std.ascii.toUpper(c) == upper
-    else
-        false;
-}
