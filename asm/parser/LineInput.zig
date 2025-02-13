@@ -1,5 +1,5 @@
 const std = @import("std");
-const SourceInput = @import("SourceInput.zig");
+const SourceInput = @import("../SourceInput.zig");
 
 source_in: *SourceInput,
 c: ?u8,

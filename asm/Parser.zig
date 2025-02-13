@@ -1,8 +1,8 @@
 const std = @import("std");
 const SourceInput = @import("SourceInput.zig");
-const LineInput = @import("LineInput.zig");
 const PassOutput = @import("PassOutput.zig");
-const Label = @import("Label.zig");
+const LineInput = @import("parser/LineInput.zig");
+const Label = @import("parser/Label.zig");
 const Command = @import("Command.zig");
 const commands = @import("commands.zig");
 
