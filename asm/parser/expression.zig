@@ -1,4 +1,5 @@
 const Parser = @import("../Parser.zig");
+const label = @import("label.zig");
 
 fn tryParseUnsignedDecimalHere(parser: *Parser, T: type) !?T {
     const in = &parser.line_in;
@@ -46,15 +47,6 @@ fn tryParseUnsignedHexHere(parser: *Parser, T: type) !?T {
         parser.raiseError(pos, "bad hexadecimal number", .{});
 }
 
-fn tryParseLabelAsValueHere(parser: *Parser, T: type) !?T {
-    const name = (try parser.tryParseLabelNameHere()) orelse return null;
-    _ = name; // autofix
-    if (parser.labels.finalized) {
-        unreachable; // todo
-    }
-    return 0;
-}
-
 fn parseUnsignedConstantTermHere(parser: *Parser, T: type) !T {
     const in = &parser.line_in;
     const pos = in.current_pos_number;
@@ -65,7 +57,7 @@ fn parseUnsignedConstantTermHere(parser: *Parser, T: type) !T {
     if (try tryParseUnsignedHexHere(parser, T)) |value|
         return value;
 
-    if (try tryParseLabelAsValueHere(parser, T)) |value|
+    if (try label.tryParseLabelAsValueHere(parser, T)) |value|
         return value;
 
     return parser.raiseError(pos, "a number or a label is expected", .{});

@@ -5,7 +5,7 @@ pub const StoredName = [max_length]u8;
 
 stored_name: StoredName,
 line: usize,
-addr: ?u16 = null,
+addr: u16,
 
 pub fn initStoredName(str: []const u8) StoredName {
     var stored_name: StoredName = undefined;

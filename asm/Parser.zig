@@ -162,50 +162,8 @@ pub fn parseCondition(self: *@This()) !u8 {
 pub const parseConstantExpression =
     @import("parser/expression.zig").parseConstantExpression;
 
-pub fn tryParseLabelNameHere(self: *@This()) !?Label.StoredName {
-    const in = &self.line_in;
-    const pos = in.current_pos_number;
-
-    if (!in.isAtAlphabetic())
-        return null;
-
-    var name: std.BoundedArray(u8, Label.max_length) = .{};
-    while (in.isAtAlphanumeric()) {
-        name.append(in.c.?) catch
-            return self.raiseError(
-            pos,
-            "label too long (max length = {})",
-            .{Label.max_length},
-        );
-        in.next();
-    }
-
-    return Label.initStoredName(name.constSlice());
-}
-
-fn parseLabelDefinitionHere(self: *@This()) !void {
-    const in = &self.line_in;
-    const pos = in.current_pos_number;
-
-    const stored_name = (try self.tryParseLabelNameHere()) orelse
-        return self.raiseError(pos, "label expected", .{});
-    self.skipWhitespace();
-
-    const pos_after_label = in.current_pos_number;
-    if (in.c == ':')
-        in.next()
-    else
-        return self.raiseError(
-            pos_after_label,
-            "label must be followed by a colon",
-            .{},
-        );
-
-    try self.labels.push(.{
-        .stored_name = stored_name,
-        .line = self.current_line_number,
-    });
-}
+const parseLabelDefinitionHere =
+    @import("parser/label.zig").parseLabelDefinitionHere;
 
 fn parseCommandHere(self: *@This(), out: *PassOutput) !void {
     const in = &self.line_in;
