@@ -1,6 +1,6 @@
 const std = @import("std");
 const Label = @import("Label.zig");
-const Parser = @import("../Parser.zig");
+const Parser = @import("Parser.zig");
 
 table: std.ArrayList(Label),
 finalized: bool = false,
