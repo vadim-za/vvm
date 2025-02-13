@@ -80,54 +80,8 @@ pub const parseConstantExpression =
 const parseLabelDefinitionHere =
     @import("parser/label.zig").parseLabelDefinitionHere;
 
-fn parseCommandHere(self: *@This(), out: *PassOutput) !void {
-    const in = &self.line_in;
-    const pos = in.current_pos_number;
-
-    const max_name = 8;
-    var name_buffer: std.BoundedArray(u8, max_name) = .{};
-
-    if (!in.isAtAlphabetic())
-        return self.raiseError(
-            pos,
-            "instruction name must begin with a letter",
-            .{},
-        );
-
-    while (in.isAtAlphabetic()) {
-        name_buffer.append(in.c.?) catch
-            return self.raiseError(
-            pos,
-            "instruction name too long (max length = {})",
-            .{max_name},
-        );
-        in.next();
-    }
-
-    if (!in.isAtWhitespaceOrEol())
-        return self.raiseError(pos, "bad instruction name", .{});
-
-    const name = name_buffer.slice();
-    _ = std.ascii.upperString(name, name);
-    const command = commands.findUppercase(name) orelse
-        return self.raiseError(
-        pos,
-        "unknown instruction name '{s}'",
-        .{name},
-    );
-
-    self.skipWhitespace();
-    try command.translate(self, out);
-    self.skipWhitespace();
-
-    const pos_after_command = in.current_pos_number;
-    if (in.c != null)
-        return self.raiseError(
-            pos_after_command,
-            "end of line expected",
-            .{},
-        );
-}
+const parseCommandHere =
+    @import("parser/command.zig").parseCommandHere;
 
 pub fn raiseError(
     self: *@This(),
