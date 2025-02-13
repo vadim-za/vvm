@@ -39,8 +39,8 @@ pub fn parseRegisterName(
     if (n >= total_number)
         return parser.raiseError(
             pos,
-            "byte register index must be between 0 and {}",
-            .{total_number},
+            "{s} register index must be between 0 and {}",
+            .{ kind, total_number },
         );
 
     return @intCast(n);
