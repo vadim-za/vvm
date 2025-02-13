@@ -6,9 +6,9 @@ fn parseConditionRegisterHere(parser: *Parser) u8 {
     const in = &parser.line_in;
 
     var register_code: ?u8 = switch (in.c orelse 0) {
-        'H' => 1,
-        'L' => 0,
-        'X' => 3,
+        'H', 'h' => 1,
+        'L', 'l' => 0,
+        'X', 'x' => 3,
         else => null,
     };
 
@@ -28,15 +28,18 @@ fn parseConditionNameHere(parser: *Parser) ?u8 {
     const reg = parseConditionRegisterHere(parser);
 
     var invert: u1 = 0;
-    if (std.ascii.toUpper(in.c orelse 0) == 'N') {
-        invert = 1;
-        in.next();
+    switch (in.c orelse 0) {
+        'N', 'n' => {
+            invert = 1;
+            in.next();
+        },
+        else => {},
     }
 
-    if (std.ascii.toUpper(in.c orelse 0) == 'Z')
-        in.next()
-    else
-        return null;
+    switch (in.c orelse 0) {
+        'Z', 'z' => in.next(),
+        else => return null,
+    }
 
     return invert + reg * 2;
 }
