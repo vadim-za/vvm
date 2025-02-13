@@ -113,15 +113,12 @@ pub fn parseRegisterName(
 fn parseConditionRegisterHere(self: *@This()) u8 {
     const in = &self.line_in;
 
-    var register_code: ?u8 = if (in.c) |c|
-        switch (std.ascii.toUpper(c)) {
-            'H' => 1,
-            'L' => 0,
-            'X' => 3,
-            else => null,
-        }
-    else
-        null;
+    var register_code: ?u8 = switch (in.c orelse 0) {
+        'H' => 1,
+        'L' => 0,
+        'X' => 3,
+        else => null,
+    };
 
     if (register_code != null)
         in.next()
@@ -139,12 +136,12 @@ fn parseConditionNameHere(self: *@This()) ?u8 {
     const reg = self.parseConditionRegisterHere();
 
     var invert: u1 = 0;
-    if (std.ascii.toUpper(in.c orelse return null) == 'N') {
+    if (std.ascii.toUpper(in.c orelse 0) == 'N') {
         invert = 1;
         in.next();
     }
 
-    if (std.ascii.toUpper(in.c orelse return null) == 'Z')
+    if (std.ascii.toUpper(in.c orelse 0) == 'Z')
         in.next()
     else
         return null;
@@ -239,19 +236,20 @@ fn parseConstantTerm(self: *@This(), T: type) !T {
     const in = &self.line_in;
     self.skipWhitespace();
 
-    var negate = false;
-    while (in.c) |c| {
-        switch (c) {
-            '+' => {},
-            '-' => negate = !negate,
-            else => break,
-        }
-        in.next();
-        self.skipWhitespace();
+    var negate: ?bool = null;
+    switch (in.c orelse 0) {
+        '+' => negate = false,
+        '-' => negate = true,
+        else => {},
     }
 
+    if (negate != null) {
+        in.next();
+        self.skipWhitespace();
+    } else negate = false;
+
     const value = try self.parseUnsignedConstantTermHere(T);
-    return if (negate) 0 -| value else value;
+    return if (negate.?) 0 -| value else value;
 }
 
 pub fn parseConstantExpression(self: *@This(), T: type) !T {
@@ -260,12 +258,14 @@ pub fn parseConstantExpression(self: *@This(), T: type) !T {
     var sum = try self.parseConstantTerm(T);
     while (true) {
         self.skipWhitespace();
-        if (in.c) |c| switch (c) {
+        switch (in.c orelse 0) {
             '+' => sum +|= try self.parseConstantTerm(T),
             '-' => sum -|= try self.parseConstantTerm(T),
-            else => return sum,
-        } else return sum;
+            else => break,
+        }
     }
+
+    return sum;
 }
 
 fn tryParseLabelNameHere(self: *@This()) !?Label.Name {
