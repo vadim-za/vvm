@@ -41,13 +41,4 @@ pub fn parseCommandHere(parser: *Parser, out: *PassOutput) !void {
 
     parser.skipWhitespace();
     try command.translate(parser, out);
-    parser.skipWhitespace();
-
-    const pos_after_command = in.current_pos_number;
-    if (in.c != null)
-        return parser.raiseError(
-            pos_after_command,
-            "end of line expected",
-            .{},
-        );
 }

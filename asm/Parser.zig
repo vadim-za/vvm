@@ -39,14 +39,41 @@ fn parseLine(self: *@This(), out: *PassOutput) !?void {
     if (in.c == null)
         return null;
 
-    if (!in.isAtWhitespace())
+    if (!in.isAtWhitespace()) {
+        if (try self.tryParseCommentHere())
+            return;
         try self.parseLabelDefinitionHere();
+    }
 
     self.skipWhitespace();
     if (in.c == null)
         return; // no command
 
+    if (try self.tryParseCommentHere())
+        return;
     try self.parseCommandHere(out);
+
+    self.skipWhitespace();
+    if (try self.tryParseCommentHere())
+        return;
+
+    if (in.c != null)
+        return self.raiseError(
+            in.current_pos_number,
+            "end of line expected",
+            .{},
+        );
+}
+
+fn tryParseCommentHere(self: *@This()) !bool {
+    const in = &self.line_in;
+    if (in.c != ';')
+        return false;
+
+    while (in.c != null)
+        in.next();
+
+    return true;
 }
 
 pub fn skipWhitespace(self: *@This()) void {
