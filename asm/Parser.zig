@@ -81,15 +81,6 @@ pub fn skipWhitespace(self: *@This()) void {
         in.next();
 }
 
-pub const parseRegisterName =
-    @import("parser/register.zig").parseRegisterName;
-
-pub const parseCondition =
-    @import("parser/condition.zig").parseCondition;
-
-pub const parseConstantExpression =
-    @import("parser/expression.zig").parseConstantExpression;
-
 const parseLabelDefinitionHere =
     @import("parser/label.zig").parseLabelDefinitionHere;
 

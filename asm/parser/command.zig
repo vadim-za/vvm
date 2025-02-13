@@ -2,6 +2,9 @@ const std = @import("std");
 const Parser = @import("../Parser.zig");
 const PassOutput = @import("../PassOutput.zig");
 const commands = @import("../commands.zig");
+const register_parser = @import("register.zig");
+const expression_parser = @import("expression.zig");
+const condition_parser = @import("condition.zig");
 
 const Command = commands.Command;
 
@@ -21,17 +24,19 @@ fn parseOptionallyWhitespacedComma(parser: *Parser) !void {
 pub fn translateCommandHere(command: Command, parser: *Parser, out: *PassOutput) !void {
     const opcode: u8 = switch (command.variant_type) {
         .none => command.base_opcode,
-        .byte_register => try parser.parseRegisterName(
+        .byte_register => try register_parser.parseRegisterName(
+            parser,
             'B',
             "byte",
             8,
         ),
-        .word_register => try parser.parseRegisterName(
+        .word_register => try register_parser.parseRegisterName(
+            parser,
             'W',
             "word",
             4,
         ),
-        .condition => try parser.parseCondition(),
+        .condition => try condition_parser.parseCondition(parser),
     };
     try out.writeByte(opcode, parser);
 
@@ -41,11 +46,11 @@ pub fn translateCommandHere(command: Command, parser: *Parser, out: *PassOutput)
     switch (command.bytes) {
         .opcode_only => {},
         .extra_byte => try out.writeByte(
-            try parser.parseConstantExpression(u8),
+            try expression_parser.parseConstantExpression(parser, u8),
             parser,
         ),
         .extra_word => try out.writeWord(
-            try parser.parseConstantExpression(u16),
+            try expression_parser.parseConstantExpression(parser, u16),
             parser,
         ),
     }
