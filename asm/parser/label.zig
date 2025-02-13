@@ -56,3 +56,16 @@ pub fn tryParseLabelAsValueHere(parser: *Parser, T: type) !?T {
     }
     return 0;
 }
+
+test "Test" {
+    const SourceInput = @import("../SourceInput.zig");
+
+    var in = SourceInput.init("ijk:");
+    var parser: Parser = .init(std.testing.allocator, &in);
+    defer parser.deinit();
+    try parseLabelDefinitionHere(&parser);
+
+    const labels = parser.labels.table.items;
+    try std.testing.expectEqual(1, labels.len);
+    try std.testing.expectEqualStrings("ijk", labels[0].name());
+}
