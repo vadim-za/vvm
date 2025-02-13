@@ -1,8 +1,9 @@
+const std = @import("std");
 const Parser = @import("../Parser.zig");
 
 pub fn parseRegisterName(
     parser: *Parser,
-    comptime prefix_uppercase_char: u8,
+    comptime prefix_uppercase: u8,
     comptime kind: []const u8,
     comptime total_number: u8,
 ) !u8 {
@@ -11,14 +12,14 @@ pub fn parseRegisterName(
 
     {
         const pos = in.current_pos_number;
-        if (in.isAtUpper(prefix_uppercase_char))
-            in.next()
-        else
-            return parser.raiseError(
+        switch (in.c orelse 0) {
+            prefix_uppercase, std.ascii.toLower(prefix_uppercase) => in.next(),
+            else => return parser.raiseError(
                 pos,
                 "expected {s} register name '{c}n'",
-                .{ kind, prefix_uppercase_char },
-            );
+                .{ kind, prefix_uppercase },
+            ),
+        }
     }
 
     const pos = in.current_pos_number;
