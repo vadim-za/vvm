@@ -1,6 +1,13 @@
 const std = @import("std");
 const VvmCore = @import("VvmCore");
-const Command = @import("Command.zig");
+
+pub const Command = struct {
+    name: []const u8,
+    bytes: VvmCore.Command.Bytes,
+    base_opcode: u8,
+    variant_count: u8,
+    variant_type: VvmCore.Command.VariantType,
+};
 
 const vvm_commands = VvmCore.commands;
 const vvm_commands_fields =
@@ -49,13 +56,13 @@ fn compare(context: []const u8, item: Command) std.math.Order {
     return std.mem.order(u8, context, item.name);
 }
 
-pub fn findUppercase(uppercase_name: []const u8) ?*const Command {
+pub fn findUppercase(uppercase_name: []const u8) ?Command {
     return if (std.sort.binarySearch(
         Command,
         &table,
         uppercase_name,
         compare,
-    )) |index| &table[index] else null;
+    )) |index| table[index] else null;
 }
 
 pub fn dumpTable() void {

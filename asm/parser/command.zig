@@ -3,6 +3,41 @@ const Parser = @import("../Parser.zig");
 const PassOutput = @import("../PassOutput.zig");
 const commands = @import("../commands.zig");
 
+const Command = commands.Command;
+
+pub fn translateCommandHere(command: Command, parser: *Parser, out: *PassOutput) !void {
+    const opcode: u8 = switch (command.variant_type) {
+        .none => command.base_opcode,
+        .byte_register => try parser.parseRegisterName(
+            'B',
+            "byte",
+            8,
+        ),
+        .word_register => try parser.parseRegisterName(
+            'W',
+            "word",
+            4,
+        ),
+        .condition => try parser.parseCondition(),
+    };
+    try out.writeByte(opcode, parser);
+
+    if (command.variant_type != .none and command.bytes != .opcode_only)
+        try parser.parseOptionallyWhitespacedComma();
+
+    switch (command.bytes) {
+        .opcode_only => {},
+        .extra_byte => try out.writeByte(
+            try parser.parseConstantExpression(u8),
+            parser,
+        ),
+        .extra_word => try out.writeWord(
+            try parser.parseConstantExpression(u16),
+            parser,
+        ),
+    }
+}
+
 pub fn parseCommandHere(parser: *Parser, out: *PassOutput) !void {
     const in = &parser.line_in;
     const pos = in.current_pos_number;
@@ -40,5 +75,5 @@ pub fn parseCommandHere(parser: *Parser, out: *PassOutput) !void {
     );
 
     parser.skipWhitespace();
-    try command.translate(parser, out);
+    try translateCommandHere(command, parser, out);
 }
