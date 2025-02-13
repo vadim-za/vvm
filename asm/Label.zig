@@ -16,7 +16,7 @@ pub fn initStoredName(str: []const u8) StoredName {
 
 pub fn lessThan(context: void, lhs: @This(), rhs: @This()) bool {
     _ = context;
-    return switch (std.mem.order(u8, lhs.id(), rhs.id())) {
+    return switch (std.mem.order(u8, lhs.name(), rhs.name())) {
         .lt => true,
         .gt => false,
         .eq => lhs.line < rhs.line,

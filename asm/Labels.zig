@@ -21,7 +21,7 @@ pub fn push(self: *@This(), label: Label) !void {
 
 pub fn finalize(self: *@This(), parser: *Parser) !void {
     std.debug.assert(!self.finalized);
-    std.sort.heap(Label, self.table.items, {}, Label.lessThanFn);
+    std.sort.heap(Label, self.table.items, {}, Label.lessThan);
     try self.checkDuplicates(parser);
     self.finalized = true;
 }
@@ -41,7 +41,7 @@ fn checkDuplicates(self: @This(), parser: *Parser) !void {
 
     // Search for the duplicate pair with the smallest line number
     // and store it into report
-    const report: ?[2]usize = null;
+    var report: ?[2]usize = null;
 
     // max_index is excluded from iteration, so that we can safely use (index+1)
     for (0..max_index) |index| {
@@ -60,7 +60,7 @@ fn checkDuplicates(self: @This(), parser: *Parser) !void {
 
     if (report) |r|
         return parser.raiseErrorAtLine(
-            items[r[0]],
+            items[r[0]].line,
             1,
             "duplicate label",
             .{},

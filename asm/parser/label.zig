@@ -69,3 +69,25 @@ test "Test" {
     try std.testing.expectEqual(1, labels.len);
     try std.testing.expectEqualStrings("ijk", labels[0].name());
 }
+
+test "Test Multiple" {
+    const SourceInput = @import("../SourceInput.zig");
+
+    var in = SourceInput.init("ijk:abcdefgh:d:");
+    var parser: Parser = .init(std.testing.allocator, &in);
+    defer parser.deinit();
+    try parseLabelDefinitionHere(&parser);
+    try parseLabelDefinitionHere(&parser);
+    try parseLabelDefinitionHere(&parser);
+
+    const labels = parser.labels.table.items;
+    try std.testing.expectEqual(3, labels.len);
+    try std.testing.expectEqualStrings("ijk", labels[0].name());
+    try std.testing.expectEqualStrings("abcdefgh", labels[1].name());
+    try std.testing.expectEqualStrings("d", labels[2].name());
+
+    try parser.labels.finalize(&parser);
+    try std.testing.expectEqualStrings("abcdefgh", labels[0].name());
+    try std.testing.expectEqualStrings("d", labels[1].name());
+    try std.testing.expectEqualStrings("ijk", labels[2].name());
+}
