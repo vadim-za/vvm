@@ -68,45 +68,8 @@ pub fn parseOptionallyWhitespacedComma(self: *@This()) !void {
     self.skipWhitespace();
 }
 
-pub fn parseRegisterName(
-    self: *@This(),
-    prefix_uppercase_char: u8,
-    kind: []const u8,
-    total_number: u8,
-) !u8 {
-    const in = &self.line_in;
-    self.skipWhitespace();
-
-    {
-        const pos = in.current_pos_number;
-        if (in.isAtUpper(prefix_uppercase_char))
-            in.next()
-        else
-            return self.raiseError(
-                pos,
-                "expected {s} register name '{c}n'",
-                .{ kind, prefix_uppercase_char },
-            );
-    }
-
-    const pos = in.current_pos_number;
-
-    if (in.isAtDigit())
-        in.next()
-    else
-        return self.raiseError(pos, "digit expected", .{});
-
-    const n: u8 = in.c.? - '0';
-
-    if (n >= total_number)
-        return self.raiseError(
-            pos,
-            "byte register index must be between 0 and {}",
-            .{total_number},
-        );
-
-    return @intCast(n);
-}
+pub const parseRegisterName =
+    @import("parser/register.zig").parseRegisterName;
 
 pub const parseCondition =
     @import("parser/condition.zig").parseCondition;
