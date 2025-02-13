@@ -81,19 +81,6 @@ pub fn skipWhitespace(self: *@This()) void {
         in.next();
 }
 
-pub fn parseOptionallyWhitespacedComma(self: *@This()) !void {
-    const in = &self.line_in;
-    self.skipWhitespace();
-
-    const pos = in.current_pos_number;
-    if (in.c == ',')
-        in.next()
-    else
-        return self.raiseError(pos, "comma expected", .{});
-
-    self.skipWhitespace();
-}
-
 pub const parseRegisterName =
     @import("parser/register.zig").parseRegisterName;
 

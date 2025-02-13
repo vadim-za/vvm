@@ -5,6 +5,19 @@ const commands = @import("../commands.zig");
 
 const Command = commands.Command;
 
+fn parseOptionallyWhitespacedComma(parser: *Parser) !void {
+    const in = &parser.line_in;
+    parser.skipWhitespace();
+
+    const pos = in.current_pos_number;
+    if (in.c == ',')
+        in.next()
+    else
+        return parser.raiseError(pos, "comma expected", .{});
+
+    parser.skipWhitespace();
+}
+
 pub fn translateCommandHere(command: Command, parser: *Parser, out: *PassOutput) !void {
     const opcode: u8 = switch (command.variant_type) {
         .none => command.base_opcode,
@@ -23,7 +36,7 @@ pub fn translateCommandHere(command: Command, parser: *Parser, out: *PassOutput)
     try out.writeByte(opcode, parser);
 
     if (command.variant_type != .none and command.bytes != .opcode_only)
-        try parser.parseOptionallyWhitespacedComma();
+        try parseOptionallyWhitespacedComma(parser);
 
     switch (command.bytes) {
         .opcode_only => {},
