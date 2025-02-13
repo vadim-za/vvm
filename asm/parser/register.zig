@@ -24,17 +24,16 @@ pub fn parseRegisterName(
 
     const pos = in.current_pos_number;
 
-    if (total_number >= 10)
+    if (total_number > 10)
         @compileError(
             "The implementation currently doesn't support register files larger than 10",
         );
 
-    if (in.isAtDigit())
-        in.next()
-    else
+    if (!in.isAtDigit())
         return parser.raiseError(pos, "digit expected", .{});
 
     const n: u8 = in.c.? - '0';
+    in.next();
 
     if (n >= total_number)
         return parser.raiseError(
@@ -44,4 +43,30 @@ pub fn parseRegisterName(
         );
 
     return @intCast(n);
+}
+
+test "Test" {
+    const SourceInput = @import("../SourceInput.zig");
+
+    for (0..10) |register_index| {
+        inline for ([_][]const u8{ "R{d}", "r{d}" }) |fmt| {
+            var source_buffer: [100]u8 = undefined;
+            const source =
+                try std.fmt.bufPrint(
+                &source_buffer,
+                fmt,
+                .{register_index},
+            );
+            var in = SourceInput.init(source);
+            var parser: Parser = .init(std.testing.allocator, &in);
+            defer parser.deinit();
+            const parsed_index = try parseRegisterName(
+                &parser,
+                'R',
+                "kind",
+                10,
+            );
+            try std.testing.expectEqual(register_index, parsed_index);
+        }
+    }
 }
