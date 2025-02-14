@@ -32,6 +32,7 @@ pub fn sameNameAs(self: @This(), other: @This()) bool {
     return std.mem.order(u8, &self.stored_name, &other.stored_name) == .eq;
 }
 
-pub fn name(self: @This()) []const u8 {
+// Use a pointer for 'self', otherwise the returned slice will be a dangling pointer!
+pub fn name(self: *const @This()) []const u8 {
     return std.mem.sliceTo(&self.stored_name, 0);
 }
