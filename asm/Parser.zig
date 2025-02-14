@@ -60,6 +60,8 @@ fn parseLine(self: *@This(), out: *PassOutput) !?void {
 
     if (try self.tryParseCommentHere())
         return;
+    if (try self.tryParseMetaCommandHere(out))
+        return;
     try self.parseCommandHere(out);
 
     self.skipWhitespace();
@@ -96,6 +98,9 @@ const parseLabelDefinitionHere =
 
 const parseCommandHere =
     @import("parser/command.zig").parseCommandHere;
+
+const tryParseMetaCommandHere =
+    @import("parser/meta_command.zig").tryParseMetaCommandHere;
 
 pub fn raiseError(
     self: *@This(),

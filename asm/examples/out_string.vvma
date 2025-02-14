@@ -21,7 +21,7 @@ exit:
     ARA
     OUT
 string:
-    XHL
-    IN
-    CPL
-    LBR B0
+    .db $53
+    .db $54
+    .db $52
+    .db 0
