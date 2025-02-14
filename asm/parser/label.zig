@@ -49,12 +49,21 @@ pub fn parseLabelDefinitionHere(parser: *Parser) !void {
 }
 
 pub fn tryParseLabelAsValueHere(parser: *Parser, T: type) !?T {
-    const name = (try tryParseLabelNameHere(parser)) orelse return null;
-    _ = name; // autofix
+    const in = &parser.line_in;
+    const pos = in.current_pos_number;
+
+    const stored_name = (try tryParseLabelNameHere(parser)) orelse return null;
+
     if (parser.labels.finalized) {
-        unreachable; // todo
-    }
-    return 0;
+        if (parser.labels.find(stored_name)) |label|
+            return @truncate(label.addr)
+        else
+            return parser.raiseError(
+                pos,
+                "unknown label '{s}'",
+                .{Label.storedNameAsSlice(&stored_name)},
+            );
+    } else return 0; // return dummy value
 }
 
 test "Test" {
@@ -92,10 +101,29 @@ test "Test Multiple" {
     try std.testing.expectEqualStrings("d", items[1].name());
     try std.testing.expectEqualStrings("ijk", items[2].name());
 
-    try std.testing.expectEqual(&items[0], labels.find("abcdefgh"));
-    try std.testing.expectEqual(&items[1], labels.find("d"));
-    try std.testing.expectEqual(&items[2], labels.find("ijk"));
-    try std.testing.expectEqual(null, labels.find(""));
-    try std.testing.expectEqual(null, labels.find("d1"));
-    try std.testing.expectEqual(null, labels.find("ij"));
+    const sn = Label.initStoredName;
+    try std.testing.expectEqual(&items[0], labels.find(sn("abcdefgh")));
+    try std.testing.expectEqual(&items[1], labels.find(sn("d")));
+    try std.testing.expectEqual(&items[2], labels.find(sn("ijk")));
+    try std.testing.expectEqual(null, labels.find(sn("")));
+    try std.testing.expectEqual(null, labels.find(sn("d1")));
+    try std.testing.expectEqual(null, labels.find(sn("ij")));
+}
+
+test "Test Parse Label as Value" {
+    const SourceInput = @import("../SourceInput.zig");
+
+    var in = SourceInput.init("abc");
+    var parser: Parser = .init(std.testing.allocator, &in);
+    defer parser.deinit();
+
+    try parser.labels.push(.{
+        .stored_name = Label.initStoredName("abc"),
+        .line = 1,
+        .addr = 1000,
+    });
+    try parser.labels.finalize(&parser);
+
+    const value = try tryParseLabelAsValueHere(&parser, u16);
+    try std.testing.expectEqual(1000, value);
 }

@@ -26,11 +26,11 @@ pub fn finalize(self: *@This(), parser: *Parser) !void {
     self.finalized = true;
 }
 
-pub fn find(self: *const @This(), name: []const u8) ?*Label {
+pub fn find(self: *const @This(), stored_name: Label.StoredName) ?*const Label {
     return if (std.sort.binarySearch(
         Label,
         self.table.items,
-        name,
+        stored_name,
         Label.compare,
     )) |index| &self.table.items[index] else null;
 }
