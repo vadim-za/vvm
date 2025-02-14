@@ -39,7 +39,7 @@ pub fn main() u8 {
     ) catch return 1;
     const code: []const u8 = translation_result.items;
 
-    //std.debug.print("{any}\n", .{code.items});
+    //std.debug.print("{x}\n", .{code});
 
     var system: System = undefined;
     system.init();
