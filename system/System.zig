@@ -41,14 +41,3 @@ test "Test" {
     try std.testing.expect(system.run(10));
     try std.testing.expectEqual(3, core.registers.pc);
 }
-
-pub fn main() void {
-    var system: @This() = undefined;
-    system.init();
-
-    //@import("examples/print_a.zig").run();
-    @import("examples/out_string.zig").run();
-    //@import("examples/print_input.zig").run();
-    //@import("examples/realtime_input.zig").run();
-    //@import("examples/print_delayed.zig").run();
-}
