@@ -53,20 +53,19 @@ pub fn translate(self: *@This(), out: *PassOutput) Error!void {
     self.current_line_number = 1;
     self.pc = 0;
 
-    while (true) : (self.current_line_number += 1) {
+    while (self.source_in.c != null) : (self.current_line_number += 1) {
         self.line_in.reset();
-        if (try self.parseLine(out) == null)
-            break;
+        try self.parseLine(out);
     }
 
     if (out.underlying == null)
         try self.labels.finalize(self);
 }
 
-fn parseLine(self: *@This(), out: *PassOutput) !?void {
+fn parseLine(self: *@This(), out: *PassOutput) !void {
     const in = &self.line_in;
     if (in.c == null)
-        return null;
+        return;
 
     if (!in.isAtWhitespace()) {
         if (try self.tryParseCommentHere())

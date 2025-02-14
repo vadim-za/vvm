@@ -1,0 +1,5 @@
+    zero
+    ara
+    out
+
+PrntHexW: ; value to print is in W0

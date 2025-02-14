@@ -21,11 +21,16 @@ pub fn init(source_in: *SourceInput) @This() {
 pub fn reset(self: *@This()) void {
     self.c = self.source_in.c;
     self.current_pos_number = 1;
+    self.accommodateWindowsEol();
 }
 
 pub fn next(self: *@This()) void {
     self.source_in.next();
     self.current_pos_number += 1;
+    self.accommodateWindowsEol();
+}
+
+fn accommodateWindowsEol(self: *@This()) void {
     self.c = switch (self.source_in.c orelse 0) {
         '\n' => blk: {
             self.source_in.next();
@@ -33,7 +38,7 @@ pub fn next(self: *@This()) void {
         },
         '\r' => blk: {
             self.source_in.next();
-            if (self.source_in.c == '\n') // Windows CRLF handling
+            if (self.source_in.c == '\n')
                 self.source_in.next();
             break :blk null;
         },
