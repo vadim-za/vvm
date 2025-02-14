@@ -1,25 +1,25 @@
-    LWV $0001
-    STWR W0 ; W0 == $0001
-    LWV string ; A = running ptr
+    lwv $0001
+    stwr w0 ; W0 == $0001
+    lwv string ; A = running ptr
     ; ----------- loop start
 loop:
-    STWR W1 ; W1 = running_ptr
-    ARA
-    LBI
-    ARV exit
-    JIF LZ
-    ARWR W0 ; ADDR = $0001
-    OUT
-    LWR W1 ; A = running_ptr
-    CXWX ; X = running_ptr
-    LWR W0 ; A = 1
-    ADD ; A = ++running ptr
-    ARV loop
-    JMP
+    stwr w1 ; W1 = running_ptr
+    ara
+    lbi
+    arv exit
+    jif lz
+    arwr w0 ; ADDR = $0001
+    out
+    lwr w1 ; A = running_ptr
+    cxwx ; X = running_ptr
+    lwr w0 ; A = 1
+    add ; A = ++running ptr
+    arv loop
+    jmp
 exit:
-    ZERO
-    ARA
-    OUT
+    zero
+    ara
+    out
 string:
     .db $53
     .db $54
