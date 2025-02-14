@@ -3,18 +3,20 @@ const Parser = @import("../Parser.zig");
 const PassOutput = @import("../PassOutput.zig");
 const meta_commands = @import("../meta_commands.zig");
 const expression_parser = @import("expression.zig");
+const string_parser = @import("string.zig");
 
 const ListEntry = meta_commands.ListEntry;
 
 pub const meta_command_list = [_]ListEntry{
     // zig fmt: off
-    .{ "DB",  parseDb },
-    .{ "DW",  parseDw },
-    .{ "ORG", parseOrg },
+    .{ "DB",  translateDb },
+    .{ "DW",  translateDw },
+    .{ "DS",  translateDs },
+    .{ "ORG", translateOrg },
     // zig fmt: on
 };
 
-fn parseDb(parser: *Parser, out: *PassOutput) Parser.Error!void {
+fn translateDb(parser: *Parser, out: *PassOutput) Parser.Error!void {
     parser.skipWhitespace();
 
     try out.writeByte(
@@ -23,7 +25,7 @@ fn parseDb(parser: *Parser, out: *PassOutput) Parser.Error!void {
     );
 }
 
-fn parseDw(parser: *Parser, out: *PassOutput) Parser.Error!void {
+fn translateDw(parser: *Parser, out: *PassOutput) Parser.Error!void {
     parser.skipWhitespace();
 
     try out.writeWord(
@@ -32,7 +34,13 @@ fn parseDw(parser: *Parser, out: *PassOutput) Parser.Error!void {
     );
 }
 
-fn parseOrg(parser: *Parser, out: *PassOutput) Parser.Error!void {
+fn translateDs(parser: *Parser, out: *PassOutput) Parser.Error!void {
+    parser.skipWhitespace();
+
+    try string_parser.translateStringHere(parser,out);
+}
+
+fn translateOrg(parser: *Parser, out: *PassOutput) Parser.Error!void {
     parser.pc = try expression_parser.parseConstantExpressionAs(parser, u16);
     _ = out;
 }

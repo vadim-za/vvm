@@ -39,7 +39,7 @@ pub fn tryParseStringAsValueHere(parser: *Parser, T: type) !?T {
     return value;
 }
 
-pub fn translateStringHere(parser: *Parser, out: PassOutput) !void {
+pub fn translateStringHere(parser: *Parser, out: *PassOutput) !void {
     const in = &parser.line_in;
     const pos = in.current_pos_number;
 
@@ -49,14 +49,17 @@ pub fn translateStringHere(parser: *Parser, out: PassOutput) !void {
         return parser.raiseError(pos, "String literal expected", .{});
 
     while (in.c != '\'') {
-        if (in.c) |c| {
-            out.writeByte(c);
-        } else return parser.raiseError(
-            pos,
-            "Unterminated string literal",
-            .{},
-        );
+        if (in.c) |c|
+            try out.writeByte(c, parser)
+        else
+            return parser.raiseError(
+                pos,
+                "Unterminated string literal",
+                .{},
+            );
 
         in.next();
     }
+
+    in.next(); // consume the apostrophe
 }

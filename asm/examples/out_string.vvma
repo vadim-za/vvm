@@ -21,7 +21,5 @@ exit:
     ara
     out
 string:
-    .db 'S'
-    .db 'T'
-    .db 'R'
+    .ds 'Str'
     .db 0
