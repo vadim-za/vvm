@@ -4,19 +4,19 @@ const ArrayListOutput = @import("ArrayListOutput.zig");
 const PassOutput = @import("PassOutput.zig");
 const Parser = @import("Parser.zig");
 
+// The caller must call deinit() on returned value
 pub fn translateSourceFile(
     alloc: std.mem.Allocator,
     source_file_path: []const u8,
-    dest_buffer: *std.ArrayList(u8),
-) (Parser.Error || ReadError)!void {
+) (Parser.Error || ReadError)!std.ArrayList(u8) {
     var source: std.ArrayList(u8) = .init(alloc);
     defer source.deinit();
     try readSourceFile(source_file_path, &source);
 
-    return translateSource(alloc, source.items, dest_buffer);
+    return translateSource(alloc, source.items);
 }
 
-const ReadError = error{ ReadError, OutOfMemory };
+const ReadError = error{ReadError};
 
 fn readSourceFile(
     source_file_path: []const u8,
@@ -44,19 +44,23 @@ fn readSourceFile(
     };
 }
 
+// The caller must call deinit() on returned value
 pub fn translateSource(
     alloc: std.mem.Allocator,
     source: []const u8,
-    dest_buffer: *std.ArrayList(u8),
-) Parser.Error!void {
+) Parser.Error!std.ArrayList(u8) {
     var in = SourceInput.init(source);
-    var out: ArrayListOutput = .{ .data = dest_buffer };
-
     var parser: Parser = .init(alloc, &in);
     defer parser.deinit();
 
+    var out_data: std.ArrayList(u8) = .init(alloc);
+    errdefer out_data.deinit();
+    var out: ArrayListOutput = .{ .data = &out_data };
+
     try runTranslationPass(&parser, null);
     try runTranslationPass(&parser, &out);
+
+    return out_data;
 }
 
 fn runTranslationPass(parser: *Parser, out: ?*ArrayListOutput) !void {

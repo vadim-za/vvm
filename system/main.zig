@@ -30,13 +30,11 @@ pub fn main() u8 {
         return 1;
     }) else null;
 
-    var translation_result: std.ArrayList(u8) = .init(alloc);
-    defer translation_result.deinit();
-    Asm.translateSourceFile(
+    const translation_result = Asm.translateSourceFile(
         alloc,
         source_file_path,
-        &translation_result,
     ) catch return 1;
+    defer translation_result.deinit();
     const code: []const u8 = translation_result.items;
 
     //std.debug.print("{x}\n", .{code});
