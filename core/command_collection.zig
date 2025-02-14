@@ -31,7 +31,7 @@ const FullCollection: type = blk: {
         field.* = .{
             .name = command.name,
             .type = Command,
-            .default_value = &command,
+            .default_value_ptr = &command,
             .is_comptime = false, // will be used only in purely comptime code anyway
             .alignment = 0,
         };
