@@ -1,31 +1,45 @@
-    lbv 12
-    arv PrntHexN
+    lwv $1A9C
+    arv PrntHexW
     call
     zero
     ara
     out
 
-; Print Hex Byte. Value to print is in W0
-; ---------------------------------------
-;PrntHexB:
-;    lwr w0
-;    ror
-;    ror
-;    ror
-;    ror
-;    xa ; SHR4'd value is in X
-;    lwv $F
-;    and ; high nibble in A
-;    arv PrntHexN
-;    call
-;    ???
+; Print Hex Word. Value to print is in A, clobber W0,W1
+; -----------------------------------------------------
+PrntHexW:
+    stwr w1
+    xhl
+    arv PrntHexB
+    call
+    lwr w1
+    arv PrntHexB
+    call
+    ret
 
-PrntHexN: ; print low hex nibble in A, clobber W1
+; Print Hex Byte. Value to print is in A, clobber W0
+; --------------------------------------------------
+PrntHexB:
+    zxbw
+    stwr w0
+    ror
+    ror
+    ror
+    ror
+    arv PrntHexN
+    call
+    lwr w0
+    arv PrntHexN
+    call
+    ret
+
+; Print Hex Nibble. Value to print is in lowest 4 bits of A
+; ---------------------------------------------------------
+PrntHexN:
     xa
     lwv $F
     and ; [A] = nibble
-    stwr w1 ; nibble in A and W1
-    xa ; nibble in X and W1
+    xa ; nibble in X
     lwv 10
     xa
     sub
