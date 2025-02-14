@@ -3,10 +3,12 @@ const Parser = @import("../Parser.zig");
 const label_parser = @import("label.zig");
 const Label = @import("../Label.zig");
 
-fn tryParseUnsignedDecimalHere(parser: *Parser, T: type) !?T {
+const ValueType = u16; // all expressions use 16 bit evaluation
+
+fn tryParseUnsignedDecimalHere(parser: *Parser) !?ValueType {
     const in = &parser.line_in;
 
-    var value: T = 0;
+    var value: ValueType = 0;
     var digit_count: usize = 0;
 
     while (in.c) |c| : (digit_count += 1) {
@@ -20,7 +22,7 @@ fn tryParseUnsignedDecimalHere(parser: *Parser, T: type) !?T {
     return if (digit_count > 0) value else null;
 }
 
-fn tryParseUnsignedHexHere(parser: *Parser, T: type) !?T {
+fn tryParseUnsignedHexHere(parser: *Parser) !?ValueType {
     const in = &parser.line_in;
 
     if (in.c == '$')
@@ -30,7 +32,7 @@ fn tryParseUnsignedHexHere(parser: *Parser, T: type) !?T {
 
     const pos = in.current_pos_number;
 
-    var value: T = 0;
+    var value: ValueType = 0;
     var digit_count: usize = 0;
 
     while (in.c) |c| : (digit_count += 1) {
@@ -49,23 +51,23 @@ fn tryParseUnsignedHexHere(parser: *Parser, T: type) !?T {
         parser.raiseError(pos, "bad hexadecimal number", .{});
 }
 
-fn parseUnsignedConstantTermHere(parser: *Parser, T: type) !T {
+fn parseUnsignedConstantTermHere(parser: *Parser) !ValueType {
     const in = &parser.line_in;
     const pos = in.current_pos_number;
 
-    if (try tryParseUnsignedDecimalHere(parser, T)) |value|
+    if (try tryParseUnsignedDecimalHere(parser)) |value|
         return value;
 
-    if (try tryParseUnsignedHexHere(parser, T)) |value|
+    if (try tryParseUnsignedHexHere(parser)) |value|
         return value;
 
-    if (try label_parser.tryParseLabelAsValueHere(parser, T)) |value|
+    if (try label_parser.tryParseLabelAsValueHere(parser)) |value|
         return value;
 
     return parser.raiseError(pos, "a number or a label is expected", .{});
 }
 
-fn parseConstantTerm(parser: *Parser, T: type) !T {
+fn parseConstantTerm(parser: *Parser) !ValueType {
     const in = &parser.line_in;
     parser.skipWhitespace();
 
@@ -82,30 +84,36 @@ fn parseConstantTerm(parser: *Parser, T: type) !T {
     };
 
     parser.skipWhitespace();
-    const value = try parseUnsignedConstantTermHere(parser, T);
+    const value = try parseUnsignedConstantTermHere(parser);
     return if (negate) 0 -% value else value;
 }
 
-pub fn parseConstantExpression(parser: *Parser, T: type) !T {
+fn parseConstantExpression(parser: *Parser) !ValueType {
     const in = &parser.line_in;
 
-    var sum = try parseConstantTerm(parser, T);
+    var sum = try parseConstantTerm(parser);
     while (true) {
         parser.skipWhitespace();
         switch (in.c orelse 0) {
             '+' => {
                 in.next();
-                sum +%= try parseConstantTerm(parser, T);
+                sum +%= try parseConstantTerm(parser);
             },
             '-' => {
                 in.next();
-                sum -%= try parseConstantTerm(parser, T);
+                sum -%= try parseConstantTerm(parser);
             },
             else => break,
         }
     }
 
     return sum;
+}
+
+pub fn parseConstantExpressionAs(parser: *Parser, T: type) !T {
+    return @truncate(
+        parseConstantExpression(parser) catch |err| return err,
+    );
 }
 
 test "Test" {
@@ -119,7 +127,7 @@ test "Test" {
         .{ "+1000", u16, 1000 },
         .{ "10+21", u8, 31 },
         .{ "10-21", u16, 10 -% @as(u16, 21) },
-        //.{ "10-abc", u16, 10 -% @as(u16, 1000) },
+        .{ "10-abc", u16, 10 -% @as(u16, 1000) },
     };
     inline for (&expressions) |expr_test| {
         const source = expr_test[0];
@@ -133,7 +141,8 @@ test "Test" {
             .line = 1,
             .addr = 1000,
         });
-        const parsed_value = try parseConstantExpression(&parser, T);
+        try parser.labels.finalize(&parser);
+        const parsed_value = try parseConstantExpressionAs(&parser, T);
         try std.testing.expectEqual(expected_value, parsed_value);
     }
 }

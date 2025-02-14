@@ -48,7 +48,7 @@ pub fn parseLabelDefinitionHere(parser: *Parser) !void {
     });
 }
 
-pub fn tryParseLabelAsValueHere(parser: *Parser, T: type) !?T {
+pub fn tryParseLabelAsValueHere(parser: *Parser) !?u16 {
     const in = &parser.line_in;
     const pos = in.current_pos_number;
 
@@ -124,6 +124,6 @@ test "Test Parse Label as Value" {
     });
     try parser.labels.finalize(&parser);
 
-    const value = try tryParseLabelAsValueHere(&parser, u16);
+    const value = try tryParseLabelAsValueHere(&parser);
     try std.testing.expectEqual(1000, value);
 }
