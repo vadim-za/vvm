@@ -1,6 +1,7 @@
 const std = @import("std");
 const Parser = @import("../Parser.zig");
 const label_parser = @import("label.zig");
+const string_parser = @import("string.zig");
 const Label = @import("../Label.zig");
 
 const ValueType = u16; // all expressions use 16 bit evaluation
@@ -61,10 +62,17 @@ fn parseUnsignedConstantTermHere(parser: *Parser) !ValueType {
     if (try tryParseUnsignedHexHere(parser)) |value|
         return value;
 
+    if (try string_parser.tryParseStringAsValueHere(parser, ValueType)) |value|
+        return value;
+
     if (try label_parser.tryParseLabelAsValueHere(parser)) |value|
         return value;
 
-    return parser.raiseError(pos, "a number or a label is expected", .{});
+    return parser.raiseError(
+        pos,
+        "a number or string literal or a label is expected",
+        .{},
+    );
 }
 
 fn parseConstantTerm(parser: *Parser) !ValueType {

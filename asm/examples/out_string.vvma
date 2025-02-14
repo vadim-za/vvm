@@ -21,7 +21,7 @@ exit:
     ara
     out
 string:
-    .db $53
-    .db $54
-    .db $52
+    .db 'S'
+    .db 'T'
+    .db 'R'
     .db 0
