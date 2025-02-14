@@ -9,21 +9,19 @@ pub fn translateSourceFile(
     source_file_path: []const u8,
     dest_buffer: *std.ArrayList(u8),
 ) (Parser.Error || ReadError)!void {
-    const source = try readSourceFile(
-        alloc,
-        source_file_path,
-    );
-    defer alloc.free(source);
+    var source: std.ArrayList(u8) = .init(alloc);
+    defer source.deinit();
+    try readSourceFile(source_file_path, &source);
 
-    return translateSource(alloc, source, dest_buffer);
+    return translateSource(alloc, source.items, dest_buffer);
 }
 
 const ReadError = error{ ReadError, OutOfMemory };
 
 fn readSourceFile(
-    alloc: std.mem.Allocator,
     source_file_path: []const u8,
-) ReadError![]const u8 {
+    file_contents: *std.ArrayList(u8),
+) ReadError!void {
     const file = std.fs.cwd().openFile(
         source_file_path,
         .{},
@@ -34,8 +32,8 @@ fn readSourceFile(
     defer file.close();
 
     const max_mbytes = 64;
-    const file_contents = file.readToEndAlloc(
-        alloc,
+    file.reader().readAllArrayList(
+        file_contents,
         max_mbytes * 1000 * 1024,
     ) catch {
         std.debug.print(
@@ -44,8 +42,6 @@ fn readSourceFile(
         );
         return error.ReadError;
     };
-
-    return file_contents;
 }
 
 pub fn translateSource(
