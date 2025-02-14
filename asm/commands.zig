@@ -14,6 +14,8 @@ const vvm_commands_fields =
     @typeInfo(@TypeOf(vvm_commands)).@"struct".fields;
 const command_count = vvm_commands_fields.len;
 
+// Use a sorted array until Zig issue 12250 is addressed,
+// at which point we could consider using nested auto-generated switches.
 const table: [command_count]Command = blk: {
     var temp_table: [command_count]Command = undefined;
 
