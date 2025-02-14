@@ -80,14 +80,22 @@ test "Test Multiple" {
     try parseLabelDefinitionHere(&parser);
     try parseLabelDefinitionHere(&parser);
 
-    const labels = parser.labels.table.items;
-    try std.testing.expectEqual(3, labels.len);
-    try std.testing.expectEqualStrings("ijk", labels[0].name());
-    try std.testing.expectEqualStrings("abcdefgh", labels[1].name());
-    try std.testing.expectEqualStrings("d", labels[2].name());
+    const labels = &parser.labels;
+    const items = labels.table.items;
+    try std.testing.expectEqual(3, items.len);
+    try std.testing.expectEqualStrings("ijk", items[0].name());
+    try std.testing.expectEqualStrings("abcdefgh", items[1].name());
+    try std.testing.expectEqualStrings("d", items[2].name());
 
     try parser.labels.finalize(&parser);
-    try std.testing.expectEqualStrings("abcdefgh", labels[0].name());
-    try std.testing.expectEqualStrings("d", labels[1].name());
-    try std.testing.expectEqualStrings("ijk", labels[2].name());
+    try std.testing.expectEqualStrings("abcdefgh", items[0].name());
+    try std.testing.expectEqualStrings("d", items[1].name());
+    try std.testing.expectEqualStrings("ijk", items[2].name());
+
+    try std.testing.expectEqual(&items[0], labels.find("abcdefgh"));
+    try std.testing.expectEqual(&items[1], labels.find("d"));
+    try std.testing.expectEqual(&items[2], labels.find("ijk"));
+    try std.testing.expectEqual(null, labels.find(""));
+    try std.testing.expectEqual(null, labels.find("d1"));
+    try std.testing.expectEqual(null, labels.find("ij"));
 }
