@@ -41,11 +41,12 @@ pub fn parseLabelDefinitionHere(parser: *Parser) !void {
             .{},
         );
 
-    try parser.labels.push(.{
-        .stored_name = stored_name,
-        .line = parser.current_line_number,
-        .addr = parser.pc,
-    });
+    if (!parser.labels.finalized)
+        try parser.labels.push(.{
+            .stored_name = stored_name,
+            .line = parser.current_line_number,
+            .addr = parser.pc,
+        });
 }
 
 pub fn tryParseLabelAsValueHere(parser: *Parser) !?u16 {

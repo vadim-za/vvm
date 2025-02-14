@@ -16,6 +16,7 @@ pub fn deinit(self: @This()) void {
 }
 
 pub fn push(self: *@This(), label: Label) !void {
+    std.debug.assert(!self.finalized);
     try self.table.append(label);
 }
 

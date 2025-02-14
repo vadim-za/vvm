@@ -6,20 +6,36 @@ c: ?u8,
 current_pos_number: usize,
 
 pub fn init(source_in: *SourceInput) @This() {
-    return .{
+    var self = @This(){
         .source_in = source_in,
-        .c = source_in.c,
-        .current_pos_number = 1,
+        .c = undefined,
+        .current_pos_number = undefined,
     };
+    self.reset();
+    return self;
+}
+
+pub fn reset(self: *@This()) void {
+    self.c = self.source_in.c;
+    self.current_pos_number = 1;
 }
 
 pub fn next(self: *@This()) void {
     self.source_in.next();
     self.current_pos_number += 1;
-    self.c = if (self.source_in.c) |c|
-        (if (c == '\n') null else c)
-    else
-        null;
+    self.c = switch (self.source_in.c orelse 0) {
+        '\n' => blk: {
+            self.source_in.next();
+            break :blk null;
+        },
+        '\r' => blk: {
+            self.source_in.next();
+            if (self.source_in.c == '\n') // Windows CRLF handling
+                self.source_in.next();
+            break :blk null;
+        },
+        else => self.source_in.c,
+    };
 }
 
 pub fn isAtWhitespaceOrEol(self: @This()) bool {

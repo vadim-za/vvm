@@ -13,13 +13,12 @@ labels: Labels,
 pc: u16,
 
 pub fn init(alloc: std.mem.Allocator, source_in: *SourceInput) @This() {
-    const line_in: LineInput = .init(source_in);
     return .{
         .source_in = source_in,
-        .line_in = line_in,
-        .current_line_number = 1,
+        .line_in = .init(source_in),
+        .current_line_number = undefined,
         .labels = .init(alloc),
-        .pc = 0,
+        .pc = undefined,
     };
 }
 
@@ -30,9 +29,18 @@ pub fn deinit(self: *const @This()) void {
 pub const Error = error{ SyntaxError, OutOfMemory };
 
 pub fn translate(self: *@This(), out: *PassOutput) Error!void {
-    if (try self.parseLine(out) == null)
-        return;
-    self.current_line_number += 1;
+    self.source_in.reset();
+    self.current_line_number = 1;
+    self.pc = 0;
+
+    while (true) : (self.current_line_number += 1) {
+        self.line_in.reset();
+        if (try self.parseLine(out) == null)
+            break;
+    }
+
+    if (out.underlying == null)
+        try self.labels.finalize(self);
 }
 
 fn parseLine(self: *@This(), out: *PassOutput) !?void {
