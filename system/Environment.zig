@@ -12,9 +12,12 @@ timer: Timer,
 
 // System is not fully initialized yet at the time of the call
 pub fn init(self: *@This(), system: *System) void {
+    const stdout = std.io.getStdOut();
+    _ = stdout.getOrEnableAnsiEscapeSupport();
+
     self.* = .{
         .system = system,
-        .output = std.io.getStdOut().writer().any(),
+        .output = stdout.writer().any(),
         .timer = .init(),
     };
 }
