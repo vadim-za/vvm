@@ -74,3 +74,8 @@ fn runTranslationPass(parser: *Parser, out: ?*ArrayListOutput) !void {
         return err;
     };
 }
+
+test "Test" {
+    // Ensure the other tests are performed
+    std.testing.refAllDecls(@This());
+}

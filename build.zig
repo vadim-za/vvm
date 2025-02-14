@@ -16,30 +16,12 @@ pub fn build(b: *std.Build) void {
         .optimize = optimize,
     });
 
-    const system = b.addExecutable(.{
-        .name = "vvm",
-        .root_source_file = b.path("system/main.zig"),
+    const Asm = b.createModule(.{
+        .root_source_file = b.path("asm/Asm.zig"),
         .target = target,
         .optimize = optimize,
     });
-    system.root_module.addImport("VvmCore", VvmCore);
-    b.installArtifact(system);
-
-    const system_tests = b.addTest(.{
-        .root_source_file = b.path("system/System.zig"),
-        .target = target,
-        .optimize = optimize,
-    });
-    system_tests.root_module.addImport("VvmCore", VvmCore);
-
-    const @"asm" = b.addExecutable(.{
-        .name = "vvmasm",
-        .root_source_file = b.path("asm/main.zig"),
-        .target = target,
-        .optimize = optimize,
-    });
-    @"asm".root_module.addImport("VvmCore", VvmCore);
-    b.installArtifact(@"asm");
+    Asm.addImport("VvmCore", VvmCore);
 
     const asm_tests = b.addTest(.{
         .root_source_file = b.path("asm/main.zig"),
@@ -48,12 +30,30 @@ pub fn build(b: *std.Build) void {
     });
     asm_tests.root_module.addImport("VvmCore", VvmCore);
 
+    const system = b.addExecutable(.{
+        .name = "vvm",
+        .root_source_file = b.path("system/main.zig"),
+        .target = target,
+        .optimize = optimize,
+    });
+    system.root_module.addImport("VvmCore", VvmCore);
+    system.root_module.addImport("Asm", Asm);
+    b.installArtifact(system);
+
+    const system_tests = b.addTest(.{
+        .root_source_file = b.path("system/System.zig"),
+        .target = target,
+        .optimize = optimize,
+    });
+    system_tests.root_module.addImport("VvmCore", VvmCore);
+    system_tests.root_module.addImport("Asm", Asm);
+
     const run_core_tests = b.addRunArtifact(core_tests);
-    const run_system_tests = b.addRunArtifact(system_tests);
     const run_asm_tests = b.addRunArtifact(asm_tests);
+    const run_system_tests = b.addRunArtifact(system_tests);
 
     const test_step = b.step("test", "Run unit tests");
     test_step.dependOn(&run_core_tests.step);
-    test_step.dependOn(&run_system_tests.step);
     test_step.dependOn(&run_asm_tests.step);
+    test_step.dependOn(&run_system_tests.step);
 }
