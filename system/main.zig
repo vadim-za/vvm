@@ -20,11 +20,21 @@ pub fn main() u8 {
         return 1;
     }
 
+    const source_file_path = args[1];
+    const max_steps = if (args.len >= 3) (std.fmt.parseInt(
+        usize,
+        args[2],
+        10,
+    ) catch {
+        std.debug.print("Second argument must be an integer", .{});
+        return 1;
+    }) else null;
+
     var translation_result: std.ArrayList(u8) = .init(alloc);
     defer translation_result.deinit();
     Asm.translateSourceFile(
         alloc,
-        args[1],
+        source_file_path,
         &translation_result,
     ) catch return 1;
     const code: []const u8 = translation_result.items;
@@ -37,7 +47,7 @@ pub fn main() u8 {
     const core = &system.core;
     @memcpy(core.memory[0..code.len], code);
     core.registers.pc = 0;
-    if (!system.run(1000))
+    if (!system.run(max_steps))
         std.debug.print("\nLooped\n", .{});
 
     return 0;
