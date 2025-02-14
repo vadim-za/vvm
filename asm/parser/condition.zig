@@ -5,19 +5,21 @@ const Parser = @import("../Parser.zig");
 fn parseConditionRegisterHere(parser: *Parser) u8 {
     const in = &parser.line_in;
 
-    var register_code: ?u8 = switch (in.c orelse 0) {
-        'H', 'h' => 1,
-        'L', 'l' => 0,
-        'X', 'x' => 3,
-        else => null,
-    };
-
-    if (register_code != null)
-        in.next()
-    else
-        register_code = 2; // accumulator
-
-    return register_code.?;
+    switch (in.c orelse 0) {
+        'H', 'h' => {
+            in.next();
+            return 1;
+        },
+        'L', 'l' => {
+            in.next();
+            return 0;
+        },
+        'X', 'x' => {
+            in.next();
+            return 3;
+        },
+        else => return 2, // accumulator
+    }
 }
 
 // This is an auxiliary function of parseCondition(), it return null on error
