@@ -22,6 +22,8 @@ fn parseOptionallyWhitespacedComma(parser: *Parser) !void {
 }
 
 pub fn translateCommandHere(command: Command, parser: *Parser, out: *PassOutput) !void {
+    parser.pc +%= @intFromEnum(command.bytes);
+
     const opcode: u8 = switch (command.variant_type) {
         .none => command.base_opcode,
         .byte_register => try register_parser.parseRegisterName(

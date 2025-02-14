@@ -10,6 +10,7 @@ source_in: *SourceInput,
 line_in: LineInput,
 current_line_number: usize,
 labels: Labels,
+pc: u16,
 
 pub fn init(alloc: std.mem.Allocator, source_in: *SourceInput) @This() {
     const line_in: LineInput = .init(source_in);
@@ -18,6 +19,7 @@ pub fn init(alloc: std.mem.Allocator, source_in: *SourceInput) @This() {
         .line_in = line_in,
         .current_line_number = 1,
         .labels = .init(alloc),
+        .pc = 0,
     };
 }
 

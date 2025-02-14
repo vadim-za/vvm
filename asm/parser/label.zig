@@ -44,7 +44,7 @@ pub fn parseLabelDefinitionHere(parser: *Parser) !void {
     try parser.labels.push(.{
         .stored_name = stored_name,
         .line = parser.current_line_number,
-        .addr = 0,
+        .addr = parser.pc,
     });
 }
 
@@ -126,4 +126,22 @@ test "Test Parse Label as Value" {
 
     const value = try tryParseLabelAsValueHere(&parser);
     try std.testing.expectEqual(1000, value);
+}
+
+test "Test Label Address" {
+    const SourceInput = @import("../SourceInput.zig");
+
+    var in = SourceInput.init("abc:");
+    var parser: Parser = .init(std.testing.allocator, &in);
+    defer parser.deinit();
+
+    parser.pc = 1000; // override current value
+    try parseLabelDefinitionHere(&parser);
+    try parser.labels.finalize(&parser);
+
+    const sn = Label.initStoredName;
+    try std.testing.expectEqual(
+        1000,
+        parser.labels.find(sn("abc")).?.addr,
+    );
 }
