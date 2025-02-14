@@ -14,9 +14,14 @@ pub fn main() u8 {
 
     var result: std.ArrayList(u8) = .init(alloc);
     defer result.deinit();
-    Asm.translateSource(
+    // Asm.translateSource(
+    //     alloc,
+    //     source,
+    //     &result,
+    // ) catch return 1;
+    Asm.translateSourceFile(
         alloc,
-        source,
+        "asm/examples/test.vvma",
         &result,
     ) catch return 1;
 
