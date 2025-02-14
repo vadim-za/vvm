@@ -15,20 +15,20 @@ pub fn main() u8 {
     };
     defer std.process.argsFree(alloc, args);
 
-    if (args.len < 2) {
-        std.debug.print("Argument expected\n", .{});
+    if (args.len < 3) {
+        const msg =
+            \\Usage: vvm command file.vvma
+            \\The following commands are supported:
+            \\    run[=max_steps]
+            \\    dump
+        ;
+        std.debug.print(msg, .{});
         return 1;
     }
 
-    const source_file_path = args[1];
-    const max_steps = if (args.len >= 3) (std.fmt.parseInt(
-        usize,
-        args[2],
-        10,
-    ) catch {
-        std.debug.print("Second argument must be an integer", .{});
-        return 1;
-    }) else null;
+    // parseCommand() prints the error, so we just return on error
+    const command = parseCommand(args[1]) catch return 1;
+    const source_file_path = args[2];
 
     const translation_result = Asm.translateSourceFile(
         alloc,
@@ -37,8 +37,14 @@ pub fn main() u8 {
     defer translation_result.deinit();
     const code: []const u8 = translation_result.items;
 
-    //std.debug.print("{x}\n", .{code});
+    switch (command) {
+        .run => |params| runCode(code, params.max_steps),
+        .dump => std.debug.print("{x}\n", .{code}),
+    }
+    return 0;
+}
 
+fn runCode(code: []const u8, max_steps: ?usize) void {
     var system: System = undefined;
     system.init();
 
@@ -47,8 +53,35 @@ pub fn main() u8 {
     core.registers.pc = 0;
     if (!system.run(max_steps))
         std.debug.print("\nLooped\n", .{});
+}
 
-    return 0;
+const Command = union(enum) {
+    run: struct { max_steps: ?usize },
+    dump: void,
+};
+
+fn parseCommand(arg: []const u8) !Command {
+    if (std.mem.startsWith(u8, arg, "run")) {
+        return .{ .run = .{
+            .max_steps = try parseEqInt(usize, arg[3..]),
+        } };
+    } else if (std.mem.order(u8, arg, "dump") == .eq) {
+        return .dump;
+    } else {
+        std.debug.print("Unknown command: {s}\n", .{arg});
+        return error.UnknownCommand;
+    }
+}
+
+fn parseEqInt(T: type, str: []const u8) !?T {
+    if (std.mem.startsWith(u8, str, "=")) {
+        return std.fmt.parseInt(T, str[1..], 10) catch |err| {
+            std.debug.print("Bad integer: {s}", .{str[1..]});
+            return err;
+        };
+    }
+
+    return null;
 }
 
 test "Test" {
