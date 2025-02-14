@@ -12,6 +12,17 @@ pub fn main() u8 {
     const alloc = gpa.allocator();
     defer _ = gpa.deinit();
 
+    const args = std.process.argsAlloc(alloc) catch {
+        std.debug.print("Failed to initialize", .{});
+        return 1;
+    };
+    defer std.process.argsFree(alloc, args);
+
+    if (args.len < 2) {
+        std.debug.print("Argument expected\n", .{});
+        return 1;
+    }
+
     var result: std.ArrayList(u8) = .init(alloc);
     defer result.deinit();
     // Asm.translateSource(
@@ -21,7 +32,7 @@ pub fn main() u8 {
     // ) catch return 1;
     Asm.translateSourceFile(
         alloc,
-        "asm/examples/test.vvma",
+        args[1], //"asm/examples/test.vvma",
         &result,
     ) catch return 1;
 
