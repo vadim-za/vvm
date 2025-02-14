@@ -3,7 +3,10 @@ const Asm = @import("Asm");
 const System = @import("System.zig");
 
 pub fn main() u8 {
-    //@import("examples/out_string.zig").run();
+    if (false) { // enable to run local example test
+        @import("examples/out_string.zig").run();
+        return 0;
+    }
 
     var gpa = std.heap.GeneralPurposeAllocator(.{}){};
     const alloc = gpa.allocator();
