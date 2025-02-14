@@ -1,0 +1,46 @@
+    lbv 12
+    arv PrntHexN
+    call
+    zero
+    ara
+    out
+
+; Print Hex Byte. Value to print is in W0
+; ---------------------------------------
+;PrntHexB:
+;    lwr w0
+;    ror
+;    ror
+;    ror
+;    ror
+;    xa ; SHR4'd value is in X
+;    lwv $F
+;    and ; high nibble in A
+;    arv PrntHexN
+;    call
+;    ???
+
+PrntHexN: ; print low hex nibble in A, clobber W1
+    xa
+    lwv $F
+    and ; [A] = nibble
+    stwr w1 ; nibble in A and W1
+    xa ; nibble in X and W1
+    lwv 10
+    xa
+    sub
+    arv PrntHxNA
+    jif xz
+    xa
+    lwv '0'+10 ; add 10 back
+    add
+    arv 1
+    out
+    ret
+PrntHxNA: ; A..F ([A] = nibble-10, clobber X,ADDR)
+    xa
+    lwv 'A'
+    add
+    arv 1
+    out
+    ret

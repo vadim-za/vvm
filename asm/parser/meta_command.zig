@@ -13,7 +13,7 @@ pub const meta_command_list = [_]ListEntry{
     .{ "DB", translateDb },
     .{ "DW", translateDw },
     .{ "DS", translateDs },
-    .{ "ORG", translateOrg },
+    //.{ "ORG", translateOrg }, // todo: prevent/handle labels
     .{ "REP", translateRep },
     // zig fmt: on
 };
