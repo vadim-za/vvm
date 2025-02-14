@@ -62,7 +62,7 @@ test "Test" {
         "lz", "lnz", "hz", "hnz", "z", "nz", "xz", "xnz",
         "LZ", "LNZ", "HZ", "HNZ", "Z", "NZ", "XZ", "XNZ",
     };
-    for (conditions, 0..) |source, index| {
+    for (&conditions, 0..) |source, index| {
         var in = SourceInput.init(source);
         var parser: Parser = .init(std.testing.allocator, &in);
         defer parser.deinit();
