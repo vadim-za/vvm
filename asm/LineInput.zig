@@ -1,3 +1,6 @@
+// The LineInput object is copyable, allowing to store and restore
+// the parsing position within the current line (used by .REP)
+
 const std = @import("std");
 const SourceInput = @import("SourceInput.zig");
 

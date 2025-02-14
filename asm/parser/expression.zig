@@ -52,9 +52,33 @@ fn tryParseUnsignedHexHere(parser: *Parser) !?ValueType {
         parser.raiseError(pos, "bad hexadecimal number", .{});
 }
 
+pub fn tryParseParenthesizedExpressionHere(parser: *Parser) !?ValueType {
+    const in = &parser.line_in;
+
+    if (in.c == '(')
+        in.next()
+    else
+        return null;
+
+    const value = try parseConstantExpression(parser);
+
+    parser.skipWhitespace();
+    const pos = in.current_pos_number;
+
+    if (in.c == ')')
+        in.next()
+    else
+        return parser.raiseError(pos, "')' expected", .{});
+
+    return value;
+}
+
 fn parseUnsignedConstantTermHere(parser: *Parser) !ValueType {
     const in = &parser.line_in;
     const pos = in.current_pos_number;
+
+    if (try tryParseParenthesizedExpressionHere(parser)) |value|
+        return value;
 
     if (try tryParseUnsignedDecimalHere(parser)) |value|
         return value;
@@ -96,7 +120,7 @@ fn parseConstantTerm(parser: *Parser) !ValueType {
     return if (negate) 0 -% value else value;
 }
 
-fn parseConstantExpression(parser: *Parser) !ValueType {
+fn parseConstantExpression(parser: *Parser) Parser.Error!ValueType {
     const in = &parser.line_in;
 
     var sum = try parseConstantTerm(parser);

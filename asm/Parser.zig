@@ -26,6 +26,26 @@ pub fn deinit(self: *const @This()) void {
     self.labels.deinit();
 }
 
+pub const StoredInputState = struct {
+    source_in: SourceInput,
+    line_in: LineInput,
+    current_line_number: usize,
+};
+
+pub fn storeInputState(self: @This()) StoredInputState {
+    return .{
+        .source_in = self.source_in.*,
+        .line_in = self.line_in,
+        .current_line_number = self.current_line_number,
+    };
+}
+
+pub fn restoreInputState(self: *@This(), stored: StoredInputState) void {
+    self.source_in.* = stored.source_in;
+    self.line_in = stored.line_in;
+    self.current_line_number = stored.current_line_number;
+}
+
 pub const Error = error{ SyntaxError, OutOfMemory };
 
 pub fn translate(self: *@This(), out: *PassOutput) Error!void {

@@ -8,11 +8,13 @@ const string_parser = @import("string.zig");
 const ListEntry = meta_commands.ListEntry;
 
 pub const meta_command_list = [_]ListEntry{
-    // zig fmt: off
-    .{ "DB",  translateDb },
-    .{ "DW",  translateDw },
-    .{ "DS",  translateDs },
+    // somehow 'zig fmt: on' below stopped working, so leave it on for now
+    // // zig fmt: off
+    .{ "DB", translateDb },
+    .{ "DW", translateDw },
+    .{ "DS", translateDs },
     .{ "ORG", translateOrg },
+    .{ "REP", translateRep },
     // zig fmt: on
 };
 
@@ -37,12 +39,49 @@ fn translateDw(parser: *Parser, out: *PassOutput) Parser.Error!void {
 fn translateDs(parser: *Parser, out: *PassOutput) Parser.Error!void {
     parser.skipWhitespace();
 
-    try string_parser.translateStringHere(parser,out);
+    try string_parser.translateStringHere(parser, out);
 }
 
 fn translateOrg(parser: *Parser, out: *PassOutput) Parser.Error!void {
     parser.pc = try expression_parser.parseConstantExpressionAs(parser, u16);
     _ = out;
+}
+
+fn translateRep(parser: *Parser, out: *PassOutput) Parser.Error!void {
+    const in = &parser.line_in;
+    const pos = in.current_pos_number;
+
+    const num_repetitions = (try expression_parser
+        .tryParseParenthesizedExpressionHere(parser)) orelse
+        return parser.raiseError(
+        pos,
+        "parethesized expression expected",
+        .{},
+    );
+
+    // We don't have an option of simply skipping the commands, therefore
+    // we cannot support zero repetitions. One can use comment feature instead.
+    if (num_repetitions == 0)
+        return parser.raiseError(
+            pos,
+            "number of repetitions must be greater than 0",
+            .{},
+        );
+
+    parser.skipWhitespace();
+
+    const stored_input_state = parser.storeInputState();
+    for (0..num_repetitions) |_| {
+        parser.restoreInputState(stored_input_state);
+        const pos_repeated = in.current_pos_number;
+
+        if (!try tryParseMetaCommandHere(parser, out))
+            return parser.raiseError(
+                pos_repeated,
+                "metacommand expected",
+                .{},
+            );
+    }
 }
 
 pub fn tryParseMetaCommandHere(parser: *Parser, out: *PassOutput) !bool {

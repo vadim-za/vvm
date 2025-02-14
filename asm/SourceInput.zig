@@ -1,3 +1,6 @@
+// The SourceInput object is copyable, allowing to store and restore
+// the parsing position (used by .REP)
+
 const std = @import("std");
 
 source: []const u8,
