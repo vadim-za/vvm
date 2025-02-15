@@ -8,10 +8,10 @@
     stsp
     lwv str
     stwr w0
-    lbv 90
+    lbv 91
     arv Prnt2d10
     call
-    arv str
+    arv str+1
     lbi
     xa
     lbv 1
@@ -25,8 +25,8 @@
 str: .rep (100) .db 0
 
 ; Print a 2-digit (up to 99) decimal number in L to [W0]
-; incrementing W0 by 1 or 2. Clobbers all regs
-; --------------------------------------------
+; incrementing W0 by 1 or 2. Returns updated W0. Clobbers all other regs
+; ----------------------------------------------------------------------
 Prnt2d10:
     zxbw
     arv Prnt2d1n
@@ -43,17 +43,42 @@ Prnt2d10:
     jif xnz ; 1 digit only
     lwr w1
     arv Div2d10
-    call
+    call ; W3 = div, W0 = rest
+    lwr w0
+    stwr w1 ; W1 = rest
     arv Prnt2d1p
     lwi
+    stwr w2
     ara
-    lbr b6
+    lbr b6 ; lob(W3)
     xa
     lbv '0'
     add
-    stbi
-    ret
-Prnt2d1b:
+    stbi ; [[Prnt2d1p]]=decimal char
+    lwr w2
+    xa
+    lwv 1
+    add
+    arv Prnt2d1p
+    stwi ; [Prnt2d1p]++
+Prnt2d1b: ; W1 = number or rest
+    lwr w1
+    xa
+    lbv '0'
+    add
+    xa ; X = decimal char
+    arv Prnt2d1p
+    lwi
+    stwr w2
+    ara
+    xa
+    stbi ; [[Prnt2d1p]]=decimal char
+    lwr w2
+    xa
+    lwv 1
+    add
+    arv Prnt2d1p
+    stwi ; [Prnt2d1p]++
     ret
 
 Prnt2d1n:   .dw 0
