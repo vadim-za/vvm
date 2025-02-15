@@ -50,6 +50,75 @@
     arv InitCatp
     call
 
+; move caterpillar head
+    ; draw body over head's position
+    arv CatpHX
+    lbi
+    stbr b0
+    arv CatpHY
+    lbi
+    stbr b2
+    arv SetCurXY
+    call
+    arv 1
+    lbv '#'
+    out
+    ; process direction
+    arv CatpDir
+    lbi
+    ror
+    xa
+    lwv 3
+    and
+    cxwx
+    add
+    stwr w3 ; backup direction*2 in W3
+    ; Update CatpHptr
+    xa
+    lwv Dir2Offs
+    add ; A = Dir2Offs + dir*2
+    ara
+    lwi ; A = [Dir2Offs + dir*2] = ptroffs
+    xa
+    arv CatpHptr
+    lwi
+    add
+    stwi ; [CatpHptr] = updated   TODO: check bumps
+    ; Update CatpHX
+    lwr w3 ; w3 = dir bits
+    xa
+    lwv Dir2Dx
+    add
+    ara
+    lwi ; A = dx
+    xa
+    arv CatpHX
+    lwi
+    add
+    stwi ; updated CatpHX
+    ; Update CatpHY
+    lwr w3 ; w3 = dir bits
+    xa
+    lwv Dir2Dy
+    add
+    ara
+    lwi ; A = dy
+    xa
+    arv CatpHY
+    lwi
+    add
+    stwi ; updated CatpHY
+    ; draw new head, L already contains x pos
+    stbr b2
+    arv CatpHX
+    lwi
+    stbr b0
+    arv SetCurXY
+    call
+    arv 1
+    lbv 'O'
+    out
+
     lwv 2
     ara
     in
@@ -68,19 +137,53 @@ ClsStr: ; cls string
     .ds '[2J'
     .db 0
 
+; Convert direction bit in LSB(A) to +/-1 in A, no clobbered registers
+Dir2Step:
+    xa
+    lwv 1
+    and ; only 1 bit
+    xa
+    zero
+    sub ; 0 => 0, 1 => FFFF
+    xa
+    lwv 1
+    or ;  0 => 0 => 1, 1 => FFFF => FFFF
+    ret
+
+; Direction translation
+Dir2Dx:
+    .dw 1
+    .dw 0
+    .dw -1
+    .dw 0
+Dir2Dy:
+    .dw 0
+    .dw 1
+    .dw 0
+    .dw -1
+Dir2Offs:
+    .dw 1
+    .dw 80
+    .dw -1
+    .dw -80
+
 ; The values must be synced with InitCatp
+CatpHptr: .dw field + 960 + 40
+CatpTptr: .dw field + 960 + 44
 CatpHX: .dw 40
 CatpHY: .dw 12
 CatpTX: .dw 44
 CatpTY: .dw 12
-CatpDir: .db 5 ; left
+CatpDir: .db 5 ; value to store in the field, 00000101 = left
+CatpDX: .dw -1
+CatpDY: .dw 0
 
 ; Initialize the caterpillar visually and in the field
-; The position must match Catp[H/T/D][X/Y/_] initial values
+; The position must match Catp... initial values
 InitCatp:
     lwv field + 960 + 41; 80*12 = 960
     stwr w0
-    lbv 5 ; left direction
+    lbv 5 ; left direction = 101
     stbr b2
     lwv 4 ; count
     stwr w2
