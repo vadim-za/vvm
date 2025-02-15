@@ -46,6 +46,9 @@
     arv DrwWallV
     call
 
+    arv InitCatp
+    call
+
     lwv 2
     ara
     in
@@ -75,6 +78,66 @@ ClsStr: ; cls string
     .db $1B
     .ds '[2J'
     .db 0
+
+; The values must be synced with InitCatp
+CatpHX: .dw 40
+CatpHY: .dw 12
+CatpTX: .dw 44
+CatpTY: .dw 12
+
+; Initialize the caterpillar visually and in the field
+; The position must match Catp[H/T][X/Y] initial values
+InitCatp:
+    lwv field + 960 + 41; 80*12 = 960
+    stwr w0
+    lbv 5 ; left direction
+    stbr b2
+    lwv 4 ; count
+    stwr w2
+InitCtpA:
+    lwr w0
+    ara
+    xa
+    lwv 1
+    add
+    stwr w0
+    lbr b2
+    stbi ; ADDR is still unchanged by W0 increment
+    lwv 1
+    xa
+    lwr w2
+    sub
+    stwr w2
+    arv InitCtpA
+    jif nz
+    ; now that we filled the data, let's draw the characters
+    lbv 40
+    stbr b0
+    lbv 12
+    stbr b2
+    arv SetCurXY
+    call
+    lwv 1
+    ara
+    lbv 'O'
+    out
+    ; drawing the tail
+    lwv 4 ; count
+    stwr w2
+InitCtpD:
+    lwv 1
+    ara
+    lbv '#'
+    out
+    lwv 1
+    xa
+    lwr w2
+    sub
+    stwr w2
+    arv InitCtpD
+    jif nz
+    ret
+
 
 ; Fills a wall. A = starting ptr in field. W1=count, W2=ptr step. Clobbers W0, W1
 FillWall:
@@ -400,7 +463,7 @@ PrintStx:
     ret
 
 ; body: 000000dd1 = tail
-;       dd bits point to next segmemt: 00 = right, 01 = down, 02 = left, 03 = up
+;       dd bits point to next segmemt: 00 = right, 01 = down, 10 = left, 11 = up
 ;       head does not use any specific value
 ; wall: 00000xx1  (xx bits can be anything)
 ; empty:  00000000
