@@ -7,12 +7,30 @@
     call
 
 ; fill walls
+    lwv 1
+    stwr w2
+    lwv 80
+    stwr w1
     lwv field
-    arv FllWallH
-    call
+    arv FillWall
+    call ; w2 is not clobbered
+    lwv 80
+    stwr w1
     lwv field + 1840 ; 80*23
-    arv FllWallH
-    ;call
+    arv FillWall
+    call
+    lwv 80
+    stwr w2
+    lwv 24
+    stwr w1
+    lwv field
+    arv FillWall
+    call ; w2 is not clobbered
+    lwv 24
+    stwr w1
+    lwv field + 79
+    arv FillWall
+    call
 
 ; draw walls
     zero
@@ -58,19 +76,17 @@ ClsStr: ; cls string
     .ds '[2J'
     .db 0
 
-; Fills horizontal wall. A = starting ptr in field. Clobbers W0, W1
-FllWallH:
+; Fills a wall. A = starting ptr in field. W1=count, W2=ptr step. Clobbers W0, W1
+FillWall:
     stwr w0 ; w0 = ptr
-    lwv 80
-    stwr w1 ; w1 = count
-FllWllHa:
+FillWlla:
     lwr w0
     ara
     lbv 7 ; wall bits
     stbi
     lwr w0
     xa
-    lwv 1
+    lwr w2
     add
     stwr w0
     lwv 1
@@ -78,7 +94,7 @@ FllWllHa:
     lwr w1
     sub
     stwr w1
-    arv FllWllHa
+    arv FillWlla
     jif lnz
     ret
 
