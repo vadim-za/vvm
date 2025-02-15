@@ -1,0 +1,104 @@
+    lbv 127
+    arv Div2d10
+    call
+    lwr w0
+    arv PrntHexB
+    call
+    zero
+    ara
+    out
+
+; Divide a 2-digit decimal number (actually up to 159) in L by 10
+; Result in W3, Rest in W0. Clobbers all regs
+; ---------------------------------------------------------------
+Div2d10:
+    zxbw    ; make sure we also handle byte inputs
+    stwr w0 ; w0 = long division source accumulator
+    lbv 80  ; use LBV since H is already 0 anyway
+    stwr w1 ; w1 = shifted divider
+    lbv 8
+    stwr w2 ; w2 = result bit
+    zero
+    stwr w3 ; w3 = result accumulator
+Div2d10l:
+    lwr w1
+    xa
+    lwr w0  ; A = source accum, X = shifted divider
+    sub
+    arv Div2d10s
+    jif xnz
+    stwr w0 ; store subtraction result back
+    lwr w2
+    xa
+    lwr w3
+    add
+    stwr w3 ; add to result
+Div2d10s:
+    lwr w1
+    zxwx
+    ror
+    stwr w1 ; divider >>= 1
+    lwr w2
+    ror ; no need to zero X, most of its bits are still zero
+    arv Div2d10e
+    jif z
+    stwr w2 ; result bit >>= 1
+    arv Div2d10l
+    jmp
+Div2d10e:
+    ret
+
+
+; Print Hex Word. Value to print is in A, clobber W0,W1
+; -----------------------------------------------------
+PrntHexW:
+    stwr w1
+    xhl
+    arv PrntHexB
+    call
+    lwr w1
+    arv PrntHexB
+    call
+    ret
+
+; Print Hex Byte. Value to print is in A, clobber W0
+; --------------------------------------------------
+PrntHexB:
+    zxbw
+    stwr w0
+    ror
+    ror
+    ror
+    ror
+    arv PrntHexN
+    call
+    lwr w0
+    arv PrntHexN
+    call
+    ret
+
+; Print Hex Nibble. Value to print is in lowest 4 bits of A
+; ---------------------------------------------------------
+PrntHexN:
+    xa
+    lwv $F
+    and ; [A] = nibble
+    xa ; nibble in X
+    lwv 10
+    xa
+    sub
+    arv PrntHxNA
+    jif xz
+    xa
+    lwv '0'+10 ; add 10 back
+    add
+    arv 1
+    out
+    ret
+PrntHxNA: ; A..F ([A] = nibble-10, clobber X,ADDR)
+    xa
+    lwv 'A'
+    add
+    arv 1
+    out
+    ret
