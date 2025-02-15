@@ -1,5 +1,41 @@
     zero
     stsp
+
+; clear screen
+    lwv ClsStr
+    arv PrintStr
+    call
+
+; draw upper wall
+    zero
+    stbr b0
+    stbr b2
+    arv SetCurXY
+    call
+    lbv '#'
+    stbr b0 ; fill char
+    lwv 80
+    stwr w1 ; count
+DrwWallU:
+    arv 1
+    lbr b0
+    out
+    lwv 1
+    xa
+    lwr w1
+    sub
+    stwr w1
+    arv DrwWallU
+    jif hz
+
+    lwv 2
+    ara
+    in
+
+    zero
+    ara
+    out
+
     lbv 5
     stbr b0
     stbr b2
@@ -17,7 +53,22 @@ str: .ds 'String'
     .db 0
     .rep (20) .db 0
 
+ClsStr: ; cls string
+    .db $1B
+    .ds '[2J'
+    .db 0
+
+; body: 000000dd1 = tail
+;       dd bits point to next segmemt: 00 = right, 01 = down, 02 = left, 03 = up
+;       head does not use any specific value
+; wall: 00000xx1  (xx bits can be anything)
+; empty:  00000000
+; pickup: 10000000
+; size 80x24
+field: .rep (1920) .db 0
+
 ; Set cursor position. b0=X, b2=Y. Clobbers all registers
+; -------------------------------------------------------
 SetCurXY:
     lbr b0
     arv SetCurX
@@ -25,6 +76,9 @@ SetCurXY:
     lwv SetCurS+2
     stwr w0
     lbr b2 ; A = Y, W0 = SetCurS+2
+    xa
+    lbv 1
+    add ; make 1-based
     arv Prnt2d10
     call ; W0 = incremented ptr
     lwr w0
@@ -38,6 +92,9 @@ SetCurXY:
     stwr w0
     arv SetCurX
     lbi ; A = X, W0 = ptr
+    xa
+    lbv 1
+    add ; make 1-based
     arv Prnt2d10
     call ; W0 = incremented ptr
     lwr w0
