@@ -28,6 +28,29 @@ DrwWallU:
     arv DrwWallU
     jif hz
 
+; draw lower wall
+    zero
+    stbr b0
+    lbv 23
+    stbr b2
+    arv SetCurXY
+    call
+    lbv '#'
+    stbr b0 ; fill char
+    lwv 80
+    stwr w1 ; count
+DrwWallL:
+    arv 1
+    lbr b0
+    out
+    lwv 1
+    xa
+    lwr w1
+    sub
+    stwr w1
+    arv DrwWallL
+    jif hz
+
     lwv 2
     ara
     in
