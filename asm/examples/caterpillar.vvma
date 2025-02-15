@@ -60,12 +60,14 @@
 ;  MAIN LOOP
 ; ----------------------------------------------------------------------
 MainLoop:
-    lbv 1
-    xa
     arv NeedPkup
     lbi
     arv NextPkup
     jif lz
+    cxbw
+    xa
+    lwv 1
+    xa
     sub ; X = 1
     arv NeedPkup
     stbi
@@ -73,17 +75,20 @@ MainLoop:
     jif lnz
 ; try placing a pickup
     arv PkupY ; to multiply by 80, let's first multiply by 10
-    lbi ; which we do as temp:=PkupY<<2, result:=(temp << 2) + temp
+    lbi ; which we do as temp:=PkupY<<1, result:=(temp << 2) + temp
     zxbw
     zxwx
-    rol
     rol
     stwr w0 ; temp
     rol
     rol
     xa
     lwr w0
-    add ; PkupY * 80
+    add ; PkupY * 10
+    zxwx
+    rol
+    rol
+    rol ; PkupY * 80
     xa
     arv PkupX
     lbi
@@ -103,7 +108,7 @@ MainLoop:
     arv NextPkup
     jmp
 MakePkup:
-    lbv 80
+    lbv $80
     arwr w0
     stbi ; write to the field
     arv PkupX
@@ -266,9 +271,9 @@ SkipKey:
 ; check for bump
     arv CatpHptr
     lwi
-    stbr b0
     ara
     lbi
+    stbr b0
     xa
     lbv 1
     and
