@@ -42,7 +42,8 @@ pub fn main() u8 {
 
     switch (command) {
         .run => |params| runCode(code, params.max_steps),
-        .dump => dump(code), //std.debug.print("{x}\n", .{code}),
+        .dump => dump(std.io.getStdOut().writer(), code) catch {},
+        //std.debug.print("{x}\n", .{code}),
     }
     return 0;
 }
@@ -58,47 +59,47 @@ fn runCode(code: []const u8, max_steps: ?usize) void {
         std.debug.print("\nLooped\n", .{});
 }
 
-fn dump(memory: []const u8) void {
+fn dump(writer: std.fs.File.Writer, memory: []const u8) !void {
     var addr: usize = 0;
     while (addr < memory.len) : (addr += 16) {
         if (addr >= 0x1_0000) {
-            std.debug.print("Memory chunk size exceeds 64K\n", .{});
+            try writer.print("Memory chunk size exceeds 64K\n", .{});
             break;
         }
 
-        std.debug.print("{X:0>4}: ", .{addr});
+        try writer.print("{X:0>4}: ", .{addr});
 
         var offset: usize = 0;
         while (offset < 8) : (offset += 1)
-            dumpByteAsHexAt(memory, addr + offset);
-        std.debug.print(" ", .{});
+            try dumpByteAsHexAt(writer, memory, addr + offset);
+        try writer.print(" ", .{});
         while (offset < 16) : (offset += 1)
-            dumpByteAsHexAt(memory, addr + offset);
+            try dumpByteAsHexAt(writer, memory, addr + offset);
 
-        std.debug.print(" ", .{});
+        try writer.print(" ", .{});
         offset = 0;
         while (offset < 16) : (offset += 1)
-            dumpByteAsCharAt(memory, addr + offset);
+            try dumpByteAsCharAt(writer, memory, addr + offset);
 
-        std.debug.print("\n", .{});
+        try writer.print("\n", .{});
     }
 }
 
-fn dumpByteAsHexAt(memory: []const u8, addr: usize) void {
+fn dumpByteAsHexAt(writer: std.fs.File.Writer, memory: []const u8, addr: usize) !void {
     if (addr < memory.len)
-        std.debug.print("{X:0>2} ", .{memory[addr]})
+        try writer.print("{X:0>2} ", .{memory[addr]})
     else
-        std.debug.print("   ", .{});
+        try writer.print("   ", .{});
 }
 
-fn dumpByteAsCharAt(memory: []const u8, addr: usize) void {
+fn dumpByteAsCharAt(writer: std.fs.File.Writer, memory: []const u8, addr: usize) !void {
     if (addr < memory.len) {
         const c = memory[addr];
         const printable = c < 0x7F and std.ascii.isPrint(c);
         const print_c = if (printable) c else '.';
-        std.debug.print("{c}", .{print_c});
+        try writer.print("{c}", .{print_c});
     } else {
-        std.debug.print(" ", .{});
+        try writer.print(" ", .{});
     }
 }
 
