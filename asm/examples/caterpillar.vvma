@@ -2,7 +2,7 @@
     stsp
     lwv str
     stwr w0
-    lbv 90
+    lbv 100
     arv Prnt2d10
     call
     lwr w0
@@ -18,11 +18,38 @@
 
 str: .rep (100) .db 0
 
+; Set cursor position. W0=X, W1=Y. Clobbers all registers
+SetCurXY:
+    lwr w0
+    arv SetCurX
+    stwi
+    lwv SetCurS+2
+    stwr w0
+    lwr w1
+SetCurX:
+    .dw 0
+SetCurS:
+    .db $1B
+    .ds '[00;00f'
+    .db 0
+
+
 ; Print a 2-digit (up to 99) decimal number in L to [W0]
 ; incrementing W0 by 1 or 2. Returns updated W0. Clobbers all other regs
 ; ----------------------------------------------------------------------
 Prnt2d10:
     zxbw
+    stwr w1
+    xa
+    lwv 100
+    xa
+    sub ; XA = num-100
+    arv Prnt2d1r
+    jif nz
+    lwv 99  ; clamp to 99
+    stwr w1
+Prnt2d1r:
+    lwr w1
     arv Prnt2d1n
     stwi ; [Prnt2d1n]=number
     stwr w1 ; w1 = number
