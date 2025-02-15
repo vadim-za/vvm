@@ -438,14 +438,19 @@ ClsStr: ; cls string
 
 KaBoomSt:
     .db $1B
-    .ds '[13;38f'
-    .ds 'KABOOM!'
+    .ds '[13;30f'
+    .ds 'KABOOM! Press Enter'
     .db 0
 
 KaBoom:
     lwv KaBoomSt
     arv PrintStr
     call
+    arv 2
+    zero
+    out ; disable realtime keyboard
+    arv 1
+    in
     zero
     ara
     out
