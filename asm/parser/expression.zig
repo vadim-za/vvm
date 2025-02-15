@@ -151,7 +151,7 @@ fn parseConstantExpression(parser: *Parser) Parser.Error!ValueType {
 
 pub fn parseConstantExpressionAs(parser: *Parser, T: type) !T {
     return @truncate(
-        parseConstantExpression(parser) catch |err| return err,
+        try parseConstantExpression(parser),
     );
 }
 
