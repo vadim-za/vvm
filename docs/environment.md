@@ -14,7 +14,7 @@ The virtual system provides the command line tool containing the cross-assembler
 
 ### Port 1: Console output
 
-Byte values written to this port are sent to the console output (stdout).
+Byte values written to this port are sent to the console output (stdout). The standard environment will attempt to support ANSI escape sequences.
 
 ### Port 2: Keyboard control
 
