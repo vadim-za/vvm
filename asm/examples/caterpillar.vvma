@@ -176,7 +176,7 @@ NextPkup:
     stbi
 
 ReadKey:
-    lwv 2
+    lwv 1
     ara
     in
     stbr b0

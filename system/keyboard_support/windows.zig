@@ -1,5 +1,26 @@
 const std = @import("std");
 
+var input_mode: u8 = 0;
+
+pub fn setInputMode(mode: u8) void {
+    input_mode = mode;
+}
+
+pub fn getInputMode() u8 {
+    return input_mode & 1; // other bits always zero
+}
+
+pub fn readKey() u8 {
+    if (input_mode == 1) {
+        return getKeyboardInput(false);
+    } else {
+        const reader = std.io.getStdIn().reader();
+        return reader.readByte() catch 0;
+    }
+}
+
+// ---------------------------------------------------------------------
+
 extern "kernel32" fn ReadConsoleInputExW(
     hConsoleInput: std.os.windows.HANDLE,
     lpBuffer: [*]INPUT_RECORD,
@@ -31,7 +52,7 @@ const KEY_EVENT_RECORD = extern struct {
 var hStdIn: ?std.os.windows.HANDLE = null;
 
 // Zero return value means no input or unrecognized input
-pub fn getKeyboardInput(wait: bool) u8 {
+fn getKeyboardInput(wait: bool) u8 {
     // Acquire hStdIn
     if (hStdIn == null) {
         if (std.os.windows.GetStdHandle(std.os.windows.STD_INPUT_HANDLE)) |h|
