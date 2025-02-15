@@ -1,12 +1,65 @@
-    lbv 127
-    arv Div2d10
+;    lbv 127
+;    arv Div2d10
+;    call
+;    lwr w0
+;    arv PrntHexB
+;    call
+    zero
+    stsp
+    lwv str
+    stwr w0
+    lbv 90
+    arv Prnt2d10
     call
-    lwr w0
-    arv PrntHexB
-    call
+    arv str
+    lbi
+    xa
+    lbv 1
+    ara
+    xa
+    out
     zero
     ara
     out
+
+str: .rep (100) .db 0
+
+; Print a 2-digit (up to 99) decimal number in L to [W0]
+; incrementing W0 by 1 or 2. Clobbers all regs
+; --------------------------------------------
+Prnt2d10:
+    zxbw
+    arv Prnt2d1n
+    stwi ; [Prnt2d1n]=number
+    stwr w1 ; w1 = number
+    arv Prnt2d1p
+    stwi ; [Prnt2d1p]=W0
+    lwr w1
+    xa
+    lwv 10
+    sub
+    arv Prnt2d1b
+    jif xnz ; 1 digit only
+    lwr w1
+    arv Div2d10
+    call
+        arv PrntHexB
+        call
+        zero
+        ara
+        out
+    xa
+    arv Prnt2d1p
+    lwi
+    ara
+    xa
+    stbi
+    ret
+Prnt2d1b:
+    ret
+
+Prnt2d1n:   .dw 0
+Prnt2d1p:   .dw 0
 
 ; Divide a 2-digit decimal number (actually up to 159) in L by 10
 ; Result in W3, Rest in W0. Clobbers all regs

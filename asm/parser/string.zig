@@ -49,14 +49,14 @@ pub fn translateStringHere(parser: *Parser, out: *PassOutput) !void {
         return parser.raiseError(pos, "String literal expected", .{});
 
     while (in.c != '\'') {
-        if (in.c) |c|
-            try out.writeByte(c, parser)
-        else
-            return parser.raiseError(
-                pos,
-                "Unterminated string literal",
-                .{},
-            );
+        if (in.c) |c| {
+            parser.pc +%= 1;
+            try out.writeByte(c, parser);
+        } else return parser.raiseError(
+            pos,
+            "Unterminated string literal",
+            .{},
+        );
 
         in.next();
     }

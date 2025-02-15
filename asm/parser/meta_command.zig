@@ -21,6 +21,7 @@ pub const meta_command_list = [_]ListEntry{
 fn translateDb(parser: *Parser, out: *PassOutput) Parser.Error!void {
     parser.skipWhitespace();
 
+    parser.pc +%= 1;
     try out.writeByte(
         try expression_parser.parseConstantExpressionAs(parser, u8),
         parser,
@@ -30,6 +31,7 @@ fn translateDb(parser: *Parser, out: *PassOutput) Parser.Error!void {
 fn translateDw(parser: *Parser, out: *PassOutput) Parser.Error!void {
     parser.skipWhitespace();
 
+    parser.pc +%= 2;
     try out.writeWord(
         try expression_parser.parseConstantExpressionAs(parser, u16),
         parser,
