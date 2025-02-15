@@ -1,10 +1,10 @@
 const std = @import("std");
 
-pub fn setInputMode(mode: u8) void {
+pub fn setInputMode(mode: u4) void {
     _ = mode;
 }
 
-pub fn getInputMode() u8 {
+pub fn getInputMode() u4 {
     return 0; // doesn't support any extra modes
 }
 

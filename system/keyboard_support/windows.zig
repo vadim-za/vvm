@@ -1,12 +1,12 @@
 const std = @import("std");
 
-var input_mode: u8 = 0;
+var input_mode: u4 = 0;
 
-pub fn setInputMode(mode: u8) void {
+pub fn setInputMode(mode: u4) void {
     input_mode = mode;
 }
 
-pub fn getInputMode() u8 {
+pub fn getInputMode() u4 {
     return input_mode & 1; // other bits always zero
 }
 

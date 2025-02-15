@@ -13,7 +13,7 @@
     xa
     lbv 1
     and
-    arv Cls
+    arv ChkAnsi
     jif lnz
     lwv NoRtKey
     arv PrintStr
@@ -25,6 +25,24 @@ NoRtKey:
     .ds 'This game cannot run: the host does not support realtime keyboard input'
     .db 10
     .db 0
+NoAnsi:
+    .ds 'This game cannot run: the host does not support ANSI control codes'
+    .db 10
+    .db 0
+
+ChkAnsi:
+    arv 2
+    in
+    zxbw
+    rol
+    arv Cls
+    jif hnz
+    lwv NoAnsi
+    arv PrintStr
+    call
+    zero
+    ara
+    out
 
 ; clear screen
 Cls:

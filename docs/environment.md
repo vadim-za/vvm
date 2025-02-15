@@ -16,7 +16,9 @@ The virtual system provides the command line tool containing the cross-assembler
 
 Byte values written to this port are sent to the console output (stdout). The standard environment will attempt to support ANSI escape sequences.
 
-### Port 2: Keyboard control
+### Port 2: Console control
+
+The lowest significant bit controls the realtime keyboard mode.
 
 | Value | Command semantics |
 | ----- | ----------------- |
@@ -24,6 +26,9 @@ Byte values written to this port are sent to the console output (stdout). The st
 | 1 | realtime keyboard mode (see [Console input](#port-1-console-input)) |
 
 The realtime keyboard mode is currently only supported on Windows. Feel free to provide support for other operating systems in your own derived projects, which can be done by putting more files into [`keyboard_support` folder](system/keyboard_support) and adjusting the `keyboard_support` decl at the top of [`Environment.zig`](system/Environment.zig) or your own environment file.
+
+- The bits 1-3 are reserved for further keyboard/console input features.
+- The bits 4-7 are reserved for console output features.
 
 ### Port 3: Timer control
 
@@ -43,9 +48,12 @@ The byte values read from this port correspond to the contents of the console in
 
 Some host environments (currently Windows) also support realtime mode, where the `IN` command will return zero if there is nothing in the buffer (without halting the processor).
 
-### Port 2: Keyboard mode
+### Port 2: Console  mode
 
-The value read from this port indicates whether realtime keyboard mode has been successfully set (lowest significant bit is set) or not (lowest significant bit is reset). Other bits of the value are reserved for the future and should not be checked.
+- The bit 0 of the value read from this port indicates whether realtime keyboard mode has been successfully set (lowest significant bit is set) or not (lowest significant bit is reset).
+- The bit 7 indicates the availability of the ANSI control codes in the console output.
+
+Other bits of the value are reserved for the future and should not be checked. The bits 1-3 are reserved for further keyboard/console input features. The bits 4-6 are reserved for further console output features.
 
 ## Readonly memory
 
