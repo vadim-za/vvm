@@ -1,9 +1,15 @@
+// Do not make large modifications to this file
+// Instead supply your own file, e.g.
+//      const Environment = @import("MyEnvironment.zig");
+// at the top of System.zig
+
 const std = @import("std");
 const VvmCore = @import("VvmCore");
 const System = @import("System.zig");
 const Timer = @import("timer.zig").SystemTimer;
 const builtin = @import("builtin");
 const keyboard_support = switch (builtin.os.tag) {
+    // You can provide realtime support for other systems here if you need to
     .windows => @import("keyboard_support/windows.zig"), // realtime input support
     else => @import("keyboard_support/default.zig"), // no realtime input support
 };

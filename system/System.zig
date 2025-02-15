@@ -1,5 +1,7 @@
 const std = @import("std");
 const VvmCore = @import("VvmCore");
+
+// You can supply your own environment here instead
 const Environment = @import("Environment.zig");
 
 core: VvmCore,
