@@ -21,7 +21,7 @@ Further details can be taken from:
 - [Assembler docs](docs/assembler.md)
 - [Assembler examples](asm/examples/)
 - [Command line docs](docs/command_line.md)
-- [Caterpillar game](asm/examples/caterpillar.vvma) written in the VVM assembler. Use `vvm run caterpillar.vvma` to try (you might need to supply relative paths to the file names and or the `vvm` file's extension) to try. Use `j`, `k`, `l`, `i` keys (lowercase only) to control.
+- [Caterpillar game](asm/examples/caterpillar.vvma) written in the VVM assembler. Use `vvm run caterpillar.vvma` to try (you might need to supply relative paths to the file names and or the `vvm` file's extension). Use `j`, `k`, `l`, `i` keys (lowercase only) to control.
 
 NB. The *caterpillar game* requires the host to support realtime keyboard support which is currently only available on Windows systems. It should be however pretty easy to provide this support on other systems (provided the systems themselves support this input mode). See `keyboard_support` declaration at the top of [system/Environment.zig](system/Environment.zig)
 
