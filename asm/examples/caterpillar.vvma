@@ -6,6 +6,14 @@
     arv PrintStr
     call
 
+; fill walls
+    lwv field
+    arv FllWallH
+    call
+    lwv field + 1840 ; 80*23
+    arv FllWallH
+    ;call
+
 ; draw walls
     zero
     arv DrwWallH
@@ -49,6 +57,30 @@ ClsStr: ; cls string
     .db $1B
     .ds '[2J'
     .db 0
+
+; Fills horizontal wall. A = starting ptr in field. Clobbers W0, W1
+FllWallH:
+    stwr w0 ; w0 = ptr
+    lwv 80
+    stwr w1 ; w1 = count
+FllWllHa:
+    lwr w0
+    ara
+    lbv 7 ; wall bits
+    stbi
+    lwr w0
+    xa
+    lwv 1
+    add
+    stwr w0
+    lwv 1
+    xa
+    lwr w1
+    sub
+    stwr w1
+    arv FllWllHa
+    jif lnz
+    ret
 
 ; Draws horizontal wall. A = vertical pos. Clobbers all registers
 DrwWallH:
