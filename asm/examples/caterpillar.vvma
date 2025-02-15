@@ -308,9 +308,25 @@ SkipKey:
     lbv 3
     arv NeedPkup
     stbi
+    lbv 4
+    arv Grow
+    stbi
 
 ; move caterpillar tail
 MoveTail:
+    lbv 1
+    xa
+    arv Grow
+    lbi
+    arv NoGrow
+    jif lz
+    zxbw
+    sub ; X = 1
+    arv Grow
+    stbi
+    arv SkipTail
+    jmp
+NoGrow:
     ; erase tail on the screen
     arv CatpTX
     lwi
@@ -374,6 +390,7 @@ MoveTail:
     add
     stwi ; updated CatpTY
 
+SkipTail:
     arv MainLoop
     jmp
 
@@ -431,6 +448,7 @@ CatpDY: .dw 0
 NeedPkup: .db 3
 PkupX: .db 50
 PkupY: .db 10
+Grow:  .db 0
 
 ; Initialize the caterpillar visually and in the field
 ; The position must match Catp... initial values
