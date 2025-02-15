@@ -146,7 +146,7 @@ SkipKey:
     arv CatpHptr
     lwi
     add
-    stwi ; [CatpHptr] = updated   TODO: check bumps
+    stwi ; [CatpHptr] = updated
     ; Update CatpHX
     lwr w3 ; w3 = dir bits
     xa
@@ -181,6 +181,17 @@ SkipKey:
     arv 1
     lbv 'O'
     out
+; check for bump
+    arv CatpHptr
+    lwi
+    ara
+    lbi
+    xa
+    lbv 1
+    and
+    arv KaBoom
+    jif lnz
+
 ; move caterpillar tail
     ; erase tail on the screen
     arv CatpTX
@@ -262,18 +273,19 @@ ClsStr: ; cls string
     .ds '[2J'
     .db 0
 
-; Convert direction bit in LSB(A) to +/-1 in A, no clobbered registers
-Dir2Step:
-    xa
-    lwv 1
-    and ; only 1 bit
-    xa
+KaBoomSt:
+    .db $1B
+    .ds '[13;38f'
+    .ds 'KABOOM!'
+    .db 0
+
+KaBoom:
+    lwv KaBoomSt
+    arv PrintStr
+    call
     zero
-    sub ; 0 => 0, 1 => FFFF
-    xa
-    lwv 1
-    or ;  0 => 0 => 1, 1 => FFFF => FFFF
-    ret
+    ara
+    out
 
 ; Direction translation
 Dir2Dx:
