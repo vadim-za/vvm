@@ -6,50 +6,13 @@
     arv PrintStr
     call
 
-; draw upper wall
+; draw walls
     zero
-    stbr b0
-    stbr b2
-    arv SetCurXY
+    arv DrwWallH
     call
-    lbv '#'
-    stbr b0 ; fill char
-    lwv 80
-    stwr w1 ; count
-DrwWallU:
-    arv 1
-    lbr b0
-    out
-    lwv 1
-    xa
-    lwr w1
-    sub
-    stwr w1
-    arv DrwWallU
-    jif hz
-
-; draw lower wall
-    zero
-    stbr b0
     lbv 23
-    stbr b2
-    arv SetCurXY
+    arv DrwWallH
     call
-    lbv '#'
-    stbr b0 ; fill char
-    lwv 80
-    stwr w1 ; count
-DrwWallL:
-    arv 1
-    lbr b0
-    out
-    lwv 1
-    xa
-    lwr w1
-    sub
-    stwr w1
-    arv DrwWallL
-    jif hz
 
     lwv 2
     ara
@@ -80,6 +43,30 @@ ClsStr: ; cls string
     .db $1B
     .ds '[2J'
     .db 0
+
+; Draws horizontal wall. A = vertical pos. Clobbers all registers
+DrwWallH:
+    stbr b2
+    zero
+    stbr b0
+    arv SetCurXY
+    call
+    lbv '#'
+    stbr b0 ; fill char
+    lwv 80
+    stwr w1 ; count
+DrwWlHa:
+    arv 1
+    lbr b0
+    out
+    lwv 1
+    xa
+    lwr w1
+    sub
+    stwr w1
+    arv DrwWlHa
+    jif hz
+    ret
 
 ; body: 000000dd1 = tail
 ;       dd bits point to next segmemt: 00 = right, 01 = down, 02 = left, 03 = up
