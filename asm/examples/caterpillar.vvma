@@ -50,7 +50,60 @@
     arv InitCatp
     call
 
+    lwv 2
+    ara
+    lbv 1
+    out
+
 MoveCatp:
+    lwv 2
+    ara
+    in
+    stbr b0
+    xa
+    lbv 'l'
+    sub
+    arv PressedR
+    jif lz
+    lbr b0
+    xa
+    lbv 'k'
+    sub
+    arv PressedD
+    jif lz
+    lbr b0
+    xa
+    lbv 'j'
+    sub
+    arv PressedL
+    jif lz
+    lbr b0
+    xa
+    lbv 'i'
+    sub
+    arv PressedU
+    jif lz
+    arv MoveCatp ; SkipKey
+    jmp
+PressedR:
+    lbv 1
+    arv StoreDir
+    jmp
+PressedD:
+    lbv 3
+    arv StoreDir
+    jmp
+PressedL:
+    lbv 5
+    arv StoreDir
+    jmp
+PressedU:
+    lbv 7
+StoreDir:
+    arv CatpDir
+    stbi
+
+SkipKey:
 ; move caterpillar head
     ; draw body over head's position
     arv CatpHX
@@ -156,6 +209,7 @@ MoveCatp:
     zero
     stbi ; erase tail (ADDR still untouched)
     ; update TailHptr
+    lwr w3
     xa
     lwv Dir2Offs
     add ; A = Dir2Offs + dir*2
@@ -191,9 +245,6 @@ MoveCatp:
     add
     stwi ; updated CatpTY
 
-    lwv 2
-    ara
-    in
     arv MoveCatp
     jmp
 
