@@ -51,15 +51,29 @@
     call
 
 ; setup realtime keyboard
-    lwv 2
-    ara
+    arv 2
     lbv 1
+    out
+
+; setup timer
+    arv 3
+    zero
+    out ; reset timer
+    arv 0
+    lbv 2
+    out ; reset timer
+    arv 3
+    lbv $30
     out
 
 ; ----------------------------------------------------------------------
 ;  MAIN LOOP
 ; ----------------------------------------------------------------------
 MainLoop:
+    arv 0
+    lbv 2
+    out ; wait
+
     arv NeedPkup
     lbi
     arv NextPkup
@@ -189,7 +203,8 @@ ReadKey:
     sub
     arv PressedU
     jif lz
-    arv ReadKey ; SkipKey
+    arv SkipKey
+    ;arv ReadKey ; use to wait for each key during debugging
     jmp
 PressedR:
     lbv 1
