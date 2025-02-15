@@ -1,9 +1,3 @@
-;    lbv 127
-;    arv Div2d10
-;    call
-;    lwr w0
-;    arv PrntHexB
-;    call
     zero
     stsp
     lwv str
@@ -11,13 +5,16 @@
     lbv 91
     arv Prnt2d10
     call
-    arv str+1
-    lbi
+    lwr w0
     xa
-    lbv 1
+    lwv 1
+    add
     ara
-    xa
-    out
+    zero
+    stbi
+    lwv str
+    arv PrintStr
+    call
     zero
     ara
     out
@@ -177,4 +174,23 @@ PrntHxNA: ; A..F ([A] = nibble-10, clobber X,ADDR)
     add
     arv 1
     out
+    ret
+
+; Print zero-terminated string pointed to by A. Clobbers W1, W0
+; -------------------------------------------------------------
+PrintStr:
+    stwr w1 ; W1 = running_ptr
+    ara
+    lbi
+    arv PrintStx
+    jif lz
+    arwr w0 ; ADDR = $0001
+    out
+    lwr w1 ; A = running_ptr
+    cxwx ; X = running_ptr
+    lwr w0 ; A = 1
+    add ; A = ++running ptr
+    arv PrintStr
+    jmp
+PrintStx:
     ret
