@@ -50,12 +50,79 @@
     arv InitCatp
     call
 
+; setup realtime keyboard
     lwv 2
     ara
     lbv 1
     out
 
-MoveCatp:
+; ----------------------------------------------------------------------
+;  MAIN LOOP
+; ----------------------------------------------------------------------
+MainLoop:
+    arv NeedPkup
+    lbi
+    arv ReadKey
+    jif lz
+    xa
+    lbv 1
+    sub
+    arv NeedPkup
+    stbi
+    arv ReadKey
+    jif lnz
+; try placing a pickup
+    arv PkupY ; to multiply by 80, let's first multiply by 10
+    lbi ; which we do as temp:=PkupY<<2, result:=(temp << 2) + temp
+    zxbw
+    zxwx
+    rol
+    rol
+    stwr w0 ; temp
+    rol
+    rol
+    xa
+    lwr w0
+    add ; PkupY * 80
+    xa
+    arv PkupX
+    lbi
+    zxbw
+    add ; PkupY * 80 + PkupX
+    xa
+    lwv field
+    add ; A = pickup address = field + PkupY * 80 + PkupX
+    stwr w0 ; w0 = pickup address
+    ara
+    lbi ; read from position
+    xa
+    lbv 1
+    and
+    arv MakePkup
+    jif lz ; free to place
+    lbv 1
+    arv NeedPkup
+    stwi ; reschedule on next step
+    arv NextPkup
+    jmp
+MakePkup:
+    lbv 80
+    arwr w0
+    stbi ; write to the field
+    arv PkupX
+    lbi
+    stbr b0
+    arv PkupY
+    lbi
+    stbr b2
+    arv SetCurXY
+    call
+    arv 1
+    lbv '@'
+    out ; draw on the screen
+NextPkup:
+
+ReadKey:
     lwv 2
     ara
     in
@@ -83,7 +150,7 @@ MoveCatp:
     sub
     arv PressedU
     jif lz
-    arv MoveCatp ; SkipKey
+    arv ReadKey ; SkipKey
     jmp
 PressedR:
     lbv 1
@@ -256,17 +323,13 @@ SkipKey:
     add
     stwi ; updated CatpTY
 
-    arv MoveCatp
+    arv MainLoop
     jmp
 
     zero
     ara
     out
 
-
-str: .ds 'String'
-    .db 0
-    .rep (20) .db 0
 
 ClsStr: ; cls string
     .db $1B
@@ -314,6 +377,9 @@ CatpTY: .dw 12
 CatpDir: .db 5 ; value to store in the field, 00000101 = left
 CatpDX: .dw -1
 CatpDY: .dw 0
+NeedPkup: .db 1
+PkupX: .db 50
+PkupY: .db 10
 
 ; Initialize the caterpillar visually and in the field
 ; The position must match Catp... initial values
