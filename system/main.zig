@@ -42,7 +42,7 @@ pub fn main() u8 {
 
     switch (command) {
         .run => |params| runCode(code, params.max_steps),
-        .dump => std.debug.print("{x}\n", .{code}),
+        .dump => dump(code), //std.debug.print("{x}\n", .{code}),
     }
     return 0;
 }
@@ -57,6 +57,52 @@ fn runCode(code: []const u8, max_steps: ?usize) void {
     if (!system.run(max_steps))
         std.debug.print("\nLooped\n", .{});
 }
+
+fn dump(memory: []const u8) void {
+    var addr: usize = 0;
+    while (addr < memory.len) : (addr += 16) {
+        if (addr >= 0x1_0000) {
+            std.debug.print("Memory chunk size exceeds 64K\n", .{});
+            break;
+        }
+
+        std.debug.print("{X:0>4}: ", .{addr});
+
+        var offset: usize = 0;
+        while (offset < 8) : (offset += 1)
+            dumpByteAsHexAt(memory, addr + offset);
+        std.debug.print(" ", .{});
+        while (offset < 16) : (offset += 1)
+            dumpByteAsHexAt(memory, addr + offset);
+
+        std.debug.print(" ", .{});
+        offset = 0;
+        while (offset < 16) : (offset += 1)
+            dumpByteAsCharAt(memory, addr + offset);
+
+        std.debug.print("\n", .{});
+    }
+}
+
+fn dumpByteAsHexAt(memory: []const u8, addr: usize) void {
+    if (addr < memory.len)
+        std.debug.print("{X:0>2} ", .{memory[addr]})
+    else
+        std.debug.print("   ", .{});
+}
+
+fn dumpByteAsCharAt(memory: []const u8, addr: usize) void {
+    if (addr < memory.len) {
+        const c = memory[addr];
+        const printable = c < 0x7F and std.ascii.isPrint(c);
+        const print_c = if (printable) c else '.';
+        std.debug.print("{c}", .{print_c});
+    } else {
+        std.debug.print(" ", .{});
+    }
+}
+
+// ------------------------------------------------------------------------------
 
 const Command = union(enum) {
     run: struct { max_steps: ?usize },
