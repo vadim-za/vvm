@@ -14,7 +14,9 @@
     arv DrwWallH
     call
     zero
-    lbv 85
+    arv DrwWallV
+    call
+    lbv 79
     arv DrwWallV
     call
 
@@ -69,7 +71,7 @@ DrwWllHa:
     sub
     stwr w1
     arv DrwWllHa
-    jif hz
+    jif lnz
     ret
 
 ; Draws vertical wall. A = horizontal pos. Clobbers all registers
@@ -95,7 +97,7 @@ DrwWllVa:
     sub
     stwi
     arv DrwWllVe
-    jif hnz
+    jif lz
     lwv CursorLD
     arv PrintStr
     call
