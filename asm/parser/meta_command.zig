@@ -13,7 +13,7 @@ pub const meta_command_list = [_]ListEntry{
     .{ "DB", translateDb },
     .{ "DW", translateDw },
     .{ "DS", translateDs },
-    //.{ "ORG", translateOrg }, // todo: prevent/handle labels
+    .{ "ORG", translateOrg },
     .{ "REP", translateRep },
     // zig fmt: on
 };
@@ -43,7 +43,9 @@ fn translateDs(parser: *Parser, out: *PassOutput) Parser.Error!void {
 }
 
 fn translateOrg(parser: *Parser, out: *PassOutput) Parser.Error!void {
-    parser.pc = try expression_parser.parseConstantExpressionAs(parser, u16);
+    // Don't allow labels, since they are not known during the first pass
+    // Currently we also do not allow other expressions.
+    parser.pc = try parseLiteralHere(parser);
     _ = out;
 }
 
@@ -51,13 +53,17 @@ fn translateRep(parser: *Parser, out: *PassOutput) Parser.Error!void {
     const in = &parser.line_in;
     const pos = in.current_pos_number;
 
-    const num_repetitions = (try expression_parser
-        .tryParseParenthesizedExpressionHere(parser)) orelse
+    // Don't allow labels, since they are not known during the first pass
+    // Currently we also do not allow other expressions.
+    const num_repetitions = try parseParenthesizedLiteralHere(parser);
+
+    if (!in.isAtWhitespace())
         return parser.raiseError(
-        pos,
-        "parethesized expression expected",
-        .{},
-    );
+            pos,
+            "whitespace expected",
+            .{},
+        );
+    parser.skipWhitespace();
 
     // We don't have an option of simply skipping the commands, therefore
     // we cannot support zero repetitions. One can use comment feature instead.
@@ -67,8 +73,6 @@ fn translateRep(parser: *Parser, out: *PassOutput) Parser.Error!void {
             "number of repetitions must be greater than 0",
             .{},
         );
-
-    parser.skipWhitespace();
 
     const stored_input_state = parser.storeInputState();
     for (0..num_repetitions) |_| {
@@ -82,6 +86,37 @@ fn translateRep(parser: *Parser, out: *PassOutput) Parser.Error!void {
                 .{},
             );
     }
+}
+
+fn parseLiteralHere(parser: *Parser) !u16 {
+    const in = &parser.line_in;
+    const pos = in.current_pos_number;
+
+    return (try expression_parser.tryParseLiteralHere(parser)) orelse
+        return parser.raiseError(pos, "literal expected", .{});
+}
+
+fn parseParenthesizedLiteralHere(parser: *Parser) !u16 {
+    const in = &parser.line_in;
+    const pos = in.current_pos_number;
+
+    if (in.c == '(')
+        in.next()
+    else
+        return parser.raiseError(pos, "'(' expected", .{});
+
+    parser.skipWhitespace();
+    const value = try parseLiteralHere(parser);
+
+    parser.skipWhitespace();
+    const pos_after = in.current_pos_number;
+
+    if (in.c == ')')
+        in.next()
+    else
+        return parser.raiseError(pos_after, "')' expected", .{});
+
+    return value;
 }
 
 pub fn tryParseMetaCommandHere(parser: *Parser, out: *PassOutput) !bool {

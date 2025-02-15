@@ -52,7 +52,7 @@ fn tryParseUnsignedHexHere(parser: *Parser) !?ValueType {
         parser.raiseError(pos, "bad hexadecimal number", .{});
 }
 
-pub fn tryParseParenthesizedExpressionHere(parser: *Parser) !?ValueType {
+fn tryParseParenthesizedExpressionHere(parser: *Parser) !?ValueType {
     const in = &parser.line_in;
 
     if (in.c == '(')
@@ -73,13 +73,7 @@ pub fn tryParseParenthesizedExpressionHere(parser: *Parser) !?ValueType {
     return value;
 }
 
-fn parseUnsignedConstantTermHere(parser: *Parser) !ValueType {
-    const in = &parser.line_in;
-    const pos = in.current_pos_number;
-
-    if (try tryParseParenthesizedExpressionHere(parser)) |value|
-        return value;
-
+pub fn tryParseLiteralHere(parser: *Parser) !?ValueType {
     if (try tryParseUnsignedDecimalHere(parser)) |value|
         return value;
 
@@ -89,12 +83,25 @@ fn parseUnsignedConstantTermHere(parser: *Parser) !ValueType {
     if (try string_parser.tryParseStringAsValueHere(parser, ValueType)) |value|
         return value;
 
+    return null;
+}
+
+fn parseUnsignedConstantTermHere(parser: *Parser) !ValueType {
+    const in = &parser.line_in;
+    const pos = in.current_pos_number;
+
+    if (try tryParseParenthesizedExpressionHere(parser)) |value|
+        return value;
+
+    if (try tryParseLiteralHere(parser)) |value|
+        return value;
+
     if (try label_parser.tryParseLabelAsValueHere(parser)) |value|
         return value;
 
     return parser.raiseError(
         pos,
-        "a number or string literal or a label is expected",
+        "a literal or a label is expected",
         .{},
     );
 }
