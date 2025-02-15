@@ -1,6 +1,6 @@
-# Vintage-like Virtual Machine - Basic Architecture
+# Basic Architecture and Instruction Set
 
-Low-endian architecture, 16-bit address space
+Little-endian architecture, 16-bit address space
 
 | Entity kind | Instances |
 | ----------- | --------- |
@@ -80,3 +80,15 @@ Low-endian architecture, 16-bit address space
 | **5x** | ZERO | ALL | CPL | XHL | IN | OUT | | | ROL | ROR | ARA | XA | POP | PUSH
 | **6x** | LBI | LBID Word | LBV Byte | | | | | | LWI | LWID Word | LWV Word | LSP 
 | **7x** | STBI | STBID Word | NOP | | SXBW | CXBW | ZXBW | AXBW | STWI | STWID Word | ARV Word | STSP | SXWX | CXWX | ZXWX | AXWX
+
+Note: commands with a *Byte* operand have the byte following the command opcode.
+Commands with a *Word* operand have the word's bytes (little-endian order) following the command opcode.
+Examples:
+
+| Mnemonic | Machine Code Bytes (Hex) |
+| -------- | ------------------------ |
+| LBI | 60 |
+| LBV 1C | 62 1C |
+| LBID 1C2E | 61 2E 1C |
+
+I/O functionality depends on the systems *environment* and is documented separately.
