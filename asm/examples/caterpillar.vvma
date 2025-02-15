@@ -50,6 +50,7 @@
     arv InitCatp
     call
 
+MoveCatp:
 ; move caterpillar head
     ; draw body over head's position
     arv CatpHX
@@ -63,9 +64,18 @@
     arv 1
     lbv '#'
     out
+    ; store new body byte
+    arv CatpDir
+    lbi ; L = field byte
+    cxwx ; X = field byte
+    arv CatpHptr
+    lwi ; A = Hptr
+    ara
+    xa
+    stbi ; store new body byte
     ; process direction
     arv CatpDir
-    lbi
+    lwi
     ror
     xa
     lwv 3
@@ -118,10 +128,74 @@
     arv 1
     lbv 'O'
     out
+; move caterpillar tail
+    ; erase tail on the screen
+    arv CatpTX
+    lwi
+    stbr b0
+    arv CatpTY
+    lwi
+    stbr b2
+    arv SetCurXY
+    call
+    arv 1
+    lbv 32
+    out ; erase tail
+    ; erase tail in the field
+    arv CatpTptr
+    lwi
+    ara
+    lbi ; tail field byte
+    ror
+    xa
+    lwv 3
+    and ; A = tail direction
+    cxwx
+    add ; A = dir*2
+    stwr w3 ; store tail direction index*2 in W3
+    zero
+    stbi ; erase tail (ADDR still untouched)
+    ; update TailHptr
+    xa
+    lwv Dir2Offs
+    add ; A = Dir2Offs + dir*2
+    ara
+    lwi ; A = [Dir2Offs + dir*2] = ptroffs
+    xa
+    arv CatpTptr
+    lwi
+    add
+    stwi ; [CatpTptr] = updated
+    ; Update CatpTX
+    lwr w3 ; w3 = dir bits
+    xa
+    lwv Dir2Dx
+    add
+    ara
+    lwi ; A = dx
+    xa
+    arv CatpTX
+    lwi
+    add
+    stwi ; updated CatpTX
+    ; Update CatpTY
+    lwr w3 ; w3 = dir bits
+    xa
+    lwv Dir2Dy
+    add
+    ara
+    lwi ; A = dy
+    xa
+    arv CatpTY
+    lwi
+    add
+    stwi ; updated CatpTY
 
     lwv 2
     ara
     in
+    arv MoveCatp
+    jmp
 
     zero
     ara
