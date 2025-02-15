@@ -162,15 +162,6 @@ CursorLD: ; cursor left and down
     .ds '[B'
     .db 0
 
-; body: 000000dd1 = tail
-;       dd bits point to next segmemt: 00 = right, 01 = down, 02 = left, 03 = up
-;       head does not use any specific value
-; wall: 00000xx1  (xx bits can be anything)
-; empty:  00000000
-; pickup: 10000000
-; size 80x24
-field: .rep (1920) .db 0
-
 ; Set cursor position. b0=X, b2=Y. Clobbers all registers
 ; -------------------------------------------------------
 SetCurXY:
@@ -407,3 +398,12 @@ PrintStr:
     jmp
 PrintStx:
     ret
+
+; body: 000000dd1 = tail
+;       dd bits point to next segmemt: 00 = right, 01 = down, 02 = left, 03 = up
+;       head does not use any specific value
+; wall: 00000xx1  (xx bits can be anything)
+; empty:  00000000
+; pickup: 10000000
+; size 80x24
+field: .rep (1920) .db 0
