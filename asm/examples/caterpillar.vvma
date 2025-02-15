@@ -60,16 +60,16 @@
 ;  MAIN LOOP
 ; ----------------------------------------------------------------------
 MainLoop:
+    lbv 1
+    xa
     arv NeedPkup
     lbi
-    arv ReadKey
+    arv NextPkup
     jif lz
-    xa
-    lbv 1
-    sub
+    sub ; X = 1
     arv NeedPkup
     stbi
-    arv ReadKey
+    arv NextPkup
     jif lnz
 ; try placing a pickup
     arv PkupY ; to multiply by 80, let's first multiply by 10
@@ -95,9 +95,6 @@ MainLoop:
     stwr w0 ; w0 = pickup address
     ara
     lbi ; read from position
-    xa
-    lbv 1
-    and
     arv MakePkup
     jif lz ; free to place
     lbv 1
@@ -121,6 +118,24 @@ MakePkup:
     lbv '@'
     out ; draw on the screen
 NextPkup:
+    arv PkupX
+    lbi
+    xa
+    lbv $5F
+    add
+    xa
+    arv CatpHX
+    lbi ; we only care about the low byte anyway
+    xor
+    ror
+    xa
+    lbv 63
+    and
+    xa
+    lbv 8
+    add
+    arv PkupX
+    stbi
 
 ReadKey:
     lwv 2
@@ -251,6 +266,7 @@ SkipKey:
 ; check for bump
     arv CatpHptr
     lwi
+    stbr b0
     ara
     lbi
     xa
@@ -258,8 +274,19 @@ SkipKey:
     and
     arv KaBoom
     jif lnz
+; check for pickups
+    lbr b0
+    zxbw
+    rol
+    arv MoveTail
+    jif hz
+    ; ate pickup
+    lbv 3
+    arv NeedPkup
+    stbi
 
 ; move caterpillar tail
+MoveTail:
     ; erase tail on the screen
     arv CatpTX
     lwi
@@ -377,7 +404,7 @@ CatpTY: .dw 12
 CatpDir: .db 5 ; value to store in the field, 00000101 = left
 CatpDX: .dw -1
 CatpDY: .dw 0
-NeedPkup: .db 1
+NeedPkup: .db 3
 PkupX: .db 50
 PkupY: .db 10
 
