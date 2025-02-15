@@ -148,10 +148,10 @@ NextPkup:
     xa
     lbv 1
     add
-        xa
-        arv CatpHY
-        lbi ; we only care about the low byte anyway
-        xor
+    xa
+    arv CatpHY
+    lbi ; we only care about the low byte anyway
+    xor
     xa
     lbv 15
     and
