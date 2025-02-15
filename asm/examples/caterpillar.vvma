@@ -2,13 +2,10 @@
     stsp
     lwv str
     stwr w0
-    lbv 91
+    lbv 90
     arv Prnt2d10
     call
     lwr w0
-    xa
-    lwv 1
-    add
     ara
     zero
     stbi
@@ -74,8 +71,7 @@ Prnt2d1b: ; W1 = number or rest
     xa
     lwv 1
     add
-    arv Prnt2d1p
-    stwi ; [Prnt2d1p]++
+    stwr w0
     ret
 
 Prnt2d1n:   .dw 0
@@ -184,11 +180,11 @@ PrintStr:
     lbi
     arv PrintStx
     jif lz
-    arwr w0 ; ADDR = $0001
+    arv 1
     out
     lwr w1 ; A = running_ptr
     cxwx ; X = running_ptr
-    lwr w0 ; A = 1
+    lwv 1 ; A = 1
     add ; A = ++running ptr
     arv PrintStr
     jmp
