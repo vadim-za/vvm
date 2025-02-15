@@ -1,3 +1,5 @@
+    zero
+    stsp
     lwv $1A9C
     arv PrntHexW
     call

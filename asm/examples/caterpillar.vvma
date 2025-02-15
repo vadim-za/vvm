@@ -33,26 +33,24 @@ Prnt2d10:
     stwi ; [Prnt2d1n]=number
     stwr w1 ; w1 = number
     arv Prnt2d1p
+    lwr w0
     stwi ; [Prnt2d1p]=W0
-    lwr w1
-    xa
     lwv 10
+    xa
+    lwr w1
     sub
     arv Prnt2d1b
     jif xnz ; 1 digit only
     lwr w1
     arv Div2d10
     call
-        arv PrntHexB
-        call
-        zero
-        ara
-        out
-    xa
     arv Prnt2d1p
     lwi
     ara
+    lbr b6
     xa
+    lbv '0'
+    add
     stbi
     ret
 Prnt2d1b:
