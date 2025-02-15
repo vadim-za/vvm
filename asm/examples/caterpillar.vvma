@@ -1,14 +1,11 @@
     zero
     stsp
-    lwv str
-    stwr w0
-    lbv 100
-    arv Prnt2d10
+    lbv 5
+    stbr b0
+    stbr b2
+    arv SetCurXY
     call
-    lwr w0
-    ara
-    zero
-    stbi
+
     lwv str
     arv PrintStr
     call
@@ -16,16 +13,47 @@
     ara
     out
 
-str: .rep (100) .db 0
+str: .ds 'String'
+    .db 0
+    .rep (20) .db 0
 
-; Set cursor position. W0=X, W1=Y. Clobbers all registers
+; Set cursor position. b0=X, b2=Y. Clobbers all registers
 SetCurXY:
-    lwr w0
+    lbr b0
     arv SetCurX
     stwi
     lwv SetCurS+2
     stwr w0
-    lwr w1
+    lbr b2 ; A = Y, W0 = SetCurS+2
+    arv Prnt2d10
+    call ; W0 = incremented ptr
+    lwr w0
+    ara
+    lbv ';'
+    stbi
+    lwr w0
+    xa
+    lwv 1
+    add ; A = ptr+1
+    stwr w0
+    arv SetCurX
+    lbi ; A = X, W0 = ptr
+    arv Prnt2d10
+    call ; W0 = incremented ptr
+    lwr w0
+    ara
+    lbv 'f'
+    stbi
+    lwr w0
+    xa
+    lwv 1
+    add
+    ara
+    zero
+    stbi
+    lwv SetCurS
+    arv PrintStr
+    jmp
 SetCurX:
     .dw 0
 SetCurS:
@@ -35,8 +63,9 @@ SetCurS:
 
 
 ; Print a 2-digit (up to 99) decimal number in L to [W0]
-; incrementing W0 by 1 or 2. Returns updated W0. Clobbers all other regs
-; ----------------------------------------------------------------------
+; incrementing W0 by 1 or 2. Clamps the input to 99 for safety.
+; Returns updated W0. Clobbers all other regs
+; --------------------------------------------------------------
 Prnt2d10:
     zxbw
     stwr w1
