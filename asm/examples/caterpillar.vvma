@@ -123,6 +123,7 @@ MakePkup:
     lbv '@'
     out ; draw on the screen
 NextPkup:
+    ; update PkupX
     arv PkupX
     lbi
     xa
@@ -140,6 +141,20 @@ NextPkup:
     lbv 8
     add
     arv PkupX
+    stbi
+    ; update PkupY
+    arv PkupY
+    lbi
+    xa
+    lbv 1
+    add
+    xa
+    lbv 15
+    and
+    xa
+    lbv 4
+    add
+    arv PkupY
     stbi
 
 ReadKey:
