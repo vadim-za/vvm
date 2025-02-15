@@ -13,6 +13,10 @@
     lbv 23
     arv DrwWallH
     call
+    zero
+    lbv 85
+    arv DrwWallV
+    call
 
     lwv 2
     ara
@@ -55,7 +59,7 @@ DrwWallH:
     stbr b0 ; fill char
     lwv 80
     stwr w1 ; count
-DrwWlHa:
+DrwWllHa:
     arv 1
     lbr b0
     out
@@ -64,9 +68,49 @@ DrwWlHa:
     lwr w1
     sub
     stwr w1
-    arv DrwWlHa
+    arv DrwWllHa
     jif hz
     ret
+
+; Draws vertical wall. A = horizontal pos. Clobbers all registers
+DrwWallV:
+    stbr b0
+    zero
+    stbr b2
+    arv SetCurXY
+    call
+    lbv '#'
+    stbr b0 ; fill char
+    lwv 24 ; count
+    arv DrwWllVc
+    stwi
+DrwWllVa:
+    arv 1
+    lbr b0
+    out
+    lwv 1
+    xa
+    arv DrwWllVc
+    lwi
+    sub
+    stwi
+    arv DrwWllVe
+    jif hnz
+    lwv CursorLD
+    arv PrintStr
+    call
+    arv DrwWllVa
+    jmp
+DrwWllVe:
+    ret
+DrwWllVc: .dw 0
+
+CursorLD: ; cursor left and down
+    .db $1B
+    .ds '[D'
+    .db $1B
+    .ds '[B'
+    .db 0
 
 ; body: 000000dd1 = tail
 ;       dd bits point to next segmemt: 00 = right, 01 = down, 02 = left, 03 = up
