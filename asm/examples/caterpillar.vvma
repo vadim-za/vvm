@@ -1,7 +1,29 @@
     zero
     stsp
 
+; setup realtime keyboard
+    arv 2
+    lbv 1
+    out
+    in
+    xa
+    lbv 1
+    and
+    arv Cls
+    jif lnz
+    lwv NoRtKey
+    arv PrintStr
+    call
+    zero
+    ara
+    out
+NoRtKey:
+    .ds 'This game cannot run: the host does not support realtime keyboard input'
+    .db 10
+    .db 0
+
 ; clear screen
+Cls:
     lwv ClsStr
     arv PrintStr
     call
@@ -49,11 +71,6 @@
 ; initialize caterpillar
     arv InitCatp
     call
-
-; setup realtime keyboard
-    arv 2
-    lbv 1
-    out
 
 ; setup timer
     arv 3
