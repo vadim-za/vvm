@@ -23,7 +23,11 @@ fn translateDb(parser: *Parser, out: *PassOutput) Parser.Error!void {
 
     parser.pc +%= 1;
     try out.writeByte(
-        try expression_parser.parseConstantExpressionAs(parser, u8),
+        try expression_parser.parseExpressionAs(
+            parser,
+            u8,
+            true,
+        ),
         parser,
     );
 }
@@ -33,7 +37,11 @@ fn translateDw(parser: *Parser, out: *PassOutput) Parser.Error!void {
 
     parser.pc +%= 2;
     try out.writeWord(
-        try expression_parser.parseConstantExpressionAs(parser, u16),
+        try expression_parser.parseExpressionAs(
+            parser,
+            u16,
+            true,
+        ),
         parser,
     );
 }
@@ -47,17 +55,26 @@ fn translateDs(parser: *Parser, out: *PassOutput) Parser.Error!void {
 fn translateOrg(parser: *Parser, out: *PassOutput) Parser.Error!void {
     // Don't allow labels, since they are not known during the first pass
     // Currently we also do not allow other expressions.
-    parser.pc = try parseLiteralHere(parser);
+    parser.pc = try expression_parser.parseExpressionAs(
+        parser,
+        u16,
+        false,
+    );
     _ = out;
 }
 
 fn translateRep(parser: *Parser, out: *PassOutput) Parser.Error!void {
-    const in = &parser.line_in;
-    const pos = in.current_pos_number;
-
     // Don't allow labels, since they are not known during the first pass
     // Currently we also do not allow other expressions.
-    const num_repetitions = try parseParenthesizedLiteralHere(parser);
+    const num_repetitions =
+        try expression_parser.parseParenthesizedExpressionAs(
+        parser,
+        u16,
+        false,
+    );
+
+    const in = &parser.line_in;
+    const pos = in.current_pos_number;
 
     if (!in.isAtWhitespace())
         return parser.raiseError(
@@ -88,37 +105,6 @@ fn translateRep(parser: *Parser, out: *PassOutput) Parser.Error!void {
                 .{},
             );
     }
-}
-
-fn parseLiteralHere(parser: *Parser) !u16 {
-    const in = &parser.line_in;
-    const pos = in.current_pos_number;
-
-    return (try expression_parser.tryParseLiteralHere(parser)) orelse
-        return parser.raiseError(pos, "literal expected", .{});
-}
-
-fn parseParenthesizedLiteralHere(parser: *Parser) !u16 {
-    const in = &parser.line_in;
-    const pos = in.current_pos_number;
-
-    if (in.c == '(')
-        in.next()
-    else
-        return parser.raiseError(pos, "'(' expected", .{});
-
-    parser.skipWhitespace();
-    const value = try parseLiteralHere(parser);
-
-    parser.skipWhitespace();
-    const pos_after = in.current_pos_number;
-
-    if (in.c == ')')
-        in.next()
-    else
-        return parser.raiseError(pos_after, "')' expected", .{});
-
-    return value;
 }
 
 pub fn tryParseMetaCommandHere(parser: *Parser, out: *PassOutput) !bool {

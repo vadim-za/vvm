@@ -48,11 +48,19 @@ pub fn translateCommandHere(command: Command, parser: *Parser, out: *PassOutput)
     switch (command.bytes) {
         .opcode_only => {},
         .extra_byte => try out.writeByte(
-            try expression_parser.parseConstantExpressionAs(parser, u8),
+            try expression_parser.parseExpressionAs(
+                parser,
+                u8,
+                true,
+            ),
             parser,
         ),
         .extra_word => try out.writeWord(
-            try expression_parser.parseConstantExpressionAs(parser, u16),
+            try expression_parser.parseExpressionAs(
+                parser,
+                u16,
+                true,
+            ),
             parser,
         ),
     }

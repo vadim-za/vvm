@@ -52,7 +52,10 @@ fn tryParseUnsignedHexHere(parser: *Parser) !?ValueType {
         parser.raiseError(pos, "bad hexadecimal number", .{});
 }
 
-fn tryParseParenthesizedExpressionHere(parser: *Parser) !?ValueType {
+fn tryParseParenthesizedExpressionHere(
+    parser: *Parser,
+    allow_labels: bool,
+) !?ValueType {
     const in = &parser.line_in;
 
     if (in.c == '(')
@@ -60,7 +63,10 @@ fn tryParseParenthesizedExpressionHere(parser: *Parser) !?ValueType {
     else
         return null;
 
-    const value = try parseConstantExpression(parser);
+    const value = try parseExpression(
+        parser,
+        allow_labels,
+    );
 
     parser.skipWhitespace();
     const pos = in.current_pos_number;
@@ -73,40 +79,50 @@ fn tryParseParenthesizedExpressionHere(parser: *Parser) !?ValueType {
     return value;
 }
 
-pub fn tryParseLiteralHere(parser: *Parser) !?ValueType {
+fn tryParseLiteralHere(parser: *Parser) !?ValueType {
     if (try tryParseUnsignedDecimalHere(parser)) |value|
         return value;
 
     if (try tryParseUnsignedHexHere(parser)) |value|
         return value;
 
-    if (try string_parser.tryParseStringAsValueHere(parser, ValueType)) |value|
+    if (try string_parser.tryParseStringAsValueHere(
+        parser,
+        ValueType,
+    )) |value|
         return value;
 
     return null;
 }
 
-fn parseUnsignedConstantTermHere(parser: *Parser) !ValueType {
+fn parseUnsignedTerm(parser: *Parser, allow_labels: bool) !ValueType {
+    parser.skipWhitespace();
+
     const in = &parser.line_in;
     const pos = in.current_pos_number;
 
-    if (try tryParseParenthesizedExpressionHere(parser)) |value|
+    if (try tryParseParenthesizedExpressionHere(
+        parser,
+        allow_labels,
+    )) |value|
         return value;
 
     if (try tryParseLiteralHere(parser)) |value|
         return value;
 
-    if (try label_parser.tryParseLabelAsValueHere(parser)) |value|
-        return value;
+    if (allow_labels) {
+        if (try label_parser.tryParseLabelAsValueHere(parser)) |value|
+            return value;
+    }
 
     return parser.raiseError(
         pos,
-        "a literal or a label is expected",
+        "an expression term expected",
         .{},
     );
 }
 
-fn parseConstantTerm(parser: *Parser) !ValueType {
+fn parseTerm(parser: *Parser, allow_labels: bool) !ValueType {
     const in = &parser.line_in;
     parser.skipWhitespace();
 
@@ -122,25 +138,30 @@ fn parseConstantTerm(parser: *Parser) !ValueType {
         else => false,
     };
 
-    parser.skipWhitespace();
-    const value = try parseUnsignedConstantTermHere(parser);
+    const value = try parseUnsignedTerm(
+        parser,
+        allow_labels,
+    );
     return if (negate) 0 -% value else value;
 }
 
-fn parseConstantExpression(parser: *Parser) Parser.Error!ValueType {
+fn parseExpression(
+    parser: *Parser,
+    allow_labels: bool,
+) Parser.Error!ValueType {
     const in = &parser.line_in;
 
-    var sum = try parseConstantTerm(parser);
+    var sum = try parseTerm(parser, allow_labels);
     while (true) {
         parser.skipWhitespace();
         switch (in.c orelse 0) {
             '+' => {
                 in.next();
-                sum +%= try parseConstantTerm(parser);
+                sum +%= try parseTerm(parser, allow_labels);
             },
             '-' => {
                 in.next();
-                sum -%= try parseConstantTerm(parser);
+                sum -%= try parseTerm(parser, allow_labels);
             },
             else => break,
         }
@@ -149,9 +170,27 @@ fn parseConstantExpression(parser: *Parser) Parser.Error!ValueType {
     return sum;
 }
 
-pub fn parseConstantExpressionAs(parser: *Parser, T: type) !T {
+pub fn parseExpressionAs(parser: *Parser, T: type, allow_labels: bool) !T {
     return @truncate(
-        try parseConstantExpression(parser),
+        try parseExpression(parser, allow_labels),
+    );
+}
+
+pub fn parseParenthesizedExpressionAs(parser: *Parser, T: type, allow_labels: bool) !T {
+    parser.skipWhitespace();
+
+    const in = &parser.line_in;
+    const pos = in.current_pos_number;
+
+    return @truncate(
+        (try tryParseParenthesizedExpressionHere(
+            parser,
+            allow_labels,
+        )) orelse return parser.raiseError(
+            pos,
+            "parenthesized expression expected",
+            .{},
+        ),
     );
 }
 
@@ -181,7 +220,7 @@ test "Test" {
             .addr = 1000,
         });
         try parser.labels.finalize(&parser);
-        const parsed_value = try parseConstantExpressionAs(&parser, T);
+        const parsed_value = try parseExpressionAs(&parser, T, true);
         try std.testing.expectEqual(expected_value, parsed_value);
     }
 }
