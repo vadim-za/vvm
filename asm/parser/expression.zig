@@ -110,9 +110,15 @@ fn parseUnsignedTerm(parser: *Parser, allow_labels: bool) !ValueType {
     if (try tryParseLiteralHere(parser)) |value|
         return value;
 
-    if (allow_labels) {
-        if (try label_parser.tryParseLabelAsValueHere(parser)) |value|
-            return value;
+    if (try label_parser.tryParseLabelAsValueHere(parser)) |value| {
+        return if (allow_labels)
+            value
+        else
+            return parser.raiseError(
+                pos,
+                "labels are not allowed here",
+                .{},
+            );
     }
 
     return parser.raiseError(
