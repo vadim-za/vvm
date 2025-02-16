@@ -91,4 +91,4 @@ Examples:
 | LBV 1C | 62 1C |
 | LBID 1C2E | 61 2E 1C |
 
-I/O functionality depends on the systems *environment* and is documented separately.
+I/O functionality depends on the system's *environment* and is documented separately.

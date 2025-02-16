@@ -4,7 +4,7 @@
 
 This is a toy virtual machine project, consisting of
 - the virtual machine's core (CPU + memory)
-- a virual system (core + virtual hardware)
+- a virtual system (core + virtual hardware)
 - a cross-assembler
 
 The machine's architecture has been designed from scratch, taking inspiration from a number of early computer and programmable calculator architectures. It has been deliberately held highly restrictive.
