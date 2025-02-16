@@ -14,7 +14,7 @@
 
 - Integer literals can be decimal or hex (the latter are prefixed with `$`)
 
-- String literals are enclosed in apostrophes. Currently you cannot "escape" an apostrophe within a string, you need to find another way to get it in there (e.g. use the `.DB` metacommand)
+- String literals are enclosed in apostrophes. Currently you cannot "escape" an apostrophe within a string, you need to find another way to get it in there (e.g. use the `.DB` metacommand). String literals are not zero terminated, you need to manually add `.DB 0` at the end if you have to.
 
 - Metacommands are like normal assembler commands, but prefixed with the '.'
 
@@ -26,5 +26,3 @@
 | .REP (N) Metacommand | Repeat the metacommand N times |
 | .ORG N | Set the formal current address to N |
 
-- String literals are not zero terminated, you need to manually add `.DB 0` at the end if you have to.
-- `N' must be an integer literal (general form expressions not supported)
