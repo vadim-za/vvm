@@ -98,14 +98,18 @@ test "Test Multiple" {
     try std.testing.expectEqualStrings("d", items[2].name());
 
     try parser.labels.finalize(&parser);
-    try std.testing.expectEqualStrings("abcdefgh", items[0].name());
-    try std.testing.expectEqualStrings("d", items[1].name());
-    try std.testing.expectEqualStrings("ijk", items[2].name());
+    try std.testing.expect(items[0].isLessThan(items[1]));
+    try std.testing.expect(items[1].isLessThan(items[2]));
 
     const sn = Label.initStoredName;
-    try std.testing.expectEqual(&items[0], labels.find(sn("abcdefgh")));
-    try std.testing.expectEqual(&items[1], labels.find(sn("d")));
-    try std.testing.expectEqual(&items[2], labels.find(sn("ijk")));
+    for (&[_][]const u8{ "abcdefgh", "d", "ijk" }) |name| {
+        const label = labels.find(sn(name));
+        try std.testing.expect(std.mem.order(
+            u8,
+            name,
+            label.?.name(),
+        ) == .eq);
+    }
     try std.testing.expectEqual(null, labels.find(sn("")));
     try std.testing.expectEqual(null, labels.find(sn("d1")));
     try std.testing.expectEqual(null, labels.find(sn("ij")));

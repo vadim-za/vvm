@@ -18,12 +18,18 @@ pub fn initStoredName(str: []const u8) StoredName {
     return stored_name;
 }
 
+pub fn isLessThan(self: @This(), other: @This()) bool {
+    return lessThan({}, self, other);
+}
+
+// To be used with std.sort
 pub fn lessThan(context: void, lhs: @This(), rhs: @This()) bool {
     _ = context;
     // stored_name has trailing zeroes, so we can simply compare the representations
 
     // Reference code uses std.mem.order, but we can just compare them as
-    // ComparableStoredName's instead.
+    // ComparableStoredName's instead. Notice that on little-endian systems the
+    // comparison result is different, but still provides a consistent ordering.
     // return switch (std.mem.order(u8, &lhs.stored_name, &rhs.stored_name)) {
     //     .lt => true,
     //     .gt => false,
@@ -35,6 +41,7 @@ pub fn lessThan(context: void, lhs: @This(), rhs: @This()) bool {
     return cmp_lhs < cmp_rhs;
 }
 
+// To be used with std.sort.binarySearch
 pub fn compare(context: StoredName, item: @This()) std.math.Order {
     // stored_name has trailing zeroes, so we can simply compare the representations
 
