@@ -203,20 +203,25 @@ pub fn parseParenthesizedExpressionAs(parser: *Parser, T: type, allow_labels: bo
 test "Test" {
     const SourceInput = @import("../SourceInput.zig");
 
-    const ExpressionTest = struct { []const u8, type, u16 };
+    const ExpressionTest = struct { []const u8, type, Parser.Error!u16, ?usize };
     const expressions = [_]ExpressionTest{
-        .{ "0", u16, 0 },
-        .{ "1", u8, 1 },
-        .{ "-10", u8, 0 -% @as(u8, 10) },
-        .{ "+1000", u16, 1000 },
-        .{ "10+21", u8, 31 },
-        .{ "10-21", u16, 10 -% @as(u16, 21) },
-        .{ "10-abc", u16, 10 -% @as(u16, 1000) },
+        .{ "0", u16, 0, null },
+        .{ "1", u8, 1, null },
+        .{ "-10", u8, 0 -% @as(u8, 10), null },
+        .{ "+1000", u16, 1000, null },
+        .{ "10+21", u8, 31, null },
+        .{ "10-$21", u16, 10 -% @as(u16, 0x21), null },
+        .{ "10-abc", u16, 10 -% @as(u16, 1000), null },
+        .{ "$-1", u16, error.SyntaxError, 2 },
+        .{ "0-ab1", u16, error.SyntaxError, 3 },
+        .{ "(0-1", u16, error.SyntaxError, 5 },
+        .{ "(?)", u16, error.SyntaxError, 2 },
     };
     inline for (&expressions) |expr_test| {
         const source = expr_test[0];
         const T = expr_test[1];
-        const expected_value = expr_test[2];
+        const expected_result: Parser.Error!T = expr_test[2];
+        const err_pos = expr_test[3];
         var in = SourceInput.init(source);
         var parser: Parser = .init(std.testing.allocator, &in);
         defer parser.deinit();
@@ -226,7 +231,13 @@ test "Test" {
             .addr = 1000,
         });
         try parser.labels.finalize(&parser);
-        const parsed_value = try parseExpressionAs(&parser, T, true);
-        try std.testing.expectEqual(expected_value, parsed_value);
+        const parse_result =
+            parseExpressionAs(&parser, T, true);
+        try std.testing.expectEqual(expected_result, parse_result);
+        if (comptime expected_result == error.SyntaxError) {
+            try std.testing.expectEqual(error.SyntaxError, parse_result);
+            try std.testing.expectEqual(err_pos.?, parser.test_error_info.?.pos);
+            try std.testing.expectEqual(1, parser.test_error_info.?.line);
+        } else std.debug.assert(err_pos == null);
     }
 }

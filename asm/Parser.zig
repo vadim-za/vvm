@@ -5,21 +5,27 @@ const LineInput = @import("LineInput.zig");
 const Label = @import("Label.zig");
 const Labels = @import("Labels.zig");
 const commands = @import("commands.zig");
+const builtin = @import("builtin");
 
 source_in: *SourceInput,
 line_in: LineInput,
 current_line_number: usize,
 labels: Labels,
 pc: u16,
+test_error_info: if (builtin.is_test) ?TestErrorInfo else void =
+    if (builtin.is_test) null,
 
 pub fn init(alloc: std.mem.Allocator, source_in: *SourceInput) @This() {
-    return .{
+    var self = @This(){
         .source_in = source_in,
         .line_in = .init(source_in),
         .current_line_number = undefined,
         .labels = .init(alloc),
         .pc = undefined,
     };
+
+    self.reset();
+    return self;
 }
 
 pub fn deinit(self: *const @This()) void {
@@ -46,12 +52,16 @@ pub fn restoreInputState(self: *@This(), stored: StoredInputState) void {
     self.current_line_number = stored.current_line_number;
 }
 
-pub const Error = error{ SyntaxError, OutOfMemory };
-
-pub fn translate(self: *@This(), out: *PassOutput) Error!void {
+pub fn reset(self: *@This()) void {
     self.source_in.reset();
     self.current_line_number = 1;
     self.pc = 0;
+}
+
+pub const Error = error{ SyntaxError, OutOfMemory };
+
+pub fn translate(self: *@This(), out: *PassOutput) Error!void {
+    self.reset();
 
     while (self.source_in.c != null) : (self.current_line_number += 1) {
         self.line_in.reset();
@@ -142,13 +152,25 @@ pub fn raiseErrorAtLine(
     comptime fmt: []const u8,
     args: anytype,
 ) error{SyntaxError} {
-    _ = self;
-    std.debug.print(
-        "({}:{}) " ++ fmt ++ "\n",
-        .{
-            line,
-            pos,
-        } ++ args,
-    );
+    if (builtin.is_test)
+        self.test_error_info = .{ .line = line, .pos = pos }
+    else
+        std.debug.print(
+            "({}:{}) " ++ fmt ++ "\n",
+            .{
+                line,
+                pos,
+            } ++ args,
+        );
+
     return error.SyntaxError;
 }
+
+const TestErrorInfo = struct {
+    line: usize,
+    pos: usize,
+
+    fn isAt(self: @This(), line: usize, pos: usize) bool {
+        return self.line == line and self.pos == pos;
+    }
+};
