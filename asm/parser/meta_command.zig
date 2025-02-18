@@ -155,7 +155,7 @@ pub fn tryParseMetaCommandHere(parser: *Parser, out: *PassOutput) !bool {
 }
 
 test "Test data write" {
-    const Asm = @import("../Asm.zig");
+    const @"asm" = @import("../asm.zig");
 
     const Test = struct { []const u8, []const u8 };
     const tests = [_]Test{
@@ -172,7 +172,7 @@ test "Test data write" {
         const expected_result = t[1];
 
         const result_container =
-            try Asm.translateSource(
+            try @"asm".translateSource(
             std.testing.allocator,
             source,
             null,
@@ -185,7 +185,7 @@ test "Test data write" {
 }
 
 test "Test labels not allowed" {
-    const Asm = @import("../Asm.zig");
+    const @"asm" = @import("../asm.zig");
 
     const Test = struct { []const u8, usize };
     const tests = [_]Test{
@@ -199,7 +199,7 @@ test "Test labels not allowed" {
 
         var error_info: Parser.ErrorInfo = undefined;
         const result =
-            Asm.translateSource(
+            @"asm".translateSource(
             std.testing.allocator,
             source,
             &error_info,

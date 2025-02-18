@@ -16,12 +16,12 @@ pub fn build(b: *std.Build) void {
         .optimize = optimize,
     });
 
-    const Asm = b.createModule(.{
-        .root_source_file = b.path("asm/Asm.zig"),
+    const @"asm" = b.createModule(.{
+        .root_source_file = b.path("asm/asm.zig"),
         .target = target,
         .optimize = optimize,
     });
-    Asm.addImport("VvmCore", VvmCore);
+    @"asm".addImport("VvmCore", VvmCore);
 
     const asm_tests = b.addTest(.{
         .root_source_file = b.path("asm/main.zig"),
@@ -37,7 +37,7 @@ pub fn build(b: *std.Build) void {
         .optimize = optimize,
     });
     system.root_module.addImport("VvmCore", VvmCore);
-    system.root_module.addImport("Asm", Asm);
+    system.root_module.addImport("asm", @"asm");
     b.installArtifact(system);
 
     const system_tests = b.addTest(.{
@@ -46,7 +46,7 @@ pub fn build(b: *std.Build) void {
         .optimize = optimize,
     });
     system_tests.root_module.addImport("VvmCore", VvmCore);
-    system_tests.root_module.addImport("Asm", Asm);
+    system_tests.root_module.addImport("asm", @"asm");
 
     const run_core_tests = b.addRunArtifact(core_tests);
     const run_asm_tests = b.addRunArtifact(asm_tests);

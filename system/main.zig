@@ -1,5 +1,5 @@
 const std = @import("std");
-const Asm = @import("Asm");
+const @"asm" = @import("asm");
 const System = @import("System.zig");
 
 pub fn main() u8 {
@@ -33,7 +33,7 @@ pub fn main() u8 {
     const command = parseCommand(args[1]) catch return 1;
     const source_file_path = args[2];
 
-    const translation_result = Asm.translateSourceFile(
+    const translation_result = @"asm".translateSourceFile(
         alloc,
         source_file_path,
     ) catch return 1;
