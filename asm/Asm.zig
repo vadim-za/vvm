@@ -13,7 +13,7 @@ pub fn translateSourceFile(
     defer source.deinit();
     try readSourceFile(source_file_path, &source);
 
-    return translateSource(alloc, source.items);
+    return translateSource(alloc, source.items, null);
 }
 
 const ReadError = error{ReadError};
@@ -48,9 +48,10 @@ fn readSourceFile(
 pub fn translateSource(
     alloc: std.mem.Allocator,
     source: []const u8,
+    error_info: ?*Parser.ErrorInfo,
 ) Parser.Error!std.ArrayList(u8) {
     var in = SourceInput.init(source);
-    var parser: Parser = .init(alloc, &in, null);
+    var parser: Parser = .init(alloc, &in, error_info);
     defer parser.deinit();
 
     var out_data: std.ArrayList(u8) = .init(alloc);

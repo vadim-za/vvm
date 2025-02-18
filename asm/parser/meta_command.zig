@@ -4,7 +4,6 @@ const PassOutput = @import("../PassOutput.zig");
 const meta_commands = @import("../meta_commands.zig");
 const expression_parser = @import("expression.zig");
 const string_parser = @import("string.zig");
-const Asm = @import("../Asm.zig");
 
 const ListEntry = meta_commands.ListEntry;
 
@@ -156,6 +155,8 @@ pub fn tryParseMetaCommandHere(parser: *Parser, out: *PassOutput) !bool {
 }
 
 test "Test data write" {
+    const Asm = @import("../Asm.zig");
+
     const Test = struct { []const u8, []const u8 };
     const tests = [_]Test{
         .{ " .db 1", &[_]u8{1} },
@@ -166,15 +167,46 @@ test "Test data write" {
         .{ " .rep (2) .ds 'AB'", &[_]u8{ 'A', 'B', 'A', 'B' } },
     };
 
-    inline for (&tests) |t| {
+    for (&tests) |t| {
         const source = t[0];
         const expected_result = t[1];
 
         const result_container =
-            try Asm.translateSource(std.testing.allocator, source);
+            try Asm.translateSource(
+            std.testing.allocator,
+            source,
+            null,
+        );
         defer result_container.deinit();
         const result = result_container.items;
 
         try std.testing.expect(std.mem.order(u8, expected_result, result) == .eq);
+    }
+}
+
+test "Test labels not allowed" {
+    const Asm = @import("../Asm.zig");
+
+    const Test = struct { []const u8, usize };
+    const tests = [_]Test{
+        .{ "abc:.org abc", 10 },
+        .{ "abc:.rep (1+abc) .ds 0", 13 },
+    };
+
+    for (&tests) |t| {
+        const source = t[0];
+        const expected_error_pos = t[1];
+
+        var error_info: Parser.ErrorInfo = undefined;
+        const result =
+            Asm.translateSource(
+            std.testing.allocator,
+            source,
+            &error_info,
+        );
+        try std.testing.expect(result == error.SyntaxError);
+        // Since we expect an error, don't need to deinit the result
+
+        try std.testing.expect(error_info.isAt(1, expected_error_pos));
     }
 }
