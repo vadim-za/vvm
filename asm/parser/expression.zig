@@ -2,7 +2,6 @@ const std = @import("std");
 const Parser = @import("../Parser.zig");
 const label_parser = @import("label.zig");
 const string_parser = @import("string.zig");
-const Label = @import("../Label.zig");
 
 const ValueType = u16; // all expressions use 16 bit evaluation
 
@@ -202,6 +201,7 @@ pub fn parseParenthesizedExpressionAs(parser: *Parser, T: type, allow_labels: bo
 
 test "Test" {
     const SourceInput = @import("../SourceInput.zig");
+    const Label = @import("../Label.zig");
 
     const ExpressionTest = struct { []const u8, type, Parser.Error!u16, ?usize };
     const expressions = [_]ExpressionTest{
@@ -222,7 +222,7 @@ test "Test" {
         const source = expr_test[0];
         const T = expr_test[1];
         const expected_result: Parser.Error!T = expr_test[2];
-        const err_pos = expr_test[3];
+        const error_pos = expr_test[3];
 
         var in = SourceInput.init(source);
         var parser: Parser = .init(std.testing.allocator, &in);
@@ -240,8 +240,8 @@ test "Test" {
         try std.testing.expectEqual(expected_result, parse_result);
         if (comptime expected_result == error.SyntaxError) {
             try std.testing.expectEqual(error.SyntaxError, parse_result);
-            try std.testing.expectEqual(err_pos.?, parser.test_error_info.?.pos);
+            try std.testing.expectEqual(error_pos.?, parser.test_error_info.?.pos);
             try std.testing.expectEqual(1, parser.test_error_info.?.line);
-        } else std.debug.assert(err_pos == null);
+        } else std.debug.assert(error_pos == null);
     }
 }
