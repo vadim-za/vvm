@@ -58,7 +58,7 @@ test "Test" {
                 .{register_index},
             );
             var in = SourceInput.init(source);
-            var parser: Parser = .init(std.testing.allocator, &in);
+            var parser: Parser = .init(std.testing.allocator, &in, null);
             defer parser.deinit();
             const parsed_index = try parseRegisterName(
                 &parser,

@@ -50,7 +50,7 @@ pub fn translateSource(
     source: []const u8,
 ) Parser.Error!std.ArrayList(u8) {
     var in = SourceInput.init(source);
-    var parser: Parser = .init(alloc, &in);
+    var parser: Parser = .init(alloc, &in, null);
     defer parser.deinit();
 
     var out_data: std.ArrayList(u8) = .init(alloc);

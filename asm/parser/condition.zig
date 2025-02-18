@@ -66,7 +66,7 @@ test "Test" {
     };
     for (&conditions, 0..) |source, index| {
         var in = SourceInput.init(source);
-        var parser: Parser = .init(std.testing.allocator, &in);
+        var parser: Parser = .init(std.testing.allocator, &in, null);
         defer parser.deinit();
         const parsed_index = try parseCondition(&parser);
         try std.testing.expectEqual(index % 8, parsed_index);

@@ -71,7 +71,7 @@ test "Test" {
     const SourceInput = @import("../SourceInput.zig");
 
     var in = SourceInput.init("ijk:");
-    var parser: Parser = .init(std.testing.allocator, &in);
+    var parser: Parser = .init(std.testing.allocator, &in, null);
     defer parser.deinit();
     try parseLabelDefinitionHere(&parser);
 
@@ -84,7 +84,7 @@ test "Test Multiple" {
     const SourceInput = @import("../SourceInput.zig");
 
     var in = SourceInput.init("ijk:abcdefgh:d:");
-    var parser: Parser = .init(std.testing.allocator, &in);
+    var parser: Parser = .init(std.testing.allocator, &in, null);
     defer parser.deinit();
     try parseLabelDefinitionHere(&parser);
     try parseLabelDefinitionHere(&parser);
@@ -119,7 +119,7 @@ test "Test Parse Label as Value" {
     const SourceInput = @import("../SourceInput.zig");
 
     var in = SourceInput.init("abc");
-    var parser: Parser = .init(std.testing.allocator, &in);
+    var parser: Parser = .init(std.testing.allocator, &in, null);
     defer parser.deinit();
 
     try parser.labels.push(.{
@@ -137,7 +137,7 @@ test "Test Label Address" {
     const SourceInput = @import("../SourceInput.zig");
 
     var in = SourceInput.init("abc:");
-    var parser: Parser = .init(std.testing.allocator, &in);
+    var parser: Parser = .init(std.testing.allocator, &in, null);
     defer parser.deinit();
 
     parser.pc = 1000; // override current value

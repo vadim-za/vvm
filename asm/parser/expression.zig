@@ -225,7 +225,12 @@ test "Test" {
         const error_pos = expr_test[3];
 
         var in = SourceInput.init(source);
-        var parser: Parser = .init(std.testing.allocator, &in);
+        var error_info: Parser.ErrorInfo = undefined;
+        var parser: Parser = .init(
+            std.testing.allocator,
+            &in,
+            &error_info,
+        );
         defer parser.deinit();
 
         try parser.labels.push(.{
@@ -238,10 +243,10 @@ test "Test" {
         const parse_result =
             parseExpressionAs(&parser, T, true);
         try std.testing.expectEqual(expected_result, parse_result);
+
         if (comptime expected_result == error.SyntaxError) {
             try std.testing.expectEqual(error.SyntaxError, parse_result);
-            try std.testing.expectEqual(error_pos.?, parser.test_error_info.?.pos);
-            try std.testing.expectEqual(1, parser.test_error_info.?.line);
+            try std.testing.expect(error_info.isAt(1, error_pos.?));
         } else std.debug.assert(error_pos == null);
     }
 }

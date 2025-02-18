@@ -12,16 +12,20 @@ line_in: LineInput,
 current_line_number: usize,
 labels: Labels,
 pc: u16,
-test_error_info: if (builtin.is_test) ?TestErrorInfo else void =
-    if (builtin.is_test) null,
+error_info: ?*ErrorInfo,
 
-pub fn init(alloc: std.mem.Allocator, source_in: *SourceInput) @This() {
+pub fn init(
+    alloc: std.mem.Allocator,
+    source_in: *SourceInput,
+    error_info: ?*ErrorInfo,
+) @This() {
     var self = @This(){
         .source_in = source_in,
         .line_in = .init(source_in),
         .current_line_number = undefined,
         .labels = .init(alloc),
         .pc = undefined,
+        .error_info = error_info,
     };
 
     self.reset();
@@ -152,9 +156,10 @@ pub fn raiseErrorAtLine(
     comptime fmt: []const u8,
     args: anytype,
 ) error{SyntaxError} {
-    if (builtin.is_test)
-        self.test_error_info = .{ .line = line, .pos = pos }
-    else
+    if (self.error_info) |info|
+        info.* = .{ .line = line, .pos = pos };
+
+    if (!builtin.is_test)
         std.debug.print(
             "({}:{}) " ++ fmt ++ "\n",
             .{
@@ -166,11 +171,11 @@ pub fn raiseErrorAtLine(
     return error.SyntaxError;
 }
 
-const TestErrorInfo = struct {
+pub const ErrorInfo = struct {
     line: usize,
     pos: usize,
 
-    fn isAt(self: @This(), line: usize, pos: usize) bool {
+    pub fn isAt(self: @This(), line: usize, pos: usize) bool {
         return self.line == line and self.pos == pos;
     }
 };
