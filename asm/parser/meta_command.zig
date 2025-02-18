@@ -4,6 +4,7 @@ const PassOutput = @import("../PassOutput.zig");
 const meta_commands = @import("../meta_commands.zig");
 const expression_parser = @import("expression.zig");
 const string_parser = @import("string.zig");
+const Asm = @import("../Asm.zig");
 
 const ListEntry = meta_commands.ListEntry;
 
@@ -152,4 +153,28 @@ pub fn tryParseMetaCommandHere(parser: *Parser, out: *PassOutput) !bool {
     try command.translate(parser, out);
 
     return true;
+}
+
+test "Test data write" {
+    const Test = struct { []const u8, []const u8 };
+    const tests = [_]Test{
+        .{ " .db 1", &[_]u8{1} },
+        .{ " .dw $1234", &[_]u8{ 0x34, 0x12 } },
+        .{ " .db abc+$ABCD\nabc:", &[_]u8{0xCE} },
+        .{ " .dw abc+$ABCD\nabc:", &[_]u8{ 0xCF, 0xAB } },
+        .{ " .ds 'ABC'", &[_]u8{ 'A', 'B', 'C' } },
+        .{ " .rep (2) .ds 'AB'", &[_]u8{ 'A', 'B', 'A', 'B' } },
+    };
+
+    inline for (&tests) |t| {
+        const source = t[0];
+        const expected_result = t[1];
+
+        const result_container =
+            try Asm.translateSource(std.testing.allocator, source);
+        defer result_container.deinit();
+        const result = result_container.items;
+
+        try std.testing.expect(std.mem.order(u8, expected_result, result) == .eq);
+    }
 }

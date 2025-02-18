@@ -217,20 +217,24 @@ test "Test" {
         .{ "(0-1", u16, error.SyntaxError, 5 }, // unclosed parenthesis
         .{ "(?)", u16, error.SyntaxError, 2 }, // bad expression
     };
+
     inline for (&expressions) |expr_test| {
         const source = expr_test[0];
         const T = expr_test[1];
         const expected_result: Parser.Error!T = expr_test[2];
         const err_pos = expr_test[3];
+
         var in = SourceInput.init(source);
         var parser: Parser = .init(std.testing.allocator, &in);
         defer parser.deinit();
+
         try parser.labels.push(.{
             .stored_name = Label.initStoredName("abc"),
             .line = 1,
             .addr = 1000,
         });
         try parser.labels.finalize(&parser);
+
         const parse_result =
             parseExpressionAs(&parser, T, true);
         try std.testing.expectEqual(expected_result, parse_result);
