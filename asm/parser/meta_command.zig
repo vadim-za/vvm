@@ -204,9 +204,9 @@ test "Test labels not allowed" {
             source,
             &error_info,
         );
-        try std.testing.expect(result == error.SyntaxError);
         // Since we expect an error, don't need to deinit the result
 
+        try std.testing.expectEqual(error.SyntaxError, result);
         try std.testing.expect(error_info.isAt(1, expected_error_pos));
     }
 }

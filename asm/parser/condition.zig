@@ -22,10 +22,9 @@ fn parseConditionRegisterHere(parser: *Parser) u8 {
     }
 }
 
-// This is an auxiliary function of parseCondition(), it return null on error
+// This is an auxiliary function of parseCondition(), it returns null on error
 fn parseConditionNameHere(parser: *Parser) ?u8 {
     const in = &parser.line_in;
-    parser.skipWhitespace();
 
     const reg = parseConditionRegisterHere(parser);
 
@@ -70,5 +69,24 @@ test "Test" {
         defer parser.deinit();
         const parsed_index = try parseCondition(&parser);
         try std.testing.expectEqual(index % 8, parsed_index);
+    }
+}
+
+test "Test bad condition name" {
+    const SourceInput = @import("../SourceInput.zig");
+
+    const conditions = [_][]const u8{
+        "l", "h", "x", "", "a",
+    };
+    for (&conditions) |source| {
+        var in = SourceInput.init(source);
+        var error_info: Parser.ErrorInfo = undefined;
+
+        var parser: Parser = .init(std.testing.allocator, &in, &error_info);
+        defer parser.deinit();
+
+        const result = parseCondition(&parser);
+        try std.testing.expectEqual(error.SyntaxError, result);
+        try std.testing.expect(error_info.isAt(1, 1));
     }
 }
