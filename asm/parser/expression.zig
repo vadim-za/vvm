@@ -212,10 +212,10 @@ test "Test" {
         .{ "10+21", u8, 31, null },
         .{ "10-$21", u16, 10 -% @as(u16, 0x21), null },
         .{ "10-abc", u16, 10 -% @as(u16, 1000), null },
-        .{ "$-1", u16, error.SyntaxError, 2 },
-        .{ "0-ab1", u16, error.SyntaxError, 3 },
-        .{ "(0-1", u16, error.SyntaxError, 5 },
-        .{ "(?)", u16, error.SyntaxError, 2 },
+        .{ "$-1", u16, error.SyntaxError, 2 }, // bad hex number
+        .{ "0-ab1", u16, error.SyntaxError, 3 }, // undefined label
+        .{ "(0-1", u16, error.SyntaxError, 5 }, // unclosed parenthesis
+        .{ "(?)", u16, error.SyntaxError, 2 }, // bad expression
     };
     inline for (&expressions) |expr_test| {
         const source = expr_test[0];
