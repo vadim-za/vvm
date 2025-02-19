@@ -22,7 +22,16 @@ fn parseOptionallyWhitespacedComma(parser: *Parser) !void {
 }
 
 pub fn translateCommandHere(command: Command, parser: *Parser, out: *PassOutput) !void {
+    const in = &parser.line_in;
+    const pos = in.current_pos_number;
+
     parser.pc +%= @intFromEnum(command.bytes);
+
+    if (command.variant_type != .none) {
+        if (!in.isAtWhitespace())
+            return parser.raiseError(pos, "whitespace expected", .{});
+        parser.skipWhitespace();
+    }
 
     const opcode: u8 = command.base_opcode + switch (command.variant_type) {
         .none => 0,
@@ -90,9 +99,6 @@ pub fn parseCommandHere(parser: *Parser, out: *PassOutput) !void {
         in.next();
     }
 
-    if (!in.isAtWhitespaceOrEol())
-        return parser.raiseError(pos, "bad instruction name", .{});
-
     const name = name_buffer.slice();
     _ = std.ascii.upperString(name, name);
     const command = commands.findUppercase(name) orelse
@@ -102,7 +108,6 @@ pub fn parseCommandHere(parser: *Parser, out: *PassOutput) !void {
         .{name},
     );
 
-    parser.skipWhitespace();
     try translateCommandHere(command, parser, out);
 }
 
@@ -112,7 +117,8 @@ test "Test error on extra symbols at the end" {
     const Test = struct { []const u8, ?usize };
     const tests = [_]Test{
         .{ " ara 1", 6 },
-        //.{ " ara;", null },
+        .{ " ara;", null },
+        .{ " jif lnz", null },
     };
 
     for (&tests) |t| {
