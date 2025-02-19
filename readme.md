@@ -27,7 +27,7 @@ NB. The *caterpillar game* requires the host to support realtime keyboard suppor
 
 ## Building
 
-Nothing special, just your usual `zig build` (with optional arguments). The project is currently being developed against `Zig 0.14.0-dev.2851`.
+Nothing special, just your usual `zig build` (with optional arguments). The project is currently being developed against Zig version `0.14.0-dev.2851+b074fb7dd`.
 
 ### .gitignore
 
