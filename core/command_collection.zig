@@ -3,7 +3,7 @@ const command_list = @import("command_list.zig");
 const Command = @import("Command.zig");
 
 // Construct a collection of all commands in 'command_list'. Comptime only.
-// See MakeFullCollectionType() for further info.
+// See FullCollection for further info.
 pub fn collectAll() FullCollection {
     return .{}; // the type already defines all necessary field values as defaults
 }

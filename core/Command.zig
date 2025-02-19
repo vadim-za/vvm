@@ -2,7 +2,7 @@
 // from an entry in 'command_list'. These descriptions are then collected
 // into a single collection available as 'Vvm.commands'.
 // The latter in turn is used as a source to construct the opcode table
-// in 'command_table.zig'.
+// in 'opcode_table.zig'.
 
 const std = @import("std");
 const Vvm = @import("Vvm.zig");
