@@ -125,7 +125,7 @@ inline fn invoke(self: *@This(), comptime handler: Command.Handler) void {
     }
 }
 
-test "Test" {
+comptime {
     // Ensure the other tests are performed
     std.testing.refAllDecls(@This());
 }

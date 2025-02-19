@@ -134,7 +134,7 @@ fn parseEqInt(T: type, str: []const u8) !?T {
     return null;
 }
 
-test "Test" {
+comptime {
     // Ensure the other tests are performed
     std.testing.refAllDecls(@This());
 }

@@ -76,7 +76,7 @@ fn runTranslationPass(parser: *Parser, out: ?*ArrayListOutput) !void {
     };
 }
 
-test "Test" {
+comptime {
     // Ensure the other tests are performed
     std.testing.refAllDecls(@This());
 }
