@@ -19,6 +19,7 @@ pub fn tryParseStringAsValueHere(parser: *Parser, T: type) !?T {
             if (len >= @sizeOf(T))
                 return parser.raiseError(
                     pos,
+                    error.StringTooLong,
                     "A string here cannot be longer than {d} characters",
                     .{@sizeOf(T)},
                 );
@@ -27,6 +28,7 @@ pub fn tryParseStringAsValueHere(parser: *Parser, T: type) !?T {
             len = len + 1;
         } else return parser.raiseError(
             pos,
+            error.UnterminatedString,
             "Unterminated string literal",
             .{},
         );
@@ -46,7 +48,12 @@ pub fn translateStringHere(parser: *Parser, out: *PassOutput) !void {
     if (in.c == '\'')
         in.next()
     else
-        return parser.raiseError(pos, "String literal expected", .{});
+        return parser.raiseError(
+            pos,
+            error.StringExpected,
+            "String literal expected",
+            .{},
+        );
 
     while (in.c != '\'') {
         if (in.c) |c| {
@@ -54,6 +61,7 @@ pub fn translateStringHere(parser: *Parser, out: *PassOutput) !void {
             try out.writeByte(c, parser);
         } else return parser.raiseError(
             pos,
+            error.UnterminatedString,
             "Unterminated string literal",
             .{},
         );

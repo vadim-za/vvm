@@ -48,7 +48,12 @@ fn tryParseUnsignedHexHere(parser: *Parser) !?ValueType {
     return if (digit_count > 0)
         value
     else
-        parser.raiseError(pos, "bad hexadecimal number", .{});
+        parser.raiseError(
+            pos,
+            error.BadHex,
+            "bad hexadecimal number",
+            .{},
+        );
 }
 
 fn tryParseParenthesizedExpressionHere(
@@ -73,7 +78,12 @@ fn tryParseParenthesizedExpressionHere(
     if (in.c == ')')
         in.next()
     else
-        return parser.raiseError(pos, "')' expected", .{});
+        return parser.raiseError(
+            pos,
+            error.ClosingParExpected,
+            "')' expected",
+            .{},
+        );
 
     return value;
 }
@@ -115,6 +125,7 @@ fn parseUnsignedTerm(parser: *Parser, allow_labels: bool) !ValueType {
         else
             return parser.raiseError(
                 pos,
+                error.LabelNotAllowed,
                 "labels are not allowed here",
                 .{},
             );
@@ -122,6 +133,7 @@ fn parseUnsignedTerm(parser: *Parser, allow_labels: bool) !ValueType {
 
     return parser.raiseError(
         pos,
+        error.ExprTermExpected,
         "an expression term expected",
         .{},
     );
@@ -193,6 +205,7 @@ pub fn parseParenthesizedExpressionAs(parser: *Parser, T: type, allow_labels: bo
             allow_labels,
         )) orelse return parser.raiseError(
             pos,
+            error.ParExprExpected,
             "parenthesized expression expected",
             .{},
         ),
@@ -203,7 +216,12 @@ test "Test" {
     const SourceInput = @import("../SourceInput.zig");
     const Label = @import("../Label.zig");
 
-    const ExpressionTest = struct { []const u8, type, Parser.Error!u16, ?usize };
+    const ExpressionTest = struct {
+        []const u8,
+        type,
+        Parser.Error!u16,
+        ?Parser.ErrorInfo.InitTuple,
+    };
     const expressions = [_]ExpressionTest{
         .{ "0", u16, 0, null },
         .{ "1", u8, 1, null },
@@ -212,17 +230,17 @@ test "Test" {
         .{ "10+21", u8, 31, null },
         .{ "10-$21", u16, 10 -% @as(u16, 0x21), null },
         .{ "10-abc", u16, 10 -% @as(u16, 1000), null },
-        .{ "$-1", u16, error.SyntaxError, 2 }, // bad hex number
-        .{ "0-ab1", u16, error.SyntaxError, 3 }, // undefined label
-        .{ "(0-1", u16, error.SyntaxError, 5 }, // unclosed parenthesis
-        .{ "(?)", u16, error.SyntaxError, 2 }, // bad expression
+        .{ "$-1", u16, error.SyntaxError, .{ 1, 2, error.BadHex } },
+        .{ "0-ab1", u16, error.SyntaxError, .{ 1, 3, error.UnknownLabel } },
+        .{ "(0-1", u16, error.SyntaxError, .{ 1, 5, error.ClosingParExpected } },
+        .{ "(?)", u16, error.SyntaxError, .{ 1, 2, error.ExprTermExpected } },
     };
 
     inline for (&expressions) |expr_test| {
         const source = expr_test[0];
         const T = expr_test[1];
         const expected_result: Parser.Error!T = expr_test[2];
-        const error_pos = expr_test[3];
+        const expected_error = expr_test[3];
 
         var in = SourceInput.init(source);
         var error_info: ?Parser.ErrorInfo = null;
@@ -246,7 +264,7 @@ test "Test" {
 
         if (comptime expected_result == error.SyntaxError) {
             try std.testing.expectEqual(error.SyntaxError, parse_result);
-            try std.testing.expect(error_info.?.isAt(1, error_pos.?));
-        } else std.debug.assert(error_pos == null);
+            try std.testing.expect(error_info.?.eqTuple(expected_error.?));
+        } else std.debug.assert(expected_error == null);
     }
 }

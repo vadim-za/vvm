@@ -14,6 +14,7 @@ fn tryParseLabelNameHere(parser: *Parser) !?Label.StoredName {
         name.append(in.c.?) catch
             return parser.raiseError(
             pos,
+            error.LabelTooLong,
             "label too long (max length = {})",
             .{Label.max_length},
         );
@@ -28,7 +29,12 @@ pub fn parseLabelDefinitionHere(parser: *Parser) !void {
     const pos = in.current_pos_number;
 
     const stored_name = (try tryParseLabelNameHere(parser)) orelse
-        return parser.raiseError(pos, "label expected", .{});
+        return parser.raiseError(
+        pos,
+        error.LabelExpected,
+        "label expected",
+        .{},
+    );
     parser.skipWhitespace();
 
     const pos_after_label = in.current_pos_number;
@@ -37,6 +43,7 @@ pub fn parseLabelDefinitionHere(parser: *Parser) !void {
     else
         return parser.raiseError(
             pos_after_label,
+            error.ColonExpected,
             "label must be followed by a colon",
             .{},
         );
@@ -61,6 +68,7 @@ pub fn tryParseLabelAsValueHere(parser: *Parser) !?u16 {
         else
             return parser.raiseError(
                 pos,
+                error.UnknownLabel,
                 "unknown label '{s}'",
                 .{Label.storedNameAsSlice(&stored_name)},
             );

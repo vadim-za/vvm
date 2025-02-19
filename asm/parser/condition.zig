@@ -53,7 +53,12 @@ pub fn parseCondition(parser: *Parser) !u8 {
     if (parseConditionNameHere(parser)) |condition_code|
         return condition_code
     else
-        return parser.raiseError(pos, "bad condition name", .{});
+        return parser.raiseError(
+            pos,
+            error.BadCondition,
+            "bad condition name",
+            .{},
+        );
 }
 
 test "Test" {
@@ -87,6 +92,6 @@ test "Test bad condition name" {
 
         const result = parseCondition(&parser);
         try std.testing.expectEqual(error.SyntaxError, result);
-        try std.testing.expect(error_info.?.isAt(1, 1));
+        try std.testing.expect(error_info.?.isAt(1, 1, error.BadCondition));
     }
 }

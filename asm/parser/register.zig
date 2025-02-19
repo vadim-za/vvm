@@ -16,6 +16,7 @@ pub fn parseRegisterName(
             prefix_uppercase, std.ascii.toLower(prefix_uppercase) => in.next(),
             else => return parser.raiseError(
                 pos,
+                error.RegisterExpected,
                 "expected {s} register name '{c}n'",
                 .{ kind, prefix_uppercase },
             ),
@@ -30,7 +31,12 @@ pub fn parseRegisterName(
         );
 
     if (!in.isAtDigit())
-        return parser.raiseError(pos, "digit expected", .{});
+        return parser.raiseError(
+            pos,
+            error.DigitExpected,
+            "digit expected",
+            .{},
+        );
 
     const n: u8 = in.c.? - '0';
     in.next();
@@ -38,6 +44,7 @@ pub fn parseRegisterName(
     if (n >= total_number)
         return parser.raiseError(
             pos,
+            error.RegisterIndexTooLarge,
             "{s} register index must be between 0 and {}",
             .{ kind, total_number },
         );

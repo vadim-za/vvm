@@ -85,6 +85,7 @@ fn translateRep(parser: *Parser, out: *PassOutput) Parser.Error!void {
     if (num_repetitions == 0)
         return parser.raiseError(
             pos,
+            error.RepZero,
             "number of repetitions must be greater than 0",
             .{},
         );
@@ -99,6 +100,7 @@ fn translateRep(parser: *Parser, out: *PassOutput) Parser.Error!void {
         if (!try tryParseMetaCommandHere(parser, out))
             return parser.raiseError(
                 pos_repeated,
+                error.MetaCommandExpected,
                 "metacommand expected",
                 .{},
             );
@@ -120,6 +122,7 @@ pub fn tryParseMetaCommandHere(parser: *Parser, out: *PassOutput) !bool {
     if (!in.isAtAlphabetic())
         return parser.raiseError(
             pos,
+            error.LetterExpected,
             "metainstruction name must begin with a letter",
             .{},
         );
@@ -128,6 +131,7 @@ pub fn tryParseMetaCommandHere(parser: *Parser, out: *PassOutput) !bool {
         name_buffer.append(in.c.?) catch
             return parser.raiseError(
             pos,
+            error.CommandTooLong,
             "metainstruction name too long (max length = {})",
             .{max_name},
         );
@@ -135,13 +139,19 @@ pub fn tryParseMetaCommandHere(parser: *Parser, out: *PassOutput) !bool {
     }
 
     if (!in.isAtWhitespaceOrEol())
-        return parser.raiseError(pos, "bad metainstruction name", .{});
+        return parser.raiseError(
+            pos,
+            error.BadCommand,
+            "bad metainstruction name",
+            .{},
+        );
 
     const name = name_buffer.slice();
     _ = std.ascii.upperString(name, name);
     const command = meta_commands.findUppercase(name) orelse
         return parser.raiseError(
         pos,
+        error.UnknownCommand,
         "unknown metainstruction name '{s}'",
         .{name},
     );
@@ -204,23 +214,27 @@ test "Test labels not allowed" {
         // Since we expect an error, don't need to deinit the result
 
         try std.testing.expectEqual(error.SyntaxError, result);
-        try std.testing.expect(error_info.?.isAt(1, expected_error_pos));
+        try std.testing.expect(error_info.?.isAt(
+            1,
+            expected_error_pos,
+            error.LabelNotAllowed,
+        ));
     }
 }
 
 test "Test other parse errors" {
     const @"asm" = @import("../asm.zig");
 
-    const Test = struct { []const u8, ?usize };
+    const Test = struct { []const u8, ?Parser.ErrorInfo.InitTuple };
     const tests = [_]Test{
-        .{ " .db 1?", 7 },
+        .{ " .db 1?", .{ 1, 7, error.EolExpected } },
         .{ " .db 1;", null },
-        .{ " .cmd 1", 2 }, // unknown metacommand
+        .{ " .cmd 1", .{ 1, 2, error.UnknownCommand } }, // unknown metacommand
     };
 
     for (&tests) |t| {
         const source = t[0];
-        const expected_error_pos = t[1];
+        const expected_error = t[1];
 
         var error_info: ?Parser.ErrorInfo = null;
         const result =
@@ -234,9 +248,9 @@ test "Test other parse errors" {
             if (result) |container| container.deinit() else |_| {}
         }
 
-        if (expected_error_pos) |pos| {
+        if (expected_error) |exp| {
             try std.testing.expectEqual(error.SyntaxError, result);
-            try std.testing.expect(error_info.?.isAt(1, pos));
+            try std.testing.expect(error_info.?.eqTuple(exp));
         } else {
             _ = try result; // fail upon a returned error
         }

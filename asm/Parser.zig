@@ -102,6 +102,7 @@ fn parseLine(self: *@This(), out: *PassOutput) !void {
     if (in.c != null)
         return self.raiseError(
             in.current_pos_number,
+            error.EolExpected,
             "end of line expected",
             .{},
         );
@@ -129,7 +130,12 @@ pub fn requireAndSkipWhitespace(self: *@This()) !void {
     const pos = in.current_pos_number;
 
     if (!in.isAtWhitespace())
-        return self.raiseError(pos, "whitespace expected", .{});
+        return self.raiseError(
+            pos,
+            error.WhitespaceExpected,
+            "whitespace expected",
+            .{},
+        );
     self.skipWhitespace();
 }
 
@@ -151,12 +157,14 @@ const tryParseMetaCommandHere =
 pub fn raiseError(
     self: *@This(),
     pos: usize,
+    specific: anyerror,
     comptime fmt: []const u8,
     args: anytype,
 ) error{SyntaxError} {
     return self.raiseErrorAtLine(
         self.current_line_number,
         pos,
+        specific,
         fmt,
         args,
     );
@@ -166,11 +174,16 @@ pub fn raiseErrorAtLine(
     self: *@This(),
     line: usize,
     pos: usize,
+    specific: anyerror,
     comptime fmt: []const u8,
     args: anytype,
 ) error{SyntaxError} {
     if (self.error_info) |info|
-        info.* = .{ .line = line, .pos = pos };
+        info.* = .{
+            .line = line,
+            .pos = pos,
+            .specific = specific,
+        };
 
     if (!builtin.is_test)
         std.debug.print(
@@ -187,8 +200,31 @@ pub fn raiseErrorAtLine(
 pub const ErrorInfo = struct {
     line: usize,
     pos: usize,
+    specific: anyerror,
 
-    pub fn isAt(self: @This(), line: usize, pos: usize) bool {
-        return self.line == line and self.pos == pos;
+    pub const InitTuple = struct { usize, usize, anyerror };
+
+    pub fn from(t: InitTuple) @This() {
+        return .{
+            .line = t[0],
+            .pos = t[1],
+            .specific = t[2],
+        };
+    }
+
+    pub fn eq(self: @This(), other: @This()) bool {
+        return self.specific == other.specific and
+            self.line == other.line and
+            self.pos == other.pos;
+    }
+
+    pub fn eqTuple(self: @This(), t: InitTuple) bool {
+        return self.eq(.from(t));
+    }
+
+    pub fn isAt(self: @This(), line: usize, pos: usize, specific: anyerror) bool {
+        return self.eq(
+            .{ .line = line, .pos = pos, .specific = specific },
+        );
     }
 };

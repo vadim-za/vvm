@@ -63,6 +63,7 @@ fn checkDuplicates(self: @This(), parser: *Parser) !void {
         return parser.raiseErrorAtLine(
             items[r[0]].line,
             1,
+            error.DuplicateLabel,
             "duplicate label",
             .{},
         );
