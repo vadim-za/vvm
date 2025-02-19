@@ -93,9 +93,7 @@ fn parseLine(self: *@This(), out: *PassOutput) !void {
 
     if (try self.tryParseCommentHere())
         return;
-    if (try self.tryParseMetaCommandHere(out))
-        return;
-    try self.parseCommandHere(out);
+    try self.parseCommandAreaHere(out);
 
     self.skipWhitespace();
     if (try self.tryParseCommentHere())
@@ -107,6 +105,12 @@ fn parseLine(self: *@This(), out: *PassOutput) !void {
             "end of line expected",
             .{},
         );
+}
+
+fn parseCommandAreaHere(self: *@This(), out: *PassOutput) !void {
+    if (try self.tryParseMetaCommandHere(out))
+        return;
+    try self.parseCommandHere(out);
 }
 
 fn tryParseCommentHere(self: *@This()) !bool {

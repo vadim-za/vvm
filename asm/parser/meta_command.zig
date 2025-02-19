@@ -210,3 +210,37 @@ test "Test labels not allowed" {
         try std.testing.expect(error_info.isAt(1, expected_error_pos));
     }
 }
+
+test "Test error on extra symbols at the end" {
+    const @"asm" = @import("../asm.zig");
+
+    const Test = struct { []const u8, ?usize };
+    const tests = [_]Test{
+        .{ " .db 1?", 7 },
+        .{ " .db 1;", null },
+    };
+
+    for (&tests) |t| {
+        const source = t[0];
+        const expected_error_pos = t[1];
+
+        var error_info: Parser.ErrorInfo = undefined;
+        const result =
+            @"asm".translateSource(
+            std.testing.allocator,
+            source,
+            &error_info,
+        );
+        defer {
+            // Deinit only if not error
+            if (result) |container| container.deinit() else |_| {}
+        }
+
+        if (expected_error_pos) |pos| {
+            try std.testing.expectEqual(error.SyntaxError, result);
+            try std.testing.expect(error_info.isAt(1, pos));
+        } else {
+            _ = try result; // fail upon a returned error
+        }
+    }
+}
