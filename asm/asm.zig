@@ -48,7 +48,7 @@ fn readSourceFile(
 pub fn translateSource(
     alloc: std.mem.Allocator,
     source: []const u8,
-    error_info: ?*Parser.ErrorInfo,
+    error_info: ?*?Parser.ErrorInfo,
 ) Parser.Error!std.ArrayList(u8) {
     var in = SourceInput.init(source);
     var parser: Parser = .init(alloc, &in, error_info);

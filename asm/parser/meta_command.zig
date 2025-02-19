@@ -194,7 +194,7 @@ test "Test labels not allowed" {
         const source = t[0];
         const expected_error_pos = t[1];
 
-        var error_info: Parser.ErrorInfo = undefined;
+        var error_info: ?Parser.ErrorInfo = null;
         const result =
             @"asm".translateSource(
             std.testing.allocator,
@@ -204,7 +204,7 @@ test "Test labels not allowed" {
         // Since we expect an error, don't need to deinit the result
 
         try std.testing.expectEqual(error.SyntaxError, result);
-        try std.testing.expect(error_info.isAt(1, expected_error_pos));
+        try std.testing.expect(error_info.?.isAt(1, expected_error_pos));
     }
 }
 
@@ -222,7 +222,7 @@ test "Test other parse errors" {
         const source = t[0];
         const expected_error_pos = t[1];
 
-        var error_info: Parser.ErrorInfo = undefined;
+        var error_info: ?Parser.ErrorInfo = null;
         const result =
             @"asm".translateSource(
             std.testing.allocator,
@@ -236,7 +236,7 @@ test "Test other parse errors" {
 
         if (expected_error_pos) |pos| {
             try std.testing.expectEqual(error.SyntaxError, result);
-            try std.testing.expect(error_info.isAt(1, pos));
+            try std.testing.expect(error_info.?.isAt(1, pos));
         } else {
             _ = try result; // fail upon a returned error
         }

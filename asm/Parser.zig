@@ -12,12 +12,12 @@ line_in: LineInput,
 current_line_number: usize,
 labels: Labels,
 pc: u16,
-error_info: ?*ErrorInfo,
+error_info: ?*?ErrorInfo,
 
 pub fn init(
     alloc: std.mem.Allocator,
     source_in: *SourceInput,
-    error_info: ?*ErrorInfo,
+    error_info: ?*?ErrorInfo,
 ) @This() {
     var self = @This(){
         .source_in = source_in,

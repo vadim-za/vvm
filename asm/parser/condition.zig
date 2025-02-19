@@ -80,13 +80,13 @@ test "Test bad condition name" {
     };
     for (&conditions) |source| {
         var in = SourceInput.init(source);
-        var error_info: Parser.ErrorInfo = undefined;
+        var error_info: ?Parser.ErrorInfo = null;
 
         var parser: Parser = .init(std.testing.allocator, &in, &error_info);
         defer parser.deinit();
 
         const result = parseCondition(&parser);
         try std.testing.expectEqual(error.SyntaxError, result);
-        try std.testing.expect(error_info.isAt(1, 1));
+        try std.testing.expect(error_info.?.isAt(1, 1));
     }
 }

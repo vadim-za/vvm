@@ -225,7 +225,7 @@ test "Test" {
         const error_pos = expr_test[3];
 
         var in = SourceInput.init(source);
-        var error_info: Parser.ErrorInfo = undefined;
+        var error_info: ?Parser.ErrorInfo = null;
         var parser: Parser = .init(
             std.testing.allocator,
             &in,
@@ -246,7 +246,7 @@ test "Test" {
 
         if (comptime expected_result == error.SyntaxError) {
             try std.testing.expectEqual(error.SyntaxError, parse_result);
-            try std.testing.expect(error_info.isAt(1, error_pos.?));
+            try std.testing.expect(error_info.?.isAt(1, error_pos.?));
         } else std.debug.assert(error_pos == null);
     }
 }

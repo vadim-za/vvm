@@ -120,7 +120,7 @@ test "Test parse errors" {
         const source = t[0];
         const expected_error_pos = t[1];
 
-        var error_info: Parser.ErrorInfo = undefined;
+        var error_info: ?Parser.ErrorInfo = null;
         const result =
             @"asm".translateSource(
             std.testing.allocator,
@@ -134,7 +134,7 @@ test "Test parse errors" {
 
         if (expected_error_pos) |pos| {
             try std.testing.expectEqual(error.SyntaxError, result);
-            try std.testing.expect(error_info.isAt(1, pos));
+            try std.testing.expect(error_info.?.isAt(1, pos));
         } else {
             _ = try result; // fail upon a returned error
         }
