@@ -124,6 +124,15 @@ fn tryParseCommentHere(self: *@This()) !bool {
     return true;
 }
 
+pub fn requireAndSkipWhitespace(self: *@This()) !void {
+    const in = &self.line_in;
+    const pos = in.current_pos_number;
+
+    if (!in.isAtWhitespace())
+        return self.raiseError(pos, "whitespace expected", .{});
+    self.skipWhitespace();
+}
+
 pub fn skipWhitespace(self: *@This()) void {
     const in = &self.line_in;
     while (in.isAtWhitespace())

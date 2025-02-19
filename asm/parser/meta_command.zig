@@ -19,7 +19,7 @@ pub const meta_command_list = [_]ListEntry{
 };
 
 fn translateDb(parser: *Parser, out: *PassOutput) Parser.Error!void {
-    parser.skipWhitespace();
+    try parser.requireAndSkipWhitespace();
 
     parser.pc +%= 1;
     try out.writeByte(
@@ -33,7 +33,7 @@ fn translateDb(parser: *Parser, out: *PassOutput) Parser.Error!void {
 }
 
 fn translateDw(parser: *Parser, out: *PassOutput) Parser.Error!void {
-    parser.skipWhitespace();
+    try parser.requireAndSkipWhitespace();
 
     parser.pc +%= 2;
     try out.writeWord(
@@ -47,12 +47,14 @@ fn translateDw(parser: *Parser, out: *PassOutput) Parser.Error!void {
 }
 
 fn translateDs(parser: *Parser, out: *PassOutput) Parser.Error!void {
-    parser.skipWhitespace();
+    try parser.requireAndSkipWhitespace();
 
     try string_parser.translateStringHere(parser, out);
 }
 
 fn translateOrg(parser: *Parser, out: *PassOutput) Parser.Error!void {
+    try parser.requireAndSkipWhitespace();
+
     // Don't allow labels, since they are not known during the first pass
     // Currently we also do not allow other expressions.
     parser.pc = try expression_parser.parseExpressionAs(
@@ -64,6 +66,8 @@ fn translateOrg(parser: *Parser, out: *PassOutput) Parser.Error!void {
 }
 
 fn translateRep(parser: *Parser, out: *PassOutput) Parser.Error!void {
+    try parser.requireAndSkipWhitespace();
+
     // Don't allow labels, since they are not known during the first pass
     // Currently we also do not allow other expressions.
     const num_repetitions =
@@ -76,14 +80,6 @@ fn translateRep(parser: *Parser, out: *PassOutput) Parser.Error!void {
     const in = &parser.line_in;
     const pos = in.current_pos_number;
 
-    if (!in.isAtWhitespace())
-        return parser.raiseError(
-            pos,
-            "whitespace expected",
-            .{},
-        );
-    parser.skipWhitespace();
-
     // We don't have an option of simply skipping the commands, therefore
     // we cannot support zero repetitions. One can use comment feature instead.
     if (num_repetitions == 0)
@@ -92,6 +88,8 @@ fn translateRep(parser: *Parser, out: *PassOutput) Parser.Error!void {
             "number of repetitions must be greater than 0",
             .{},
         );
+
+    try parser.requireAndSkipWhitespace();
 
     const stored_input_state = parser.storeInputState();
     for (0..num_repetitions) |_| {
@@ -148,7 +146,6 @@ pub fn tryParseMetaCommandHere(parser: *Parser, out: *PassOutput) !bool {
         .{name},
     );
 
-    parser.skipWhitespace();
     try command.translate(parser, out);
 
     return true;
@@ -211,13 +208,14 @@ test "Test labels not allowed" {
     }
 }
 
-test "Test error on extra symbols at the end" {
+test "Test other parse errors" {
     const @"asm" = @import("../asm.zig");
 
     const Test = struct { []const u8, ?usize };
     const tests = [_]Test{
         .{ " .db 1?", 7 },
         .{ " .db 1;", null },
+        .{ " .cmd 1", 2 }, // unknown metacommand
     };
 
     for (&tests) |t| {

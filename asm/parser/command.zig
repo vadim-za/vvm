@@ -22,16 +22,10 @@ fn parseOptionallyWhitespacedComma(parser: *Parser) !void {
 }
 
 pub fn translateCommandHere(command: Command, parser: *Parser, out: *PassOutput) !void {
-    const in = &parser.line_in;
-    const pos = in.current_pos_number;
-
     parser.pc +%= @intFromEnum(command.bytes);
 
-    if (command.variant_type != .none) {
-        if (!in.isAtWhitespace())
-            return parser.raiseError(pos, "whitespace expected", .{});
-        parser.skipWhitespace();
-    }
+    if (command.variant_type != .none)
+        try parser.requireAndSkipWhitespace();
 
     const opcode: u8 = command.base_opcode + switch (command.variant_type) {
         .none => 0,
