@@ -111,14 +111,15 @@ pub fn parseCommandHere(parser: *Parser, out: *PassOutput) !void {
     try translateCommandHere(command, parser, out);
 }
 
-test "Test error on extra symbols at the end" {
+test "Test parse errors" {
     const @"asm" = @import("../asm.zig");
 
     const Test = struct { []const u8, ?usize };
     const tests = [_]Test{
-        .{ " ara 1", 6 },
+        .{ " ara 1", 6 }, // unexpected operand
         .{ " ara;", null },
         .{ " jif lnz", null },
+        .{ " cmd b0", 2 }, // wrong mnemonic
     };
 
     for (&tests) |t| {
