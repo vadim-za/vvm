@@ -44,7 +44,6 @@ fn readKey(self: *@This()) u8 {
 pub fn envIn(ptr: ?*anyopaque, port: u8) u8 {
     const self: *@This() = @alignCast(@ptrCast(ptr.?));
     return switch (port) {
-        0 => if (self.ansi_supported) 1 else 0,
         1 => self.readKey(),
         2 => @as(u8, @as(u4, keyboard_support.getInputMode())) |
             @as(u8, if (self.ansi_supported) 0x80 else 0),
