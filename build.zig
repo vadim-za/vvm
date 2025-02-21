@@ -24,7 +24,7 @@ pub fn build(b: *std.Build) void {
     @"asm".addImport("VvmCore", VvmCore);
 
     const asm_tests = b.addTest(.{
-        .root_source_file = b.path("asm/main.zig"),
+        .root_source_file = b.path("asm/asm.zig"),
         .target = target,
         .optimize = optimize,
     });
