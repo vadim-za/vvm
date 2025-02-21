@@ -7,14 +7,15 @@ Little-endian architecture, 16-bit address space
 | Byte registers | B0, B1, B2, B3, B4, B5, B6, B7 |
 | Word (2-byte) registers | W0, W1, W2, W3 (where W0=B1:B0, W1=B3:B2, W2=B5:B4, W3=B7:B6) |
 | Additional word registers | PC (program counter), A (accumulator), X (accumulator eXtension), ADDR (address register) |
+The low and high bytes of the accumulator may be also referred to as `LoB(A)`/`HiB(A)` and/or `L` and `H`
 
 | Command | Deciphering | Description |
 | ------- | ----------- | ----------- |
-| LBR Bn | Load from Byte Register | LSB(A):=Bn |
+| LBR Bn | Load from Byte Register | LoB(A):=Bn |
 | LWR Wn | Load from Word Register | A:=Wn |
-| STBR Bn | STore to Byte Register | Bn:=LSB(A) |
+| STBR Bn | STore to Byte Register | Bn:=LoB(A) |
 | STWR Wn | STore to Word Register | Wn:=A |
-| XBR Bn | eXchange Byte Register | LSB(A)<->Bn |
+| XBR Bn | eXchange Byte Register | LoB(A)<->Bn |
 | XWR Wn | eXchange Word Register | A<->Wn |
 | JIF cond | Jump IF condition | if(cond) PC:=ADDR |
 | | LZ: Low byte is Zero | LoB(A)==0 |
@@ -37,29 +38,29 @@ Little-endian architecture, 16-bit address space
 | ZERO | Zero the accumulator | A:=0 |
 | ALL | Set all accumulator bits | A:=0xFFFF |
 | CPL | Complement all accumulator bits | A:=~A |
-| XHL | eXchange accumulator's high and low bytes | MSB(A)<->LSB(A) |
-| IN | Input: read from port | LSB(A):=Port[LSB(ADDR)] |
-| OUT | Output: write into port | Port[LSB(ADDR)]:=LSB(A) |
+| XHL | eXchange accumulator's high and low bytes | HiB(A)<->LoB(A) |
+| IN | Input: read from port | LoB(A):=Port[LoB(ADDR)] |
+| OUT | Output: write into port | Port[LoB(ADDR)]:=LoB(A) |
 | ROL | ROtate extended accumulator Left | (X:A):=ROL(X:A) |
 | ROR | ROtate extended accumulator Right | (X:A):=ROR(X:A) |
 | ARA | Address Register from Accumulator | ADDR:=A |
 | XA | eXchange the accumulators | X<->A |
 | POP | Pop from stack | A:=[SP], SP:=SP+2 |
 | PUSH | Push to stack | SP:=SP-2, [SP]:=A |
-| LBI | Load Byte Indirect | LSB(A):=[ADDR] |
-| LBID Word | Load Byte Indirect Displaced | LSB(A):=[ADDR+Word] |
-| LBV Byte | Load Byte Value | LSB(A):=Byte |
+| LBI | Load Byte Indirect | LoB(A):=[ADDR] |
+| LBID Word | Load Byte Indirect Displaced | LoB(A):=[ADDR+Word] |
+| LBV Byte | Load Byte Value | LoB(A):=Byte |
 | LWI | Load Word Indirect | A:=[ADDR] |
 | LWID Word | Load Word Indirect Displaced | A:=[ADDR+Word] |
 | LWV Word | Load Word Value | A:=Word |
 | LSP | Load Stack Pointer | A:=SP |
-| STBI | STore Byte Indirect | [ADDR]:=LSB(A) |
-| STBID Word | STore Byte Indirect Displaced | [ADDR+Word]:=LSB(A) |
+| STBI | STore Byte Indirect | [ADDR]:=LoB(A) |
+| STBID Word | STore Byte Indirect Displaced | [ADDR+Word]:=LoB(A) |
 | NOP | No-operation | Do nothing |
-| SXBW | Sign eXtend Byte to Word | A:=SignExtend(LSB(A)) |
-| CXBW | Copy-eXtend Byte to Word | MSB(A):=LSB(A) |
-| ZXBW | Zero-eXtend Byte to Word | MSB(A):=0 |
-| AXBW | All-eXtend Byte to Word | MSB(A):=0xFF |
+| SXBW | Sign eXtend Byte to Word | A:=SignExtend(LoB(A)) |
+| CXBW | Copy-eXtend Byte to Word | HiB(A):=LoB(A) |
+| ZXBW | Zero-eXtend Byte to Word | HiB(A):=0 |
+| AXBW | All-eXtend Byte to Word | HiB(A):=0xFF |
 | STWI | STore Word Indirect | [ADDR]:=A |
 | STWID Word | STore Word Indirect Displaced | [ADDR+Word]:=A |
 | ARV Word | Address Register from Value | ADDR:=Word |
