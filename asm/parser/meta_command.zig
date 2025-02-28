@@ -161,7 +161,7 @@ pub fn tryParseMetaCommandHere(parser: *Parser, out: *PassOutput) !bool {
     return true;
 }
 
-test "Test data write" {
+test "Data write" {
     const @"asm" = @import("../asm.zig");
 
     const Test = struct { []const u8, []const u8 };
@@ -191,7 +191,7 @@ test "Test data write" {
     }
 }
 
-test "Test labels not allowed" {
+test "Labels not allowed" {
     const @"asm" = @import("../asm.zig");
 
     const tests = [_]@"asm".TranslateSourceErrorTest{
@@ -202,7 +202,7 @@ test "Test labels not allowed" {
     try @"asm".testTranslateSourceErrors(&tests);
 }
 
-test "Test other parse errors" {
+test "Other parse errors" {
     const @"asm" = @import("../asm.zig");
 
     const tests = [_]@"asm".TranslateSourceErrorTest{

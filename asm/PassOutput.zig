@@ -39,7 +39,7 @@ pub fn writeWord(self: *@This(), word: u16, parser: *Parser) !void {
     try self.writeByte(hib, parser);
 }
 
-test "Test overflow detection" {
+test "Overflow detection" {
     const @"asm" = @import("asm.zig");
 
     const tests = [_]@"asm".TranslateSourceErrorTest{

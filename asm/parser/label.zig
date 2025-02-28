@@ -123,7 +123,7 @@ test "Test Multiple" {
     try std.testing.expectEqual(null, labels.find(sn("ij")));
 }
 
-test "Test Parse Label as Value" {
+test "Parse Label as Value" {
     const SourceInput = @import("../SourceInput.zig");
 
     var in = SourceInput.init("abc");
@@ -141,7 +141,7 @@ test "Test Parse Label as Value" {
     try std.testing.expectEqual(1000, value);
 }
 
-test "Test Label Address" {
+test "Label Address" {
     const SourceInput = @import("../SourceInput.zig");
 
     var in = SourceInput.init("abc:");

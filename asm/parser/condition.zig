@@ -77,7 +77,7 @@ test "Test" {
     }
 }
 
-test "Test bad condition name" {
+test "Bad condition name" {
     const SourceInput = @import("../SourceInput.zig");
 
     const conditions = [_][]const u8{

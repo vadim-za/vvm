@@ -113,7 +113,7 @@ pub fn parseCommandHere(parser: *Parser, out: *PassOutput) !void {
     try translateCommandHere(command, parser, out);
 }
 
-test "Test parse errors" {
+test "Parse errors" {
     const @"asm" = @import("../asm.zig");
 
     const tests = [_]@"asm".TranslateSourceErrorTest{
