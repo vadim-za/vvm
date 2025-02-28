@@ -194,65 +194,22 @@ test "Test data write" {
 test "Test labels not allowed" {
     const @"asm" = @import("../asm.zig");
 
-    const Test = struct { []const u8, usize };
-    const tests = [_]Test{
-        .{ "abc:.org abc", 10 },
-        .{ "abc:.rep (1+abc) .ds 0", 13 },
+    const tests = [_]@"asm".TranslateSourceErrorTest{
+        .{ "abc:.org abc", .{ 1, 10, error.LabelNotAllowed } },
+        .{ "abc:.rep (1+abc) .ds 0", .{ 1, 13, error.LabelNotAllowed } },
     };
 
-    for (&tests) |t| {
-        const source = t[0];
-        const expected_error_pos = t[1];
-
-        var error_info: ?Parser.ErrorInfo = null;
-        const result =
-            @"asm".translateSource(
-            std.testing.allocator,
-            source,
-            &error_info,
-        );
-        // Since we expect an error, don't need to deinit the result
-
-        try std.testing.expectEqual(error.SyntaxError, result);
-        try std.testing.expect(error_info.?.isAt(
-            1,
-            expected_error_pos,
-            error.LabelNotAllowed,
-        ));
-    }
+    try @"asm".testTranslateSourceErrors(&tests);
 }
 
 test "Test other parse errors" {
     const @"asm" = @import("../asm.zig");
 
-    const Test = struct { []const u8, ?Parser.ErrorInfo.InitTuple };
-    const tests = [_]Test{
+    const tests = [_]@"asm".TranslateSourceErrorTest{
         .{ " .db 1?", .{ 1, 7, error.EolExpected } },
         .{ " .db 1;", null },
         .{ " .cmd 1", .{ 1, 2, error.UnknownCommand } }, // unknown metacommand
     };
 
-    for (&tests) |t| {
-        const source = t[0];
-        const expected_error = t[1];
-
-        var error_info: ?Parser.ErrorInfo = null;
-        const result =
-            @"asm".translateSource(
-            std.testing.allocator,
-            source,
-            &error_info,
-        );
-        defer {
-            // Deinit only if not error
-            if (result) |container| container.deinit() else |_| {}
-        }
-
-        if (expected_error) |exp| {
-            try std.testing.expectEqual(error.SyntaxError, result);
-            try std.testing.expect(error_info.?.eqTuple(exp));
-        } else {
-            _ = try result; // fail upon a returned error
-        }
-    }
+    try @"asm".testTranslateSourceErrors(&tests);
 }

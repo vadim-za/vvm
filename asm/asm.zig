@@ -80,3 +80,33 @@ comptime {
     // Ensure the other tests are performed
     std.testing.refAllDecls(@This());
 }
+
+// Test helpers
+
+pub const TranslateSourceErrorTest = // { source, expected_error_info }
+    struct { []const u8, ?Parser.ErrorInfo.InitTuple };
+
+pub fn testTranslateSourceErrors(tests: []const TranslateSourceErrorTest) !void {
+    for (tests) |t| {
+        const source = t[0];
+        const expected_error = t[1];
+
+        var error_info: ?Parser.ErrorInfo = null;
+        const result = translateSource(
+            std.testing.allocator,
+            source,
+            &error_info,
+        );
+        defer {
+            // Deinit only if not error
+            if (result) |container| container.deinit() else |_| {}
+        }
+
+        if (expected_error) |exp| {
+            try std.testing.expectEqual(error.SyntaxError, result);
+            try std.testing.expect(error_info.?.eqTuple(exp));
+        } else {
+            _ = try result; // fail upon a returned error
+        }
+    }
+}
