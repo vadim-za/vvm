@@ -159,7 +159,7 @@ fn parseTerm(parser: *Parser, allow_labels: bool) !ValueType {
         parser,
         allow_labels,
     );
-    return if (negate) 0 -% value else value;
+    return if (negate) -%value else value;
 }
 
 fn parseExpression(
@@ -225,7 +225,7 @@ test "Test" {
     const expressions = [_]ExpressionTest{
         .{ "0", u16, 0, null },
         .{ "1", u8, 1, null },
-        .{ "-10", u8, 0 -% @as(u8, 10), null },
+        .{ "-10", u8, -%@as(u8, 10), null },
         .{ "+1000", u16, 1000, null },
         .{ "10+21", u8, 31, null },
         .{ "10-$21", u16, 10 -% @as(u16, 0x21), null },
